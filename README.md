@@ -4,11 +4,6 @@ EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Libr
 
 EasyUI uses functions native to arduino for creating the perfect Good Looking User Interface without the Need of Knowing Complex Javascripts etc.
 
-
-  - Type some Markdown on the left
-  - See HTML in the right
-  - Magic
-
 ## How to Install
 ###### Directly Through Arduino IDE
 Go to Sketch > Include Library > Library Manager > Search for "EasyUI" > Install
