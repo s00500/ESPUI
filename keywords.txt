@@ -1,0 +1,7 @@
+EasyUI KEYWORD1
+
+title KEYWORD2
+begin KEYWORD2
+label KEYWORD2
+toggleButton KEYWORD2
+loop KEYWORD2

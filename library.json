@@ -1,0 +1,15 @@
+{
+  "name": "EasyUI",
+  "keywords": "EasyUI, esp8266, ui, easyui, user, interface, gui, iot, arduino, Wifi, server",
+  "description": "Easily Setup an User Interface on Your ESP8266 with EasyUI",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/ayushsharma82/EasyDDNS.git"
+  },
+  "frameworks": "arduino",
+  "platforms":
+  [
+    "espressif"
+  ]
+}
