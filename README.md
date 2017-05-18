@@ -26,22 +26,29 @@ This Library is Dependent on the Following Libraries to Function Properly.
 
 Make Sure all Libraries are Installed to make this Work.
 
-## Features
+## Elements
 
-EasyUI Currently has the Following User Interface Features:
+EasyUI Currently has the Following User Interface Elements:
 
   - Toggle Button
   - Label
 
-Upcoming:
+## Upcoming Elements and Features
+
+Upcoming Elements:
 - ~~Toggle Button~~
 - ~~Label~~
 - Smart Variable
 - Progress Bar
 - Click Button
-- DropBox
+- Dropbox Selection 
 - Forums
 - Tables
+
+Upcoming Features:
+- Detect Internet and Switch to Online File CDN
+- WiFi Credentials Setup Page
+- Embed MQTT
 
 ## Documentation
 
