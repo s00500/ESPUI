@@ -1,6 +1,8 @@
 # EasyUI
+![alt text](https://github.com/ayushsharma82/EasyUI/blob/master/img-example1.PNG "EasyUI")
+
 Did you Ever Got into the Trouble of Making a good Looking UI for ESP8266 without having the skills to Build Perfect Webpages?
-EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Library Uses Light-weight Websockets Protocol for Communicating with Webpage to Control, Make and Update Elements.
+EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Library Uses Light-weight Websockets Protocol for Communicating with Webpage to Control, Make and Update Elements. All Elements are Created in  a Card Type Grid, Where Each Element Stacks aside the other. The Whole webpage is Responsive and Adapts to Mobile Displays.
 
 EasyUI uses functions native to arduino for creating the perfect Good Looking User Interface without the Need of Knowing Complex Javascripts etc.
 
