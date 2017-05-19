@@ -1,4 +1,5 @@
 # EasyUI
+![EasyUI Dashboard](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img1.PNG)
 Did you Ever Got into the Trouble of Making a good Looking UI for ESP8266 without having the skills to Build Perfect Webpages?
 EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Library Uses Light-weight Websockets Protocol for Communicating with Webpage to Control, Make and Update Elements.
 
@@ -24,7 +25,7 @@ This Library is Dependent on the Following Libraries to Function Properly.
   - [arduinoWebSockets Library](https://github.com/Links2004/arduinoWebSockets)
   - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
-Make Sure all Libraries are Installed to make this Work.
+Make Sure all Dependencies are Installed at their Latest Version to make this Work.
 
 ## Elements
 
@@ -41,7 +42,7 @@ Upcoming Elements:
 - Smart Variable
 - Progress Bar
 - Click Button
-- Dropbox Selection 
+- Dropbox Selection
 - Forums
 - Tables
 
@@ -55,21 +56,30 @@ Upcoming Features:
 EasyUI is Based on [Skeleton CSS](http://getskeleton.com/) and Jquery for Handling Click Events Etc. The Communication Between ESP8266 and Webpage is with Websockets.
 EasyUI is not Internet Dependent and will Continue working without any Internet Connection, All Assets are Loaded form ESP8266 Program Memory.
 
-##### Following Functions can be Used in Sketch:
+#### Following Functions can be Used in Sketch:
+<br>
+**To Detect Internet and Switch to CDN**
+The most Heaviest Part of the code is Jquery so, to make Webpages Load faster , user can use this function to switch between jquery served from esp memory or through online CDN when Internet is Available. (This Function is to be used in Station Mode Only!)
+```
+EasyUI.detectCDN(true);
+```
 <br>
 **To Set an Title for your Webpage:**
+![EasyUI Title](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img2.PNG)
 This Line of Code will Add your Custom Title to the Webpage Displayed by ESP8266. By Default is "EasyUI".
 ```
 EasyUI.title("");
 ```
 <br>
 **To Make Label on Webpage:**
+![EasyUI Label](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img3.PNG)
 This will add an Label on your Web Interface.
 ```
 EasyUI.label("Title", "Value");
 ```
 <br>
 **To Make Toggle Button on Webpage:**
+![EasyUI Button1](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img4.PNG) ![EasyUI Button2](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img5.PNG)
 This will add an toggle Button on your Webpage. For Extra Functionality* See Below
 ```
 EasyUI.toggleButton(pin,"Title");
