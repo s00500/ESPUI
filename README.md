@@ -1,8 +1,6 @@
 # EasyUI
-![alt text](https://github.com/ayushsharma82/EasyUI/blob/master/img-example1.PNG "EasyUI")
-
 Did you Ever Got into the Trouble of Making a good Looking UI for ESP8266 without having the skills to Build Perfect Webpages?
-EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Library Uses Light-weight Websockets Protocol for Communicating with Webpage to Control, Make and Update Elements. All Elements are Created in  a Card Type Grid, Where Each Element Stacks aside the other. The Whole webpage is Responsive and Adapts to Mobile Displays.
+EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Library Uses Light-weight Websockets Protocol for Communicating with Webpage to Control, Make and Update Elements.
 
 EasyUI uses functions native to arduino for creating the perfect Good Looking User Interface without the Need of Knowing Complex Javascripts etc.
 
@@ -58,45 +56,37 @@ EasyUI is Based on [Skeleton CSS](http://getskeleton.com/) and Jquery for Handli
 EasyUI is not Internet Dependent and will Continue working without any Internet Connection, All Assets are Loaded form ESP8266 Program Memory.
 
 ##### Following Functions can be Used in Sketch:
-
+<br>
 **To Set an Title for your Webpage:**
 This Line of Code will Add your Custom Title to the Webpage Displayed by ESP8266. By Default is "EasyUI".
-
 ```
 EasyUI.title("");
 ```
-
+<br>
 **To Make Label on Webpage:**
 This will add an Label on your Web Interface.
-
 ```
 EasyUI.label("Title", "Value");
 ```
-
-
+<br>
 **To Make Toggle Button on Webpage:**
 This will add an toggle Button on your Webpage. For Extra Functionality* See Below
-
 ```
 EasyUI.toggleButton(pin,"Title");
 ```
-
-
+<br>
 **Start the Library:**
 Once you have Specified Any of the above Elements, Use this Below them to Start Inializing the Library.
-
 ```
 EasyUI.begin();
 ```
-
-
+<br>
 **Loop Function:**
 Don't Forget to Add this in your void loop()
-
 ```
 EasyUI.loop();
 ```
-
+<br>
 
 ## Extra Functionality
 There are Some Elements in Library which have Added extra Functionality for Ease of Use.

@@ -1,5 +1,6 @@
 EasyUI KEYWORD1
 
+detectCDN KEYWORD2
 title KEYWORD2
 begin KEYWORD2
 label KEYWORD2

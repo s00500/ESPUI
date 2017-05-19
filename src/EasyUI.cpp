@@ -3,7 +3,7 @@
 #include "HTML_PAGE.h"      // Added HTML Index Page
 #include "CSS_STYLE.h"      // Added Main CSS Style
 #include "CSS_NORMALIZE.h"  // Added Normalize CSS
-#include "JS_JQUERY.h"      // Added Jquery JS
+#include "JS_JQUERY.h"
 
 #include <functional>
 using namespace std;
@@ -12,7 +12,14 @@ using namespace std::placeholders;
 
 // Generate Websockets Script for Webpage
 void EasyUIClass::handleSockets(){
-  String ip = WiFi.localIP().toString();
+  String ip;
+  if(WiFi.localIP().toString() != "0.0.0.0"){
+   ip = WiFi.localIP().toString();
+  }
+  else if(WiFi.softAPIP().toString() != "0.0.0.0"){
+   ip = WiFi.softAPIP().toString();
+  }
+
   String ws;
   ws = "var connection = new WebSocket(\"ws://"+ip+":81/\", ['easyui']);";
   ws += " var keys = {};";
@@ -69,6 +76,10 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
     }
 }
 
+void EasyUIClass::detectCDN(bool _autoState){
+  CDN = _autoState;
+}
+
 void EasyUIClass::title(const char* _title){
   ui_title = _title;
 }
@@ -123,43 +134,47 @@ void EasyUIClass::tbuttonStatus(){
 
 // Handle Index HTML
 void EasyUIClass::handleRoot(){
-server->setContentLength(CONTENT_LENGTH_UNKNOWN);
-server->send(200,"text/html", "");
-server->sendContent(HTML_HEAD1);
-server->sendContent(String("<title>")+ui_title+"</title>");
-server->sendContent(HTML_HEAD2);
-server->sendContent(String("<h4>")+ui_title+"  <span id=\"connection_status\" class=\"label\">Offline</span></h4></div><hr />");
-server->sendContent(HTML_BODY);
-server->client().stop();
+  bool internet = false;
+if(CDN){
+  HTTPClient http;
+  http.begin("http://www.google.com/");
+  int httpCode = http.GET();
+  if(httpCode > 0) {
+    internet = true;
+  }
+}
+  server->setContentLength(CONTENT_LENGTH_UNKNOWN);
+  server->send(200,"text/html", "");
+  server->sendContent(HTML_HEAD1);
+  server->sendContent(String("<title>")+ui_title+"</title>");
+  server->sendContent(HTML_HEAD2);
+  server->sendContent(String("<h4>")+ui_title+"  <span id=\"connection_status\" class=\"label\">Offline</span></h4></div><hr />");
+  server->sendContent(HTML_BODY);
+
+    if(internet){
+      server->sendContent("<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js\"></script>");
+    }
+    else{
+      server->sendContent("<script src=\"/js/jquery.js\"></script>");
+    }
+
+  server->sendContent(HTML_END);
+  server->client().stop();
 }
 
 // Handle Main Style CSS
 void EasyUIClass::handleSCSS(){
-server->send(200, "text/css", CSS_STYLE);
+server->send_P(200, "text/css", CSS_STYLE);
 }
 
 // Handle Normalize CSS
 void EasyUIClass::handleNCSS(){
-server->send(200, "text/css", CSS_NORMALIZE);
+server->send_P(200, "text/css", CSS_NORMALIZE);
 }
 
 // Handle Jquery
 void EasyUIClass::handleJS(){
-  server->setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server->send(200,"application/javascript", "");
-  server->sendContent(JS_JQUERY1);
-  server->sendContent(JS_JQUERY2);
-  server->sendContent(JS_JQUERY3);
-  server->sendContent(JS_JQUERY4);
-  server->sendContent(JS_JQUERY5);
-  server->sendContent(JS_JQUERY6);
-  server->sendContent(JS_JQUERY7);
-  server->sendContent(JS_JQUERY8);
-  server->sendContent(JS_JQUERY9);
-  server->sendContent(JS_JQUERY10);
-  server->sendContent(JS_JQUERY11);
-
-  server->client().stop();
+  server->send_P(200, "application/javascript", JS_JQUERY);
 }
 
 // Handle Not found Page
@@ -188,7 +203,6 @@ void EasyUIClass::handleNotFound() {
     file.close();
   }
   else {
-    Serial.println("File not Found : " + url);
     server->send(200, "text/html", "<html><h1>404 - You are Lost</h1></html>");
   }
 }

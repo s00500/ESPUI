@@ -7,10 +7,10 @@
 #include "ESP8266WiFi.h"
 #include "WiFiClient.h"
 #include "ESP8266WebServer.h"
+#include "ESP8266HTTPClient.h"
 #include "ArduinoJson.h"
 #include "WebSocketsServer.h"
 #include "Hash.h"
-
 
 #define HARDWARE "esp8266"
 
@@ -18,6 +18,7 @@ class EasyUIClass{
 
 public:
   void begin();   // Begin HTTP Server + WebSocketsServer & Initalize All Elements
+  void detectCDN(bool _autoState = true); // Detect if Internet Available or Switch to Offline Jquery
   void title(const char* _title);  // Define Webpage Header Name and title
   void toggleButton(uint8_t  pin, const char* tbutton_label, int start_state = 0, bool swap_state = false);   // Create Toggle Button
   void label(const char* label_name, const char*  label_val); // Create Label
@@ -50,6 +51,7 @@ public:
   std::unique_ptr<ESP8266WebServer> server;       // Create Unique Instance for Webserver
   std::unique_ptr<WebSocketsServer> webSocket;    // Create Unique Instance for WebSocketsServer
 
+  bool CDN = false;
 
   void handleRoot();      // Handle Index HTML
   void handleNCSS();      // Handle Normalize CSS

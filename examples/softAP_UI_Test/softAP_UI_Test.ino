@@ -8,24 +8,17 @@
 #include <WiFiClient.h>
 #include <EasyUI.h>
 
-const char* ssid = ".........";
-const char* password = "..........";
+const char* ssid = "EasyUI";
+const char* password = "";
 
 void setup(void) {
   Serial.begin(115200);
-  WiFi.begin(ssid, password);
-  Serial.println("");
-  // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
   Serial.println("");
   Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-  
-// Detects Internet Connectivity and Switches to Online CDN. (For STA Mode Only)
-  EasyUI.detectCDN(true);
+  Serial.println(WiFi.softAPIP());
+
   EasyUI.label("Label","123");
   EasyUI.toggleButton(2, "LED", HIGH, true);   // LED Toggle Button
   EasyUI.begin();

@@ -20,7 +20,9 @@ const char HTML_BODY[] PROGMEM = R"=====(
     <div id="row" class="row u-full-width">
     </div>
   </div>
- <script src="/js/jquery.js"></script>
+  )=====";
+
+const char HTML_END[] PROGMEM = R"=====(
  <script src="/js/sockets.js"></script>
   </body>
   </html>

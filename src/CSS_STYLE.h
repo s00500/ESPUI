@@ -4,7 +4,7 @@ const char CSS_STYLE[] PROGMEM = R"=====(
   }
   .container {
     position: relative;
-    width: 100%;
+    width: 79%;
     margin: 20px;
     box-sizing: border-box; }
   .column,
@@ -51,7 +51,7 @@ const char CSS_STYLE[] PROGMEM = R"=====(
   /* For devices larger than 400px */
   @media (min-width: 400px) {
     .container {
-    width: 85%;}
+    width: 84%;}
 
   }
 
@@ -155,7 +155,7 @@ const char CSS_STYLE[] PROGMEM = R"=====(
     h2 { font-size: 4.2rem; }
     h3 { font-size: 3.6rem; }
     h4 { font-size: 3.0rem; }
-    h5 { font-size: 2.4rem; }
+    h5 { font-size: 2.0rem; }
     h6 { font-size: 1.5rem; }
   }
 
