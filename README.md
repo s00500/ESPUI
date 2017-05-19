@@ -58,47 +58,42 @@ EasyUI is not Internet Dependent and will Continue working without any Internet 
 
 #### Following Functions can be Used in Sketch:
 
-<br>
-
-**To Detect Internet and Switch to CDN** <br>
+**To Detect Internet and Switch to CDN** 
 The most Heaviest Part of the code is Jquery so, to make Webpages Load faster , user can use this function to switch between jquery served from esp memory or through online CDN when Internet is Available. (This Function is to be used in Station Mode Only!)
 ```
 EasyUI.detectCDN(true);
 ```
 <br>
 
-**To Set an Title for your Webpage:** <br>
-![EasyUI Title](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img2.PNG) <br>
+**To Set an Title for your Webpage:**
 This Line of Code will Add your Custom Title to the Webpage Displayed by ESP8266. By Default is "EasyUI".
 ```
 EasyUI.title("");
 ```
 <br>
 
-**To Make Label on Webpage:** <br>
-![EasyUI Label](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img3.PNG) <br>
+**To Make Label on Webpage:**
 This will add an Label on your Web Interface.
 ```
 EasyUI.label("Title", "Value");
 ```
 <br>
 
-**To Make Toggle Button on Webpage:** <br>
-![EasyUI Button1](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img4.PNG) ![EasyUI Button2](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img5.PNG) <br>
+**To Make Toggle Button on Webpage:**
 This will add an toggle Button on your Webpage. For Extra Functionality* See Below
 ```
 EasyUI.toggleButton(pin,"Title");
 ```
 <br>
 
-**Start the Library:** <br>
+**Start the Library:**
 Once you have Specified Any of the above Elements, Use this Below them to Start Inializing the Library. <br>
 ```
 EasyUI.begin();
 ```
 <br>
 
-**Loop Function:** <br>
+**Loop Function:**
 Don't Forget to Add this in your void loop()
 ```
 EasyUI.loop();
