@@ -47,7 +47,7 @@ Upcoming Elements:
 - Tables
 
 Upcoming Features:
-- Detect Internet and Switch to Online File CDN
+- ~~Detect Internet and Switch to Online File CDN~~
 - WiFi Credentials Setup Page
 - Embed MQTT
 
