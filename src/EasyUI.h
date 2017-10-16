@@ -9,7 +9,8 @@
 #include "Arduino.h"
 #include "stdlib_noniso.h"
 #include "ArduinoJson.h"
-//#include "FS.h"
+#include "FS.h"
+#include "SPIFFS.h"
 #include "WiFi.h"
 
 #include <AsyncTCP.h>
@@ -24,8 +25,6 @@ public:
   void toggleButton(uint8_t  pin, const char* tbutton_label, int start_state = 0, bool swap_state = false);   // Create Toggle Button
   void button(uint8_t  pin, const char* tbutton_label, int start_state = 0, bool swap_state = false);   // Create Toggle Button
   void label(const char* label_name, const char*  label_val); // Create Label
-  void loop();    // Do All Loop Work
-
   // Variables ---
   const char* ui_title = "EasyUI"; // Store UI Title and Header Name
   int tb_index;   // Calculate How Many Toggle Buttons
@@ -43,21 +42,13 @@ public:
   String webpage;                      // Coverts Arduino elements to JSON elements
   String wsString = "";                      // Stores Websockets Script
 
-  // Don't Issue the Below functions in your Sketch! - These are Resposible for Webpage functioning.
   void tbClick(String _index, String _status);
   void tbuttonStatus();
-  void handleWebpage();
-
+  void handleWebpage(AsyncWebSocketClient * client);
 
  private:
-  std::unique_ptr<AsyncWebServer> server;       // Create Unique Instance for Webserver
-  std::unique_ptr<AsyncWebSocket> ws;    // Create Unique Instance for WebSocketsServer
-
-  void handleRoot(AsyncWebServerRequest *request);  // Handle MainPage
-  void handleNotFound();  // Handle Page Not-Found
-  void handleSockets(AsyncWebServerRequest *request);   // Handle Sockets Script
-
-
+  AsyncWebServer* server;       // Create Unique Instance for Webserver
+  AsyncWebSocket* ws;
 };
 
 extern EasyUIClass EasyUI;
