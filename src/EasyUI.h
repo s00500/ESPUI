@@ -1,26 +1,28 @@
 #ifndef EasyUI_h
 #define EasyUI_h
 
+#define HARDWARE "esp32"
+
+//ifdef 8266
+//#include "Hash.h"
+
 #include "Arduino.h"
 #include "stdlib_noniso.h"
-#include "FS.h"
-#include "ESP8266WiFi.h"
-#include "WiFiClient.h"
-#include "ESP8266WebServer.h"
-#include "ESP8266HTTPClient.h"
 #include "ArduinoJson.h"
-#include "WebSocketsServer.h"
-#include "Hash.h"
+//#include "FS.h"
+#include "WiFi.h"
 
-#define HARDWARE "esp8266"
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+
 
 class EasyUIClass{
 
 public:
   void begin();   // Begin HTTP Server + WebSocketsServer & Initalize All Elements
-  void detectCDN(bool _autoState = true); // Detect if Internet Available or Switch to Offline Jquery
   void title(const char* _title);  // Define Webpage Header Name and title
   void toggleButton(uint8_t  pin, const char* tbutton_label, int start_state = 0, bool swap_state = false);   // Create Toggle Button
+  void button(uint8_t  pin, const char* tbutton_label, int start_state = 0, bool swap_state = false);   // Create Toggle Button
   void label(const char* label_name, const char*  label_val); // Create Label
   void loop();    // Do All Loop Work
 
@@ -39,7 +41,7 @@ public:
   // const char* variable_type[10];   // un-used feature for now  // Stores Label Types, Like 'C' , 'F' or '%' - MAX 10
 
   String webpage;                      // Coverts Arduino elements to JSON elements
-  String ws = "";                      // Stores Websockets Script
+  String wsString = "";                      // Stores Websockets Script
 
   // Don't Issue the Below functions in your Sketch! - These are Resposible for Webpage functioning.
   void tbClick(String _index, String _status);
@@ -48,17 +50,12 @@ public:
 
 
  private:
-  std::unique_ptr<ESP8266WebServer> server;       // Create Unique Instance for Webserver
-  std::unique_ptr<WebSocketsServer> webSocket;    // Create Unique Instance for WebSocketsServer
+  std::unique_ptr<AsyncWebServer> server;       // Create Unique Instance for Webserver
+  std::unique_ptr<AsyncWebSocket> ws;    // Create Unique Instance for WebSocketsServer
 
-  bool CDN = false;
-
-  void handleRoot();      // Handle Index HTML
-  void handleNCSS();      // Handle Normalize CSS
-  void handleSCSS();      // Handle Main Style CSS
-  void handleJS();        // Handle JQuery
+  void handleRoot(AsyncWebServerRequest *request);  // Handle MainPage
   void handleNotFound();  // Handle Page Not-Found
-  void handleSockets();   // Handle Sockets Script
+  void handleSockets(AsyncWebServerRequest *request);   // Handle Sockets Script
 
 
 };
