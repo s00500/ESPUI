@@ -10,31 +10,34 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             break;
         case WS_EVT_CONNECT:
             {
-              //Serial.printf("[WSc] Connected to url: %s\n",  payload);
 				      Serial.println("Connected");
-              EasyUI.handleWebpage(client);
+              EasyUI.jsonDom(client);
               Serial.println("JSON Data Sent to Client!");
             }
             break;
         case WS_EVT_DATA:
-        Serial.print("WS Event");
+          Serial.print("WS Event");
           String msg = "";
           for (size_t i = 0; i < len; i++) {
             msg += (char) data[i];
           }
           Serial.println(msg);
-
-            StaticJsonBuffer<200> jsonBuffer;
-            JsonObject& root = jsonBuffer.parseObject(data);
-             String mode = root["mode"];
-             if(mode == "check_tb_status"){
+          StaticJsonBuffer<200> jsonBuffer;
+          JsonObject& root = jsonBuffer.parseObject(msg);
+             String type = root["type"];
+             if(type == "t"){
+               //Button Action
+               //TODO: get Button here
+               EasyUI.buttons[0]->callback();
                //EasyUI.tbuttonStatus();
              }
+             /*
              else if(mode == "tb_click"){
                String status = root["status"];
                String index = root["index"];
               //EasyUI.tbClick(index, status);
              }
+             */
             break;
     }
 }
@@ -61,14 +64,15 @@ void EasyUIClass::toggleButton(uint8_t  pin, const char* tbutton_label, int star
 }
 */
 // Create a generic Button
-void EasyUIClass::button(uint8_t  pin, const char* tbutton_label, int start_state, bool swap_state){
-//TODO: Implement
-  digitalWrite(pin, start_state);
-  tbutton_swap[tb_index] = swap_state;
-  tbutton_pinout[tb_index] = pin;
-  tbuttontitle[tb_index] = tbutton_label;
-  tb_index++;
+void EasyUIClass::button(const char* bLabel, void(* callBack)()){
 
+//TODO: Implement
+  Button* newB = new Button();
+
+  newB->label = bLabel;
+  newB->callback = callBack;
+  buttons[bIndex] = newB;
+  bIndex++;
 }
 /*
 // Check Toggle Buttons States and Transfer to Webpage
@@ -137,7 +141,9 @@ void EasyUIClass::tbClick(String _index, String _status){
 */
 
 // Convert & Transfer Arduino elements to JSON elements
-void EasyUIClass::handleWebpage(AsyncWebSocketClient * client){
+void EasyUIClass::jsonDom(AsyncWebSocketClient * client){
+  //SiteTitle
+  //TODO: emit here
   // Labels
   for(int i=0; i<l_index; i++){
     String json;
@@ -150,13 +156,13 @@ void EasyUIClass::handleWebpage(AsyncWebSocketClient * client){
     client->text(json);
   }
   //  Buttons
-  for(int i=0; i<tb_index; i++){
+  for(int i=0; i<bIndex; i++){
     String json;
     StaticJsonBuffer<200> jsonBuffer2;
     JsonObject& root2 = jsonBuffer2.createObject();
     root2["type"] = "domButton";
     root2["index"] = String(i);
-    root2["label"] = tbuttontitle[i];
+    root2["label"] = buttons[i]->label;
     root2.printTo(json);
     client->text(json);
     }
