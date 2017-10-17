@@ -1,11 +1,4 @@
-/*
- * Author:  Ayush Sharma (ayushsharma82) Github
- * Library: EasyUI
- * - This is a Test Code of EasyUI Library
- * - It Will Use the OnBoard LED of ESP8266 and toggle it.
- */
-#include <ESP8266WiFi.h>
-#include <WiFiClient.h>
+#include <WiFi.h>
 #include <EasyUI.h>
 
 const char* ssid = "EasyUI";
@@ -15,15 +8,29 @@ void setup(void) {
   Serial.begin(115200);
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
+
   Serial.println("");
   Serial.print("IP address: ");
   Serial.println(WiFi.softAPIP());
 
+  EasyUI.title("LARSControl");
+
   EasyUI.label("Label","123");
-  EasyUI.toggleButton(2, "LED", HIGH, true);   // LED Toggle Button
+  EasyUI.label("Label2","456");
+  EasyUI.label("Label3","789");
+  EasyUI.button("LED", &callback1);
   EasyUI.begin();
 }
 
 void loop(void) {
-  EasyUI.loop();
+}
+
+void callback1(void) {
+  Serial.println("CALLBACK UNO");
+}
+void callback2(void) {
+  Serial.println("CALLBACK DOS");
+}
+void callback3(void) {
+  Serial.println("CALLBACK TRES");
 }
