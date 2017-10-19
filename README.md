@@ -1,5 +1,7 @@
 # ESPUI
-![ESPUI Dashboard](https://github.com/s00500/ESPUI/blob/master/docs/img1.PNG)
+![ESPUI Controlpad](https://github.com/s00500/ESPUI/blob/master/docs/controlpad.png)
+![ESPUI Switch](https://github.com/s00500/ESPUI/blob/master/docs/switch.png)
+
 
 ESPUI is a simple library to make a web user interface for your projects using the **ESP32**
 It uses web sockets and lets you create, control, and update elements on your GUI through multiple devices like phones and tablets.
@@ -51,9 +53,9 @@ This library is dependent on the following libraries to function properly.
 
 
 ## User interface Elements
-  - Label (update able)
+  - Label (updateable)
   - Button
-  - Switch (update able)
+  - Switch (updateable)
   - Control pad
   - Control pad with center button
 
@@ -61,16 +63,17 @@ This library is dependent on the following libraries to function properly.
 
 ## Roadmap :
 
-- Refactor id system
+- refactor id system
 - make button colour customisable
+- do a proper redesign
 - cleanup unnecessary CSS
 - gzip files to make them load faster
 - setup spiffs using values in program memory ? (if you have feedback to this idea let me know)
-- Support ESP8266
+- ESP8266 support
 
 ## Documentation
 
-The heart of ESPUI is
+The heart of ESPUI is [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer).
 ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for Handling Click Events Etc. The communication between the *ESP32* and the client browser works using web sockets.
 ESPUI does not need network access and can be used in standalone access point mode.
 All assets are loaded from the internal SPIFFS filesystem of the ESP32.
