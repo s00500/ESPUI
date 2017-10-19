@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <EasyUI.h>
 
-const char* ssid = "LARSUI";
+const char* ssid = "ESP32";
 const char* password = "";
 
 long oldTime = 0;
@@ -16,21 +16,38 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.softAPIP());
 
-  EasyUI.label("Status: Maxim Stop");
-  EasyUI.label("0");
-  EasyUI.button("MaximDance Button", &callback2);
-  EasyUI.pad("center", true, &callback3);
-  EasyUI.pad("NoCenter", false, &callback3);
+  // change the beginning to this if you want to join an existing network
+  /*
+    Serial.begin(115200);
+    WiFi.begin(ssid, password);
+    Serial.println("");
+    // Wait for connection
+    while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    }
+    Serial.println("");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+  */
 
-  EasyUI.begin("LARS Control");
+  EasyUI.label("Status: Stop");
+  EasyUI.label("0");
+  EasyUI.button("Push Button", &buttonExample);
+  EasyUI.pad("center", true, &padExample);
+  EasyUI.pad("NoCenter", false, &padExample);
+  EasyUI.switcher("Switch one", false, &switchExample);
+  EasyUI.switcher("Switch two", true, &otherSwitchExample);
+
+  EasyUI.begin("ESP32 Control");
 
 }
 
 void loop(void) {
-  if(millis()-oldTime> 5000){
+  if (millis() - oldTime > 5000) {
     EasyUI.print(1, String(millis()));
     oldTime = millis();
-    }
+  }
 }
 
 void callback1(int id, int type) {
@@ -45,50 +62,77 @@ void callback1(int id, int type) {
 
 }
 
-void callback2(int id, int type) {
+void buttonExample(int id, int type) {
   switch (type) {
     case B_DOWN:
-      Serial.println("Maxim Start DAnce######################");
-      EasyUI.print(0, "Status: Maxim Start");
+      Serial.println("Status: Start");
+      EasyUI.print(0, "Status: Start");
       break;
     case B_UP:
-      Serial.println("Maxim STOP DAnce######################");
-      EasyUI.print(0, "Status: Maxim Start");
+      Serial.println("Status: Stop");
+      EasyUI.print(0, "Status: Stop");
       break;
   }
 }
-void callback3(int id, int value) {
+void padExample(int id, int value) {
   switch (value) {
     case P_LEFT_DOWN:
-      Serial.println("left down");
+      Serial.print("left down");
       break;
     case P_LEFT_UP:
-      Serial.println("left up");
+      Serial.print("left up");
       break;
     case P_RIGHT_DOWN:
-      Serial.println("right down");
+      Serial.print("right down");
       break;
     case P_RIGHT_UP:
-      Serial.println("right up");
+      Serial.print("right up");
       break;
     case P_FOR_DOWN:
-      Serial.println("for down");
+      Serial.print("for down");
       break;
     case P_FOR_UP:
-      Serial.println("for up");
+      Serial.print("for up");
       break;
     case P_BACK_DOWN:
-      Serial.println("back down");
+      Serial.print("back down");
       break;
     case P_BACK_UP:
-      Serial.println("back up");
+      Serial.print("back up");
       break;
     case P_CENTER_DOWN:
-      Serial.println("center down");
+      Serial.print("center down");
       break;
     case P_CENTER_UP:
-      Serial.println("center up");
+      Serial.print("center up");
       break;
   }
+  Serial.print(" ");
+  Serial.println(id);
+}
+
+void switchExample(int id, int value) {
+  switch (value) {
+    case S_ACTIVE:
+      Serial.print("Active:");
+      break;
+    case S_INACTIVE:
+      Serial.print("Inactive");
+      break;
+  }
+  Serial.print(" ");
+  Serial.println(id);
+}
+
+void otherSwitchExample(int id, int value) {
+  switch (value) {
+    case S_ACTIVE:
+      Serial.print("Active:");
+      break;
+    case S_INACTIVE:
+      Serial.print("Inactive");
+      break;
+  }
+  Serial.print(" ");
   Serial.println(id);
 }
