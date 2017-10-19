@@ -33,6 +33,7 @@ void setup(void) {
 
   EasyUI.label("Status: Stop");
   EasyUI.label("0");
+  EasyUI.button("Push Button", &buttonCallback);
   EasyUI.button("Push Button", &buttonExample);
   EasyUI.pad("center", true, &padExample);
   EasyUI.pad("NoCenter", false, &padExample);
@@ -50,7 +51,7 @@ void loop(void) {
   }
 }
 
-void callback1(int id, int type) {
+void buttonCallback(int id, int type) {
   switch (type) {
     case B_DOWN:
       Serial.println("Button DOWN");
