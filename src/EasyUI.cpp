@@ -44,16 +44,23 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_CENTER_DOWN);
           }else if(msg.startsWith("pcup:")){
             EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_CENTER_UP);
+          }else if(msg.startsWith("sactive:")){
+            EasyUI.updateSwitcher(msg.substring(8).toInt(), true);
+            EasyUI.controls[msg.substring(8).toInt()]->callback(msg.substring(8).toInt(), S_ACTIVE);
+          }else if(msg.startsWith("sinactive:")){
+            EasyUI.updateSwitcher(msg.substring(10).toInt(), false);
+            EasyUI.controls[msg.substring(10).toInt()]->callback(msg.substring(10).toInt(), S_INACTIVE);
           }
           break;
     }
 }
 
-void EasyUIClass::label(const char* label){
+void EasyUIClass::label(const char* label, String value){
   Control* newL = new Control();
   newL->type = UI_LABEL;
   newL->label = label;
-  newL->oldValue = label;
+  if(value != "") newL->value = value; // Init with labeltext
+  else newL->value = String(label);
   newL->callback = NULL;
   controls[cIndex] = newL;
   cIndex++;
@@ -68,15 +75,14 @@ void EasyUIClass::button(const char* label, void(* callBack)(int, int)){
   cIndex++;
 }
 
-void EasyUIClass::switcher(const char* label, int start_state, void(* callBack)(int, int)){
+void EasyUIClass::switcher(const char* label, bool startState, void(* callBack)(int, int)){
   Control* newS = new Control();
   newS->type = UI_SWITCHER;
   newS->label = label;
+  newS->value = String(startState);
   newS->callback = callBack;
   controls[cIndex] = newS;
   cIndex++;
-  //TODO: implement switch state buffer
-  //tbutton_swap[tb_index] = swap_state;
 }
 
 void EasyUIClass::pad(const char* label, bool center, void(* callBack)(int, int)){
@@ -89,19 +95,35 @@ void EasyUIClass::pad(const char* label, bool center, void(* callBack)(int, int)
   cIndex++;
 }
 
-void EasyUIClass::print(int labelid, String value){
-  if(labelid<cIndex && controls[labelid]->type == UI_LABEL){
-    controls[labelid]->oldValue = value;
+void EasyUIClass::print(int id, String value){
+  if(id<cIndex && controls[id]->type == UI_LABEL){
+    controls[id]->value = value;
     String json;
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
     root["type"] = UPDATE_LABEL;
-    root["label"] = value;
-    root["id"] = String(labelid);
+    root["value"] = value;
+    root["id"] = String(id);
     root.printTo(json);
     this->ws->textAll(json);
   }else{
-    Serial.println(String("Error: ")+ String(labelid) +String(" is no label"));
+    Serial.println(String("Error: ")+ String(id) +String(" is no label"));
+  }
+}
+
+void EasyUIClass::updateSwitcher(int id, bool nValue){
+  if(id<cIndex && controls[id]->type == UI_SWITCHER){
+    controls[id]->value = nValue?1:0;
+    String json;
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    root["type"] = UPDATE_SWITCH;
+    root["value"] = nValue?1:0;
+    root["id"] = String(id);
+    root.printTo(json);
+    this->ws->textAll(json);
+  }else{
+    Serial.println(String("Error: ")+ String(id) +String(" is no switcher"));
   }
 }
 
@@ -118,8 +140,8 @@ void EasyUIClass::jsonDom(AsyncWebSocketClient * client){
     }else{
       root["type"] = controls[i]->type;
       root["label"] = String(controls[i]->label);
+      root["value"] = String(controls[i]->value);
       root["id"] = String(i);
-      if(controls[i]->type == UI_LABEL)root["label"] = controls[i]->oldValue;
     }
     root.printTo(json);
     client->text(json);

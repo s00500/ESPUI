@@ -21,7 +21,7 @@ typedef struct Control
     unsigned int type;
     const char *label;
     void (*callback)(int, int);
-    String oldValue;
+    String value;
 } Control;
 
 // Types
@@ -32,6 +32,7 @@ typedef struct Control
 #define UI_PAD 4
 #define UI_CPAD 5
 #define UPDATE_LABEL 6
+#define UPDATE_SWITCH 7
 
 // Values
 #define B_DOWN -1
@@ -47,6 +48,8 @@ typedef struct Control
 #define P_BACK_UP 5
 #define P_CENTER_DOWN -6
 #define P_CENTER_UP 6
+#define S_ACTIVE -7
+#define S_INACTIVE 7
 
 
 
@@ -56,13 +59,14 @@ public:
   void begin(const char* _title);   // Setup servers and page
 
   // Creating Elements
-  void label(const char* label); // Create Label
+  void label(const char* label, String value = ""); // Create Label
   void button(const char* label, void(* callBack)(int, int));   // Create Event Button
-  void switcher(const char* label, int start_state, void(* callBack)(int, int));   // Create Toggle Button
+  void switcher(const char* label, bool startState, void(* callBack)(int, int));   // Create Toggle Button
   void pad(const char* label, bool centerButton, void(* callBack)(int, int));   // Create Pad Control
 
   // Update Elements
-  void print(int labelid, String value);
+  void print(int id, String value);
+  void updateSwitcher(int id, bool nValue);
 
   // Variables ---
   const char* ui_title = "ESPUI"; // Store UI Title and Header Name
