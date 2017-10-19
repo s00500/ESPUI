@@ -1,116 +1,79 @@
-# EasyUI
-![EasyUI Dashboard](https://github.com/ayushsharma82/EasyUI/blob/master/docs/img1.PNG)
-Did you Ever Got into the Trouble of Making a good Looking UI for ESP8266 without having the skills to Build Perfect Webpages?
-EasyUI is an User Interface Library for ESP8266 to Solve this Problem. This Library Uses Light-weight Websockets Protocol for Communicating with Webpage to Control, Make and Update Elements.
+# ESPUI
+![ESPUI Dashboard](https://github.com/s00500/ESPUI/blob/master/docs/img1.PNG)
 
-EasyUI uses functions native to arduino for creating the perfect Good Looking User Interface without the Need of Knowing Complex Javascripts etc.
+ESPUI is a simple library to make a web user interface for your projects using the **ESP32**
+It uses web sockets and lets you create, control, and update elements on your GUI through multiple devices like phones and tablets.
+
+ESPUI uses simple Arduino-style syntax for creating a solid, functioning user interface without too much boilerplate code.
+
+So if you either don't know how or just don't want to waste time: this is your simple solution user interface without the need of internet connectivity or any additional servers.
+
+I completely rewrote the EasyUI Library created by ayushsharma82 [Here](https://github.com/ayushsharma82/)
+Now it uses ESPAsyncWebserver and is mainly to be used with the ESP32 Processor.
+ESP8266 support will be interesting maybe in the future.
+
+## Getting started (Filesystem upload)
+
+ESPUI **NEEDS** its files burnt on the SPIFFS filesystem on the ESP. **Without this ESPUI will NOT work at all**
+
+To do this download and install me-no-devs wonderful [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin)
+
+Then open the example sketch and select "ESP32 Upload Sketch Data" from the Tools menu.
+Now you are set to go and use any code you want to with this library
+
+
+
 
 ## How to Install
 ###### Directly Through Arduino IDE
-Go to Sketch > Include Library > Library Manager > Search for "EasyUI" > Install
 
-###### Mannual Install
+THIS IS NOT DONE YET
+~~Go to Sketch > Include Library > Library Manager > Search for "EasyUI" > Install~~
 
-For Windows: Download the [Repository](https://github.com/ayushsharma82/EasyUI/archive/master.zip) and extract the .zip in Documents>Arduino>Libraries>{Place "EasyUI" folder Here}
+###### Manual Install
 
-For Linux: Download the [Repository](https://github.com/ayushsharma82/EasyUI/archive/master.zip) and extract the .zip in Sketchbook>Libraries>{Place "EasyUI" folder Here}
+For Windows: Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the .zip in Documents>Arduino>Libraries>{Place "ESPUI" folder Here}
 
-###### Mannually through IDE
+For Linux: Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the .zip in Sketchbook/Libraries/{Place "ESPUI" folder Here}
 
-Download the [Repository](https://github.com/ayushsharma82/EasyUI/archive/master.zip), Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
+For macOs: Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the .zip in ~/Documents/Arduino/libraries/{Place "ESPUI" folder Here}
 
-## Dependancies
-This Library is Dependent on the Following Libraries to Function Properly.
-  - [ESP8266 Core Library](https://github.com/esp8266/Arduino)
-  - [arduinoWebSockets Library](https://github.com/Links2004/arduinoWebSockets)
+###### Manually through IDE
+
+Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
+
+## Dependencies
+This library is dependent on the following libraries to function properly.
+  - [ESP32 Core Library](https://github.com/espressif/arduino-esp32)
+  - [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
+  (There is still an open issue because there is a mistake in the current version that creates an error, please wait until that is done or checkout the [issue](https://github.com/me-no-dev/ESPAsyncWebServer/issues/234))
   - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
-Make Sure all Dependencies are Installed at their Latest Version to make this Work.
 
-## Elements
+## User interface Elements
+  - Label (update able)
+  - Button
+  - Switch (update able)
+  - Control pad
+  - Control pad with center button
 
-EasyUI Currently has the Following User Interface Elements:
+  Checkout the example for the usage
 
-  - Toggle Button
-  - Label
+## Roadmap :
 
-## Upcoming Elements and Features
-
-Upcoming Elements:
-- ~~Toggle Button~~
-- ~~Label~~
-- Smart Variable
-- Progress Bar
-- Click Button
-- Dropbox Selection
-- Forums
-- Tables
-
-Upcoming Features:
-- ~~Detect Internet and Switch to Online File CDN~~
-- WiFi Credentials Setup Page
-- Embed MQTT
+- Refactor id system
+- make button colour customisable
+- cleanup unnecessary CSS
+- gzip files to make them load faster
+- setup spiffs using values in program memory ? (if you have feedback to this idea let me know)
+- Support ESP8266
 
 ## Documentation
 
-EasyUI is Based on [Skeleton CSS](http://getskeleton.com/) and Jquery for Handling Click Events Etc. The Communication Between ESP8266 and Webpage is with Websockets.
-EasyUI is not Internet Dependent and will Continue working without any Internet Connection, All Assets are Loaded form ESP8266 Program Memory.
+The heart of ESPUI is
+ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for Handling Click Events Etc. The communication between the *ESP32* and the client browser works using web sockets.
+ESPUI does not need network access and can be used in standalone access point mode.
+All assets are loaded from the internal SPIFFS filesystem of the ESP32.
 
-#### Following Functions can be Used in Sketch:
-
-**To Detect Internet and Switch to CDN** 
-The most Heaviest Part of the code is Jquery so, to make Webpages Load faster , user can use this function to switch between jquery served from esp memory or through online CDN when Internet is Available. (This Function is to be used in Station Mode Only!)
-```
-EasyUI.detectCDN(true);
-```
-<br>
-
-**To Set an Title for your Webpage:**
-This Line of Code will Add your Custom Title to the Webpage Displayed by ESP8266. By Default is "EasyUI".
-```
-EasyUI.title("");
-```
-<br>
-
-**To Make Label on Webpage:**
-This will add an Label on your Web Interface.
-```
-EasyUI.label("Title", "Value");
-```
-<br>
-
-**To Make Toggle Button on Webpage:**
-This will add an toggle Button on your Webpage. For Extra Functionality* See Below
-```
-EasyUI.toggleButton(pin,"Title");
-```
-<br>
-
-**Start the Library:**
-Once you have Specified Any of the above Elements, Use this Below them to Start Inializing the Library. <br>
-```
-EasyUI.begin();
-```
-<br>
-
-**Loop Function:**
-Don't Forget to Add this in your void loop()
-```
-EasyUI.loop();
-```
-<br>
-
-## Extra Functionality
-There are Some Elements in Library which have Added extra Functionality for Ease of Use.
-
-**For Toggle Buttons:**
-For Toggle Buttons There are 2 Extra Functionalities which can be defined by user.
-
-- First is **{Start State}** , This is for Selecting if you want that **GPIO** to Start in **LOW** or **HIGH**. **By Default it's LOW.** (Define LOW or HIGH instead of '{Start State}' )
-
-- Second **{Swap State}**, is useful for Swapping the States at which UI Buttons will work. making **'{Swap State}'** replace with **true** will make GPIO **LOW when Clicked "Turn On"** and **HIGH when clicked "Turn Off"**. By Default this is **false**.
-```
-EasyUI.toggleButton(pin, "Title", {Start State}, {Swap State});
-```
 # Contribute
-Liked this Library? You can Support me by sending me a :coffee: [Coffee](https://www.paypal.me/ayushsharma82/3).
+Liked this Library? You can Support me by sending me a :coffee: [Coffee](https://paypal.me/lukasbachschwell/3).
