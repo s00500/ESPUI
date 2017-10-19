@@ -1,11 +1,11 @@
 {
-  "name": "EasyUI",
-  "keywords": "EasyUI, esp8266, ui, easyui, user, interface, gui, iot, arduino, Wifi, server",
-  "description": "Easily Setup an User Interface on Your ESP8266 with EasyUI",
+  "name": "ESPUI",
+  "keywords": "ESPUI, esp32, ui, espui, user, interface, gui, iot, arduino, Wifi, server, webinterface, web",
+  "description": "Quickly create an user interface on an ESP32",
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/ayushsharma82/EasyUI.git"
+    "url": "https://github.com/s00500/ESPUI.git"
   },
   "frameworks": "arduino",
   "platforms":
