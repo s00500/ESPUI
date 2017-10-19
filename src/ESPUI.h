@@ -1,5 +1,5 @@
-#ifndef EasyUI_h
-#define EasyUI_h
+#ifndef ESPUI_h
+#define ESPUI_h
 
 #define HARDWARE "esp32"
 
@@ -53,7 +53,7 @@ typedef struct Control
 
 
 
-class EasyUIClass{
+class ESPUIClass{
 
 public:
   void begin(const char* _title);   // Setup servers and page
@@ -79,5 +79,5 @@ private:
   AsyncWebSocket* ws;
 };
 
-extern EasyUIClass EasyUI;
+extern ESPUIClass ESPUI;
 #endif

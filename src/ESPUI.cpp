@@ -1,4 +1,4 @@
-#include "EasyUI.h"
+#include "ESPUI.h"
 #include <ESPAsyncWebServer.h>
 #include <functional>
 
@@ -11,7 +11,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         case WS_EVT_CONNECT:
             {
 				      Serial.println("Connected");
-              EasyUI.jsonDom(client);
+              ESPUI.jsonDom(client);
               Serial.println("JSON Data Sent to Client!");
             }
             break;
@@ -21,41 +21,41 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             msg += (char) data[i];
           }
           if(msg.startsWith("bdown:")){
-            EasyUI.controls[msg.substring(6).toInt()]->callback(msg.substring(6).toInt(), B_DOWN);
+            ESPUI.controls[msg.substring(6).toInt()]->callback(msg.substring(6).toInt(), B_DOWN);
           }else if(msg.startsWith("bup:")){
-            EasyUI.controls[msg.substring(4).toInt()]->callback(msg.substring(4).toInt(), B_UP);
+            ESPUI.controls[msg.substring(4).toInt()]->callback(msg.substring(4).toInt(), B_UP);
           }else if(msg.startsWith("pfdown:")){
-            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_FOR_DOWN);
+            ESPUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_FOR_DOWN);
           }else if(msg.startsWith("pfup:")){
-            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_FOR_UP);
+            ESPUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_FOR_UP);
           }else if(msg.startsWith("pldown:")){
-            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_LEFT_DOWN);
+            ESPUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_LEFT_DOWN);
           }else if(msg.startsWith("plup:")){
-            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_LEFT_UP);
+            ESPUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_LEFT_UP);
           }else if(msg.startsWith("prdown:")){
-            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_RIGHT_DOWN);
+            ESPUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_RIGHT_DOWN);
           }else if(msg.startsWith("prup:")){
-            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_RIGHT_UP);
+            ESPUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_RIGHT_UP);
           }else if(msg.startsWith("pbdown:")){
-            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_BACK_DOWN);
+            ESPUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_BACK_DOWN);
           }else if(msg.startsWith("pbup:")){
-            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_BACK_UP);
+            ESPUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_BACK_UP);
           }else if(msg.startsWith("pcdown:")){
-            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_CENTER_DOWN);
+            ESPUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_CENTER_DOWN);
           }else if(msg.startsWith("pcup:")){
-            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_CENTER_UP);
+            ESPUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_CENTER_UP);
           }else if(msg.startsWith("sactive:")){
-            EasyUI.updateSwitcher(msg.substring(8).toInt(), true);
-            EasyUI.controls[msg.substring(8).toInt()]->callback(msg.substring(8).toInt(), S_ACTIVE);
+            ESPUI.updateSwitcher(msg.substring(8).toInt(), true);
+            ESPUI.controls[msg.substring(8).toInt()]->callback(msg.substring(8).toInt(), S_ACTIVE);
           }else if(msg.startsWith("sinactive:")){
-            EasyUI.updateSwitcher(msg.substring(10).toInt(), false);
-            EasyUI.controls[msg.substring(10).toInt()]->callback(msg.substring(10).toInt(), S_INACTIVE);
+            ESPUI.updateSwitcher(msg.substring(10).toInt(), false);
+            ESPUI.controls[msg.substring(10).toInt()]->callback(msg.substring(10).toInt(), S_INACTIVE);
           }
           break;
     }
 }
 
-void EasyUIClass::label(const char* label, String value){
+void ESPUIClass::label(const char* label, String value){
   Control* newL = new Control();
   newL->type = UI_LABEL;
   newL->label = label;
@@ -66,7 +66,7 @@ void EasyUIClass::label(const char* label, String value){
   cIndex++;
 }
 
-void EasyUIClass::button(const char* label, void(* callBack)(int, int)){
+void ESPUIClass::button(const char* label, void(* callBack)(int, int)){
   Control* newB = new Control();
   newB->type = UI_BUTTON;
   newB->label = label;
@@ -75,7 +75,7 @@ void EasyUIClass::button(const char* label, void(* callBack)(int, int)){
   cIndex++;
 }
 
-void EasyUIClass::switcher(const char* label, bool startState, void(* callBack)(int, int)){
+void ESPUIClass::switcher(const char* label, bool startState, void(* callBack)(int, int)){
   Control* newS = new Control();
   newS->type = UI_SWITCHER;
   newS->label = label;
@@ -85,7 +85,7 @@ void EasyUIClass::switcher(const char* label, bool startState, void(* callBack)(
   cIndex++;
 }
 
-void EasyUIClass::pad(const char* label, bool center, void(* callBack)(int, int)){
+void ESPUIClass::pad(const char* label, bool center, void(* callBack)(int, int)){
   Control* newP = new Control();
   if(center)newP->type = UI_CPAD;
   else newP->type = UI_PAD;
@@ -95,7 +95,7 @@ void EasyUIClass::pad(const char* label, bool center, void(* callBack)(int, int)
   cIndex++;
 }
 
-void EasyUIClass::print(int id, String value){
+void ESPUIClass::print(int id, String value){
   if(id<cIndex && controls[id]->type == UI_LABEL){
     controls[id]->value = value;
     String json;
@@ -111,7 +111,7 @@ void EasyUIClass::print(int id, String value){
   }
 }
 
-void EasyUIClass::updateSwitcher(int id, bool nValue){
+void ESPUIClass::updateSwitcher(int id, bool nValue){
   if(id<cIndex && controls[id]->type == UI_SWITCHER){
     controls[id]->value = nValue?1:0;
     String json;
@@ -129,7 +129,7 @@ void EasyUIClass::updateSwitcher(int id, bool nValue){
 
 
 // Convert & Transfer Arduino elements to JSON elements
-void EasyUIClass::jsonDom(AsyncWebSocketClient * client){
+void ESPUIClass::jsonDom(AsyncWebSocketClient * client){
   for(int i=-1; i<cIndex; i++){
     String json;
     StaticJsonBuffer<200> jsonBuffer;
@@ -149,7 +149,7 @@ void EasyUIClass::jsonDom(AsyncWebSocketClient * client){
 }
 
 
-void EasyUIClass::begin(const char * _title){
+void ESPUIClass::begin(const char * _title){
   ui_title = _title;
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
@@ -171,4 +171,4 @@ void EasyUIClass::begin(const char * _title){
   Serial.println("UI Initialized");
 }
 
-EasyUIClass EasyUI;
+ESPUIClass ESPUI;
