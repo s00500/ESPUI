@@ -295,6 +295,7 @@
 
   /* Lists
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
+/*
   ul {
     list-style: circle inside; }
   ol {
@@ -310,7 +311,7 @@
     font-size: 90%; }
   li {
     margin-bottom: 1rem; }
-
+*/
 
   /* Code
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -398,3 +399,85 @@
     content: "";
     display: table;
     clear: both; }
+
+  /* ButtonPad
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+  .control {
+  background-color: #ddd;
+  background-image: linear-gradient(hsla(0,0%,0%,.1), hsla(0,0%,100%,.1));
+  border-radius: 50%;
+  box-shadow: inset 0 1px 1px 1px hsla(0,0%,100%,.5),
+              0 0 1px 1px hsla(0,0%,100%,.75),
+              0 0 1px 2px hsla(0,0%,100%,.25),
+              0 0 1px 3px hsla(0,0%,100%,.25),
+              0 0 1px 4px hsla(0,0%,100%,.25),
+              0 0 1px 6px hsla(0,0%,0%,.75);
+  height: 9em;
+  margin: 3em auto;
+  position: relative;
+  width: 9em;
+}
+.control ul {
+  height: 100%;
+  padding: 0;
+  transform: rotate(45deg);
+}
+.control li {
+  border-radius: 100% 0 0 0;
+  box-shadow: inset -1px -1px 1px hsla(0,0%,100%,.5),
+              0 0 1px hsla(0,0%,0%,.75);
+  display: inline-block;
+  height: 50%;
+  overflow: hidden;
+  width: 50%;
+}
+.control ul li:nth-child(2) {
+  transform: rotate(90deg);
+}
+.control ul li:nth-child(3) {
+  transform: rotate(-90deg);
+}
+.control ul li:nth-child(4) {
+  transform: rotate(180deg);
+}
+.control ul a {
+  height: 200%;
+  position: relative;
+  transform: rotate(-45deg);
+  width: 200%;
+}
+.control a:hover,
+.control a:focus {
+  background-color: hsla(0,0%,100%,.25);
+}
+.control a {
+  border-radius: 50%;
+  color: #333;
+  display: block;
+  font: bold 1em/3 sans-serif;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 1px 1px hsla(0,0%,100%,.4);
+  transition: .15s;
+}
+.control .confirm {
+  background-color: #ddd;
+  background-image: linear-gradient(hsla(0,0%,0%,.15), hsla(0,0%,100%,.25));
+  box-shadow: inset 0 1px 1px 1px hsla(0,0%,100%,.5),
+              0 0 1px 1px hsla(0,0%,100%,.25),
+              0 0 1px 2px hsla(0,0%,100%,.25),
+              0 0 1px 3px hsla(0,0%,100%,.25),
+              0 0 1px 4px hsla(0,0%,100%,.25),
+              0 0 1px 6px hsla(0,0%,0%,.85);
+  left: 50%;
+  line-height: 3;
+  margin: -1.5em;
+  position: absolute;
+  top: 50%;
+  width: 3em;
+}
+.control .confirm:hover,
+.control .confirm:focus {
+  background-color: #eee;
+}

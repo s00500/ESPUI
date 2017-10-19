@@ -16,38 +16,61 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
-typedef struct Button
+typedef struct Control
 {
+    unsigned int type;
     const char *label;
-    void (*callback)();
-} Button;
+    void (*callback)(int, int);
+    String oldValue;
+} Control;
+
+// Types
+#define UI_TITEL 0
+#define UI_LABEL 1
+#define UI_BUTTON 2
+#define UI_SWITCHER 3
+#define UI_PAD 4
+#define UI_CPAD 5
+#define UPDATE_LABEL 6
+
+// Values
+#define B_DOWN -1
+#define B_UP  1
+
+#define P_LEFT_DOWN -2
+#define P_LEFT_UP 2
+#define P_RIGHT_DOWN -3
+#define P_RIGHT_UP 3
+#define P_FOR_DOWN -4
+#define P_FOR_UP 4
+#define P_BACK_DOWN -5
+#define P_BACK_UP 5
+#define P_CENTER_DOWN -6
+#define P_CENTER_UP 6
+
+
 
 class EasyUIClass{
 
 public:
-  void begin();   // Begin HTTP Server + WebSocketsServer & Initalize All Elements
-  void title(const char* _title);  // Define Webpage Header Name and title
-  //void toggleButton(uint8_t  pin, const char* tbutton_label, int start_state = 0, bool swap_state = false);   // Create Toggle Button
-  void button(const char* tbutton_label, void(* callBack)());   // Create Event Button
-  void label(const char* label_name, const char*  label_val); // Create Label
+  void begin(const char* _title);   // Setup servers and page
+
+  // Creating Elements
+  void label(const char* label); // Create Label
+  void button(const char* label, void(* callBack)(int, int));   // Create Event Button
+  void switcher(const char* label, int start_state, void(* callBack)(int, int));   // Create Toggle Button
+  void pad(const char* label, bool centerButton, void(* callBack)(int, int));   // Create Pad Control
+
+  // Update Elements
+  void print(int labelid, String value);
+
   // Variables ---
-  const char* ui_title = "EasyUI"; // Store UI Title and Header Name
-  int bIndex;   // How Many Buttons
-  int l_index;    // How Many Labels
-
-  bool tbutton_swap[10];
-  Button* buttons[10];
-
-  const char*  label_value[10];      // Stores Label Values - MAX 10
-  const char* label_title[10];    // Stores Label Titles - MAX 10
-
-  String webpage;                      // Coverts Arduino elements to JSON elements
-
-  void tbClick(String _index, String _status);
-  void tbuttonStatus();
+  const char* ui_title = "ESPUI"; // Store UI Title and Header Name
+  int cIndex;   // Control index
+  Control* controls[25];
   void jsonDom(AsyncWebSocketClient * client);
 
- private:
+private:
   AsyncWebServer* server;
   AsyncWebSocket* ws;
 };

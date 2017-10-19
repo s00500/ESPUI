@@ -16,168 +16,124 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
             }
             break;
         case WS_EVT_DATA:
-          Serial.print("WS Event");
           String msg = "";
           for (size_t i = 0; i < len; i++) {
             msg += (char) data[i];
           }
-          Serial.println(msg);
-          StaticJsonBuffer<200> jsonBuffer;
-          JsonObject& root = jsonBuffer.parseObject(msg);
-             String type = root["type"];
-             if(type == "t"){
-               //Button Action
-               //TODO: get Button here
-               EasyUI.buttons[0]->callback();
-               //EasyUI.tbuttonStatus();
-             }
-             /*
-             else if(mode == "tb_click"){
-               String status = root["status"];
-               String index = root["index"];
-              //EasyUI.tbClick(index, status);
-             }
-             */
-            break;
+          if(msg.startsWith("bdown:")){
+            EasyUI.controls[msg.substring(6).toInt()]->callback(msg.substring(6).toInt(), B_DOWN);
+          }else if(msg.startsWith("bup:")){
+            EasyUI.controls[msg.substring(4).toInt()]->callback(msg.substring(4).toInt(), B_UP);
+          }else if(msg.startsWith("pfdown:")){
+            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_FOR_DOWN);
+          }else if(msg.startsWith("pfup:")){
+            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_FOR_UP);
+          }else if(msg.startsWith("pldown:")){
+            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_LEFT_DOWN);
+          }else if(msg.startsWith("plup:")){
+            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_LEFT_UP);
+          }else if(msg.startsWith("prdown:")){
+            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_RIGHT_DOWN);
+          }else if(msg.startsWith("prup:")){
+            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_RIGHT_UP);
+          }else if(msg.startsWith("pbdown:")){
+            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_BACK_DOWN);
+          }else if(msg.startsWith("pbup:")){
+            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_BACK_UP);
+          }else if(msg.startsWith("pcdown:")){
+            EasyUI.controls[msg.substring(7).toInt()]->callback(msg.substring(7).toInt(), P_CENTER_DOWN);
+          }else if(msg.startsWith("pcup:")){
+            EasyUI.controls[msg.substring(5).toInt()]->callback(msg.substring(5).toInt(), P_CENTER_UP);
+          }
+          break;
     }
 }
 
-void EasyUIClass::title(const char* _title){
-  ui_title = _title;
+void EasyUIClass::label(const char* label){
+  Control* newL = new Control();
+  newL->type = UI_LABEL;
+  newL->label = label;
+  newL->oldValue = label;
+  newL->callback = NULL;
+  controls[cIndex] = newL;
+  cIndex++;
 }
 
-// Create Labels
-void EasyUIClass::label(const char* label_name,const char*  label_val){
-  label_value[l_index] = label_val;
-  label_title[l_index] = label_name;
-  l_index++;
-}
-/*
-// Create Toggle Buttons
-void EasyUIClass::toggleButton(uint8_t  pin, const char* tbutton_label, int start_state, bool swap_state){
-  pinMode(pin, OUTPUT);
-  digitalWrite(pin, start_state);
-  tbutton_swap[tb_index] = swap_state;
-  tbutton_pinout[tb_index] = pin;
-  tbuttontitle[tb_index] = tbutton_label;
-  tb_index++;
-}
-*/
-// Create a generic Button
-void EasyUIClass::button(const char* bLabel, void(* callBack)()){
-
-//TODO: Implement
-  Button* newB = new Button();
-
-  newB->label = bLabel;
+void EasyUIClass::button(const char* label, void(* callBack)(int, int)){
+  Control* newB = new Control();
+  newB->type = UI_BUTTON;
+  newB->label = label;
   newB->callback = callBack;
-  buttons[bIndex] = newB;
-  bIndex++;
+  controls[cIndex] = newB;
+  cIndex++;
 }
-/*
-// Check Toggle Buttons States and Transfer to Webpage
-void EasyUIClass::tbuttonStatus(){
-  String json;
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
-  root["mode"] = "t_button_startup";
-  root["index"] = tb_index;
-    for(int i=0; i<tb_index; i++){
-      String name = "tb"+String(i);
-      int stat = digitalRead(tbutton_pinout[i]);
-    if(tbutton_swap[i]){
-      if(stat == HIGH)
-      root[name] = "0";
-     else if(stat == LOW)
-      root[name] = "1";
-     else
-     root[name] = "unknown";
-   }
-   else{
-    if(stat == HIGH)
-     root[name] = "1";
-    else if(stat == LOW)
-     root[name] = "0";
-    else
-    root[name] = "unknown";
-   }
-}
-    root.printTo(json);
-  webSocket->broadcastTXT(json);
-}
-*/
 
-/*
-// Handle Toggle Button Click Response
-void EasyUIClass::tbClick(String _index, String _status){
-  String json;
-  StaticJsonBuffer<200> jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
-  String name = "tb"+_index;
-  root["mode"] = "t_button_click";
-  root["index"] = _index;
+void EasyUIClass::switcher(const char* label, int start_state, void(* callBack)(int, int)){
+  Control* newS = new Control();
+  newS->type = UI_SWITCHER;
+  newS->label = label;
+  newS->callback = callBack;
+  controls[cIndex] = newS;
+  cIndex++;
+  //TODO: implement switch state buffer
+  //tbutton_swap[tb_index] = swap_state;
+}
 
-  if(_status == "on"){
-    root[name] = "1";
+void EasyUIClass::pad(const char* label, bool center, void(* callBack)(int, int)){
+  Control* newP = new Control();
+  if(center)newP->type = UI_CPAD;
+  else newP->type = UI_PAD;
+  newP->label = label;
+  newP->callback = callBack;
+  controls[cIndex] = newP;
+  cIndex++;
+}
+
+void EasyUIClass::print(int labelid, String value){
+  if(labelid<cIndex && controls[labelid]->type == UI_LABEL){
+    controls[labelid]->oldValue = value;
+    String json;
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    root["type"] = UPDATE_LABEL;
+    root["label"] = value;
+    root["id"] = String(labelid);
     root.printTo(json);
-    webSocket->broadcastTXT(json);
-    if(tbutton_swap[_index.toInt()]){
-      digitalWrite(tbutton_pinout[_index.toInt()], LOW);
-    }else{
-      digitalWrite(tbutton_pinout[_index.toInt()], HIGH);
-    }
-  }
-  else if(_status == "off"){
-    root[name] = "0";
-    root.printTo(json);
-    webSocket->broadcastTXT(json);
-  if(tbutton_swap[_index.toInt()]){
-    digitalWrite(tbutton_pinout[_index.toInt()], HIGH);
+    this->ws->textAll(json);
   }else{
-    digitalWrite(tbutton_pinout[_index.toInt()], LOW);
-  }
+    Serial.println(String("Error: ")+ String(labelid) +String(" is no label"));
   }
 }
-*/
+
 
 // Convert & Transfer Arduino elements to JSON elements
 void EasyUIClass::jsonDom(AsyncWebSocketClient * client){
-  //SiteTitle
-  //TODO: emit here
-  // Labels
-  for(int i=0; i<l_index; i++){
+  for(int i=-1; i<cIndex; i++){
     String json;
-    StaticJsonBuffer<200> jsonBuffer1;
-    JsonObject& root1 = jsonBuffer1.createObject();
-    root1["type"] = "domLabel";
-    root1["l_title"] = String(label_title[i]);
-    root1["label"] = String(label_value[i]);
-    root1.printTo(json);
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& root = jsonBuffer.createObject();
+    if(i == -1){
+      root["type"] = UI_TITEL;
+      root["label"] = String(ui_title);
+    }else{
+      root["type"] = controls[i]->type;
+      root["label"] = String(controls[i]->label);
+      root["id"] = String(i);
+      if(controls[i]->type == UI_LABEL)root["label"] = controls[i]->oldValue;
+    }
+    root.printTo(json);
     client->text(json);
   }
-  //  Buttons
-  for(int i=0; i<bIndex; i++){
-    String json;
-    StaticJsonBuffer<200> jsonBuffer2;
-    JsonObject& root2 = jsonBuffer2.createObject();
-    root2["type"] = "domButton";
-    root2["index"] = String(i);
-    root2["label"] = buttons[i]->label;
-    root2.printTo(json);
-    client->text(json);
-    }
-
 }
 
 
-void EasyUIClass::begin(){
+void EasyUIClass::begin(const char * _title){
+  ui_title = _title;
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
-  SPIFFS.begin(false);
-
+  SPIFFS.begin();
   ws->onEvent(onWsEvent);
   server->addHandler(ws);
-
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
 
   //Heap for general Servertest
