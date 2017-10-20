@@ -31,22 +31,22 @@ void setup(void) {
     Serial.println(WiFi.localIP());
   */
 
-  EasyUI.label("Status: Stop");
-  EasyUI.label("0");
-  EasyUI.button("Push Button", &buttonCallback);
-  EasyUI.button("Push Button", &buttonExample);
-  EasyUI.pad("center", true, &padExample);
-  EasyUI.pad("NoCenter", false, &padExample);
-  EasyUI.switcher("Switch one", false, &switchExample);
-  EasyUI.switcher("Switch two", true, &otherSwitchExample);
+  ESPUI.label("Status: Stop");
+  ESPUI.label("0");
+  ESPUI.button("Push Button", &buttonCallback);
+  ESPUI.button("Push Button", &buttonExample);
+  ESPUI.pad("center", true, &padExample);
+  ESPUI.pad("NoCenter", false, &padExample);
+  ESPUI.switcher("Switch one", false, &switchExample);
+  ESPUI.switcher("Switch two", true, &otherSwitchExample);
 
-  EasyUI.begin("ESP32 Control");
+  ESPUI.begin("ESP32 Control");
 
 }
 
 void loop(void) {
   if (millis() - oldTime > 5000) {
-    EasyUI.print(1, String(millis()));
+    ESPUI.print(1, String(millis()));
     oldTime = millis();
   }
 }
@@ -67,11 +67,11 @@ void buttonExample(int id, int type) {
   switch (type) {
     case B_DOWN:
       Serial.println("Status: Start");
-      EasyUI.print(0, "Status: Start");
+      ESPUI.print(0, "Status: Start");
       break;
     case B_UP:
       Serial.println("Status: Stop");
-      EasyUI.print(0, "Status: Stop");
+      ESPUI.print(0, "Status: Stop");
       break;
   }
 }
