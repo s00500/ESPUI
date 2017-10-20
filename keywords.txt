@@ -1,8 +1,8 @@
-EasyUI KEYWORD1
+EasyUI	KEYWORD1
 
-detectCDN KEYWORD2
-title KEYWORD2
-begin KEYWORD2
-label KEYWORD2
-toggleButton KEYWORD2
-loop KEYWORD2
+detectCDN	KEYWORD2
+title	KEYWORD2
+begin	KEYWORD2
+label	KEYWORD2
+toggleButton	KEYWORD2
+loop	KEYWORD2
