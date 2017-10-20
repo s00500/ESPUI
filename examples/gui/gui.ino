@@ -1,5 +1,5 @@
 #include <WiFi.h>
-#include <EasyUI.h>
+#include <ESPUI.h>
 
 const char* ssid = "ESP32";
 const char* password = "";
