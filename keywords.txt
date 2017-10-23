@@ -1,8 +1,10 @@
-EasyUI KEYWORD1
+ESPUI	KEYWORD1
 
-detectCDN KEYWORD2
-title KEYWORD2
-begin KEYWORD2
-label KEYWORD2
-toggleButton KEYWORD2
-loop KEYWORD2
+label	KEYWORD2
+button	KEYWORD2
+switcher  KEYWORD2
+pad	KEYWORD2
+
+begin	KEYWORD2
+print	KEYWORD2
+updateSwitcher	KEYWORD2
