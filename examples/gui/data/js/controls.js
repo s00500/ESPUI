@@ -67,7 +67,7 @@ function start() {
       "</div>");
       break;
       case UI_CPAD:
-      center = "<a class='confirm' onmousedown='padclick(CENTER, "+data.id+", true)' onmouseup='padclick(CENTER, "+data.id+", false)' href='#' id='c"+data.id+"'>OK</a>";
+      center = "<a class='confirm' onmousedown='padclick(CENTER, "+data.id+", true)' onmouseup='padclick(CENTER, "+data.id+", false)' href='#' id='pc"+data.id+"'>OK</a>";
       //NO BREAK
       case UI_PAD:
       $('#row').append(
