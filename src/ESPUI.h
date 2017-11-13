@@ -3,6 +3,8 @@
 
 #define HARDWARE "esp32"
 
+#define debug true
+
 //ifdef 8266
 //#include "Hash.h"
 
@@ -18,10 +20,11 @@
 
 typedef struct Control
 {
-    unsigned int type;
-    const char *label;
-    void (*callback)(int, int);
-    String value;
+  unsigned int type;
+  unsigned int id; // just mirroring the id here for practical reasons
+  const char *label;
+  void (*callback)(Control*, int);
+  String value;
 } Control;
 
 // Types
@@ -53,30 +56,35 @@ typedef struct Control
 
 
 
-class ESPUIClass{
+class ESPUIClass {
 
 public:
-  void begin(const char* _title);   // Setup servers and page
+void begin(const char* _title);     // Setup servers and page
 
-  // Creating Elements
-  void label(const char* label, String value = ""); // Create Label
-  void button(const char* label, void(* callBack)(int, int));   // Create Event Button
-  void switcher(const char* label, bool startState, void(* callBack)(int, int));   // Create Toggle Button
-  void pad(const char* label, bool centerButton, void(* callBack)(int, int));   // Create Pad Control
+// Creating Elements
+void label(const char* label, String value = "");   // Create Label
+void button(const char* label, void (* callBack)(Control*, int));    // Create Event Button
+void switcher(const char* label, bool startState, void (* callBack)(Control*, int));    // Create Toggle Button
+void pad(const char* label, bool centerButton, void (* callBack)(Control*, int));    // Create Pad Control
 
-  // Update Elements
-  void print(int id, String value);
-  void updateSwitcher(int id, bool nValue);
+// Update Elements
+void print(int id, String value);
+void print(String label, String value);
 
-  // Variables ---
-  const char* ui_title = "ESPUI"; // Store UI Title and Header Name
-  int cIndex;   // Control index
-  Control* controls[25];
-  void jsonDom(AsyncWebSocketClient * client);
+void updateSwitcher(int id, bool nValue);
+void updateSwitcher(String label, bool nValue);
+
+// Variables ---
+const char* ui_title = "ESPUI";   // Store UI Title and Header Name
+int cIndex = 0;     // Control index
+Control* controls[25];
+void jsonDom(AsyncWebSocketClient * client);
+int getIdByLabel(String label);
+bool labelExists(String label);
 
 private:
-  AsyncWebServer* server;
-  AsyncWebSocket* ws;
+AsyncWebServer* server;
+AsyncWebSocket* ws;
 };
 
 extern ESPUIClass ESPUI;
