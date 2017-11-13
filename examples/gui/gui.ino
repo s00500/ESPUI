@@ -5,6 +5,7 @@ const char* ssid = "ESP32";
 const char* password = "";
 
 long oldTime = 0;
+bool switchi = false;
 
 void setup(void) {
   Serial.begin(115200);
@@ -31,12 +32,12 @@ void setup(void) {
     Serial.println(WiFi.localIP());
   */
 
-  ESPUI.label("Status: Stop");
-  ESPUI.label("0");
+  ESPUI.label("Status:", "Stop");
+  ESPUI.label("Millis:","0");
   ESPUI.button("Push Button", &buttonCallback);
   ESPUI.button("Push Button", &buttonExample);
-  ESPUI.pad("center", true, &padExample);
-  ESPUI.pad("NoCenter", false, &padExample);
+  ESPUI.pad("Pad with center", true, &padExample);
+  ESPUI.pad("Pad without center", false, &padExample);
   ESPUI.switcher("Switch one", false, &switchExample);
   ESPUI.switcher("Switch two", true, &otherSwitchExample);
 
@@ -46,12 +47,14 @@ void setup(void) {
 
 void loop(void) {
   if (millis() - oldTime > 5000) {
-    ESPUI.print(1, String(millis()));
+    ESPUI.print("Millis:", String(millis()));
+    switchi = !switchi;
+    ESPUI.updateSwitcher("Switch one", switchi);
     oldTime = millis();
   }
 }
 
-void buttonCallback(int id, int type) {
+void buttonCallback(Control* sender, int type) {
   switch (type) {
     case B_DOWN:
       Serial.println("Button DOWN");
@@ -63,7 +66,7 @@ void buttonCallback(int id, int type) {
 
 }
 
-void buttonExample(int id, int type) {
+void buttonExample(Control* sender, int type) {
   switch (type) {
     case B_DOWN:
       Serial.println("Status: Start");
@@ -75,7 +78,7 @@ void buttonExample(int id, int type) {
       break;
   }
 }
-void padExample(int id, int value) {
+void padExample(Control* sender, int value) {
   switch (value) {
     case P_LEFT_DOWN:
       Serial.print("left down");
@@ -109,10 +112,10 @@ void padExample(int id, int value) {
       break;
   }
   Serial.print(" ");
-  Serial.println(id);
+  Serial.println(sender->id);
 }
 
-void switchExample(int id, int value) {
+void switchExample(Control* sender, int value) {
   switch (value) {
     case S_ACTIVE:
       Serial.print("Active:");
@@ -122,10 +125,10 @@ void switchExample(int id, int value) {
       break;
   }
   Serial.print(" ");
-  Serial.println(id);
+  Serial.println(sender->id);
 }
 
-void otherSwitchExample(int id, int value) {
+void otherSwitchExample(Control* sender, int value) {
   switch (value) {
     case S_ACTIVE:
       Serial.print("Active:");
@@ -135,5 +138,5 @@ void otherSwitchExample(int id, int value) {
       break;
   }
   Serial.print(" ");
-  Serial.println(id);
+  Serial.println(sender->id);
 }
