@@ -63,7 +63,7 @@ void begin(const char* _title);     // Setup servers and page
 
 // Creating Elements
 void label(const char* label, String value = "");   // Create Label
-void button(const char* label, void (* callBack)(Control*, int));    // Create Event Button
+void button(const char* label, void (* callBack)(Control*, int), String value = "");    // Create Event Button
 void switcher(const char* label, bool startState, void (* callBack)(Control*, int));    // Create Toggle Button
 void pad(const char* label, bool centerButton, void (* callBack)(Control*, int));    // Create Pad Control
 

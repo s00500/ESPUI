@@ -87,7 +87,7 @@ void ESPUIClass::label(const char *label, String value) {
   cIndex++;
 }
 
-void ESPUIClass::button(const char *label, void (*callBack)(Control*, int)) {
+void ESPUIClass::button(const char *label, void (*callBack)(Control*, int), String value) {
   if (labelExists(label)) {
     if (debug) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
     return;
@@ -96,6 +96,12 @@ void ESPUIClass::button(const char *label, void (*callBack)(Control*, int)) {
   Control *newB = new Control();
   newB->type = UI_BUTTON;
   newB->label = label;
+
+  if (value != "")
+    newB->value = value; // Init with labeltext
+  else
+    newB->value = String(label);
+
   newB->callback = callBack;
   newB->id = cIndex;
   controls[cIndex] = newB;
