@@ -35,7 +35,7 @@ void setup(void) {
   ESPUI.label("Status:", "Stop");
   ESPUI.label("Millis:","0");
   ESPUI.button("Push Button", &buttonCallback);
-  ESPUI.button("Push Button", &buttonExample);
+  ESPUI.button("Other Button",  &buttonExample, "Press");
   ESPUI.pad("Pad with center", true, &padExample);
   ESPUI.pad("Pad without center", false, &padExample);
   ESPUI.switcher("Switch one", false, &switchExample);
