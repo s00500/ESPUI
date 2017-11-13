@@ -48,7 +48,6 @@ Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), G
 This library is dependent on the following libraries to function properly.
   - [ESP32 Core Library](https://github.com/espressif/arduino-esp32)
   - [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
-  (There is still an open issue because there is a mistake in the current version that creates an error, please wait until that is done or checkout the [issue](https://github.com/me-no-dev/ESPAsyncWebServer/issues/234))
   - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
 
 
