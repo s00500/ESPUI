@@ -13,6 +13,50 @@ const LEFT = 2;
 const RIGHT = 3;
 const CENTER = 4;
 
+// Colors
+const C_TURQUOISE = 0;
+const C_EMERALD = 1;
+const C_PETERRIVER = 2;
+const C_WETASPHALT = 3;
+const C_SUNFLOWER = 4;
+const C_CARROT = 5;
+const C_ALIZARIN = 6;
+
+function colorClass(colorId){
+  colorId = Number(colorId);
+  switch(colorId){
+    case C_TURQUOISE:
+      return "turquoise";
+    break;
+
+    case C_EMERALD:
+      return "emerald";
+    break;
+
+    case C_PETERRIVER:
+      return "peterriver";
+      break;
+
+    case C_WETASPHALT:
+      return "wetasphalt";
+    break;
+
+    case C_SUNFLOWER:
+      return "sunflower";
+    break;
+
+    case C_CARROT:
+      return "carrot"
+    break;
+
+    case C_ALIZARIN:
+      return "alizarin"
+    break;
+    default:
+      return "alizarin";
+  }
+}
+
 var websock;
 
 function start() {
@@ -45,10 +89,10 @@ function start() {
         $('#mainHeader').html(data.label);
       break;
       case UI_LABEL:
-        $('#row').append("<div class='two columns card tcenter wetasphalt'><h5 id='"+data.id+"'>"+data.label+"</h5><hr /><span id='l"+data.id+"' class='label'>"+data.value+"</span></div>");
+        $('#row').append("<div class='two columns card tcenter "+colorClass(data.color)+"'><h5 id='"+data.id+"'>"+data.label+"</h5><hr /><span id='l"+data.id+"' class='label'>"+data.value+"</span></div>");
       break;
       case UI_BUTTON:
-        $('#row').append("<div class='one columns card tcenter wetasphalt'><h5>"+data.label+"</h5><hr/><button onmousedown='buttonclick("+data.id+", true)' onmouseup='buttonclick("+data.id+", false)' id='"+data.id+"'>"+data.value+"</button></div>");
+        $('#row').append("<div class='one columns card tcenter "+colorClass(data.color)+"'><h5>"+data.label+"</h5><hr/><button onmousedown='buttonclick("+data.id+", true)' onmouseup='buttonclick("+data.id+", false)' id='"+data.id+"'>"+data.value+"</button></div>");
         $('#'+data.id).on({ 'touchstart' : function(e){e.preventDefault(); buttonclick(data.id, true) } });
         $('#'+data.id).on({ 'touchend' : function(e){e.preventDefault(); buttonclick(data.id, false) } });
       break;
@@ -60,7 +104,7 @@ function start() {
         input = "<input type='checkbox' id='s"+data.id+"' onClick='switcher("+data.id+",null)' >";
       }
       $('#row').append(
-      "<div id='"+data.id+"' class='one columns card tcenter wetasphalt'><h5>"+data.label+"</h5><hr/>" +
+      "<div id='"+data.id+"' class='one columns card tcenter "+colorClass(data.color)+"'><h5>"+data.label+"</h5><hr/>" +
       label + "<i class='icon-ok'></i>" +
       "<i class='icon-remove'></i>" + input +
       "</label>" +
@@ -71,7 +115,7 @@ function start() {
       //NO BREAK
       case UI_PAD:
       $('#row').append(
-      "<div class='two columns card tcenter wetasphalt'><h5>"+data.label+"</h5><hr/>"+
+      "<div class='two columns card tcenter "+colorClass(data.color)+"'><h5>"+data.label+"</h5><hr/>"+
       "<nav class='control'>"+
       "<ul>"+
       "<li><a onmousedown='padclick(FOR, "+data.id+", true)' onmouseup='padclick(FOR, "+data.id+", false)' href='#' id='pf"+data.id+"'>▲</a></li>" +
