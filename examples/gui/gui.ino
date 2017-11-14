@@ -39,16 +39,8 @@ void setup(void) {
   ESPUI.pad("Pad with center", true, &padExample, COLOR_SUNFLOWER);
   ESPUI.pad("Pad without center", false, &padExample, COLOR_CARROT);
   ESPUI.switcher("Switch one", false, &switchExample, COLOR_ALIZARIN);
-  ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_TURQUOISE);
+  ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_NONE);
 
-
-  #define COLOR_TURQUOISE 0
-  #define COLOR_EMERALD 1
-  #define COLOR_PETERRIVER 2
-  #define COLOR_WETASPHALT 3
-  #define COLOR_SUNFLOWER 4
-  #define COLOR_CARROT 5
-  #define COLOR_ALIZARIN 6
   ESPUI.begin("ESP32 Control");
 
 }
