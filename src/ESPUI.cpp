@@ -93,8 +93,8 @@ void ESPUIClass::label(const char *label, int color, String value) {
   cIndex++;
 }
 
-void ESPUIClass::button(const char *label, void (*callBack)(Control, int), int color,
-                        String value) {
+void ESPUIClass::button(const char *label, void (*callBack)(Control, int),
+                        int color, String value) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
