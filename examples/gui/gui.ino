@@ -32,15 +32,23 @@ void setup(void) {
     Serial.println(WiFi.localIP());
   */
 
-  ESPUI.label("Status:", 0, "Stop");
-  ESPUI.label("Millis:", 1, "0");
-  ESPUI.button("Push Button", &buttonCallback, 2);
-  ESPUI.button("Other Button",  &buttonExample, 3, "Press" );
-  ESPUI.pad("Pad with center", true, &padExample, 4);
-  ESPUI.pad("Pad without center", false, &padExample, 5);
-  ESPUI.switcher("Switch one", false, &switchExample, 6);
-  ESPUI.switcher("Switch two", true, &otherSwitchExample, 0);
+  ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
+  ESPUI.label("Millis:", COLOR_EMERALD, "0");
+  ESPUI.button("Push Button", &buttonCallback, COLOR_PETERRIVER);
+  ESPUI.button("Other Button",  &buttonExample, COLOR_WETASPHALT, "Press" );
+  ESPUI.pad("Pad with center", true, &padExample, COLOR_SUNFLOWER);
+  ESPUI.pad("Pad without center", false, &padExample, COLOR_CARROT);
+  ESPUI.switcher("Switch one", false, &switchExample, COLOR_ALIZARIN);
+  ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_TURQUOISE);
 
+
+  #define COLOR_TURQUOISE 0
+  #define COLOR_EMERALD 1
+  #define COLOR_PETERRIVER 2
+  #define COLOR_WETASPHALT 3
+  #define COLOR_SUNFLOWER 4
+  #define COLOR_CARROT 5
+  #define COLOR_ALIZARIN 6
   ESPUI.begin("ESP32 Control");
 
 }

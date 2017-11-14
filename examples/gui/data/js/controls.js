@@ -21,6 +21,7 @@ const C_WETASPHALT = 3;
 const C_SUNFLOWER = 4;
 const C_CARROT = 5;
 const C_ALIZARIN = 6;
+const C_NONE = 7;
 
 function colorClass(colorId){
   colorId = Number(colorId);
@@ -52,8 +53,13 @@ function colorClass(colorId){
     case C_ALIZARIN:
       return "alizarin"
     break;
+
+    case C_NONE:
+      return ""
+    break;
+
     default:
-      return "alizarin";
+      return "";
   }
 }
 
