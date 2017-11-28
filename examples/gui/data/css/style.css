@@ -1,8 +1,3 @@
-  body {
-    font-family: 'Open Sans', sans-serif;
-    background-color: #ecf0f1;
-  }
-
   .container {
     position: relative;
     width: 79%;
@@ -225,11 +220,11 @@
   body {
     margin: 0;
     font-size: 1.5em;
-    /* currently ems cause chrome bug misinterpreting rems on body element */
     line-height: 1.0;
     font-weight: 400;
-    font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     color: #222;
+    background-color: #ecf0f1;
   }
 
   /* Typography
@@ -325,6 +320,9 @@
     color: #fff;
   }
 
+  /* Main Head Part
+  –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
   #mainHeader {
     display: inline-block;
   }
@@ -334,36 +332,11 @@
     font-size: 0.75em;
   }
 
-  /* Tables
-  –––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-  th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #E1E1E1;
-  }
-
-  th:first-child, td:first-child {
-    padding-left: 0;
-  }
-
-  th:last-child, td:last-child {
-    padding-right: 0;
-  }
-
   /* Spacing
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
   button, .button {
     margin-bottom: 1rem;
-  }
-
-  input, textarea, select, fieldset {
-    margin-bottom: 1.5rem;
-  }
-
-  pre, blockquote, dl, figure, table, p, ul, ol, form {
-    margin-bottom: 2.5rem;
   }
 
   /* Utilities
@@ -584,3 +557,205 @@
   .switch .icon-remove {
     float: right;
   }
+
+  /* ----------------------------------------------------------------------
+    Material Design Range Slider - by Ravikumar Chauhan
+  ------------------------------------------------------------------------- */
+  .rkmd-slider {
+    display: block;
+    position: relative;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+  }
+  .rkmd-slider input[type="range"] {
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .rkmd-slider input[type="range"] + .slider {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background-color: #bebebe;
+  }
+  .rkmd-slider input[type="range"] + .slider .slider-fill {
+    display: block;
+    position: absolute;
+    width: 0%;
+    height: 100%;
+    user-select: none;
+    z-index: 1;
+  }
+  .rkmd-slider input[type="range"] + .slider .slider-handle {
+    cursor: pointer;
+    position: absolute;
+    top: -5.5px;
+    left: 0%;
+    width: 15px;
+    height: 15px;
+    margin-left: -8px;
+    border-radius: 50%;
+    transition: all .2s ease;
+    user-select: none;
+    z-index: 2;
+  }
+  .rkmd-slider input[type="range"]:disabled + .slider {
+    background-color: #b0b0b0 !important;
+  }
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-fill,
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-handle {
+    cursor: default !important;
+    background-color: #b0b0b0 !important;
+  }
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-fill .slider-label,
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-handle .slider-label {
+    display: none;
+    background-color: #b0b0b0 !important;
+  }
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-fill.is-active,
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-handle.is-active {
+    top: -5.5px;
+    width: 15px;
+    height: 15px;
+    margin-left: -8px;
+  }
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-fill.is-active .slider-label,
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-handle.is-active .slider-label {
+    display: none;
+    border-radius: 50%;
+    transform: none;
+  }
+  .rkmd-slider input[type="range"]:disabled + .slider .slider-handle:active {
+    box-shadow: none !important;
+    transform: scale(1) !important;
+  }
+
+  /* ----------------------------------------------------------------------
+    Discrete Range Slider - by Ravikumar Chauhan
+  ------------------------------------------------------------------------- */
+  .rkmd-slider.slider-discrete .slider .slider-handle {
+    position: relative;
+    z-index: 1;
+  }
+
+  .rkmd-slider.slider-discrete .slider .slider-handle .slider-label {
+    position: absolute;
+    top: -17.5px;
+    left: -2px;
+    width: 30px;
+    height: 30px;
+    -webkit-transform-origin: 50% 100%;
+            transform-origin: 50% 100%;
+    border-radius: 50%;
+    -webkit-transform: scale(0.5) rotate(-45deg);
+            transform: scale(0.5) rotate(-45deg);
+    -webkit-transition: all .2s ease;
+    transition: all .2s ease;
+  }
+
+  .rkmd-slider.slider-discrete .slider .slider-handle .slider-label span {
+    position: absolute;
+    top: 7px;
+    left: 0px;
+    width: 100%;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+    opacity: 0;
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+  }
+
+  .rkmd-slider.slider-discrete .slider .slider-handle.is-active {
+    top: 0px;
+    margin-left: -2px;
+    width: 4px;
+    height: 4px;
+  }
+  .rkmd-slider.slider-discrete .slider .slider-handle.is-active .slider-label {
+    top: -15px;
+    left: -2px;
+    border-radius: 15px 15px 15px 0;
+    -webkit-transform: rotate(-45deg) translate(23px, -25px);
+            transform: rotate(-45deg) translate(23px, -25px);
+  }
+  .rkmd-slider.slider-discrete .slider .slider-handle.is-active .slider-label span {
+    opacity: 1;
+  }
+
+
+
+  .rkmd-slider.slider-discrete.slider-turquoise .slider-label {
+    background-color: #16a085;
+  }
+
+  .rkmd-slider.slider-discrete.slider-emerald .slider-label {
+    background-color: #27ae60;
+  }
+
+  .peterriver {
+    background: #3498db;
+    border-bottom: #2980b9 3px solid;
+  }
+
+  .rkmd-slider.slider-discrete.slider-peterriver .slider-label {
+    background-color: #2980b9;
+  }
+
+  .wetasphalt {
+    background: #34495e;
+    border-bottom: #2c3e50 3px solid;
+  }
+
+  .rkmd-slider.slider-discrete.slider-wetasphalt .slider-label {
+    background-color: #2c3e50;
+  }
+
+  .sunflower {
+    background: #f1c40f;
+    border-bottom: #E6BB0F 3px solid;
+  }
+
+  .rkmd-slider.slider-discrete.slider-sunflower .slider-label {
+    background-color: #E6BB0F;
+  }
+
+  .carrot {
+    background: #e67e22;
+    border-bottom: #d35400 3px solid;
+  }
+
+  .rkmd-slider.slider-discrete.slider-carrot .slider-label {
+    background-color: #d35400;
+  }
+
+  .alizarin {
+    background: #e74c3c;
+    border-bottom: #c0392b 3px solid;
+  }
+
+  .rkmd-slider.slider-discrete.slider-alizarin .slider-label {
+    background-color: #c0392b;
+  }
+
+
+  /*
+  .rkmd-slider.slider-light input[type="range"] + .slider {
+    background-color: #5c5c5c;
+  }
+  .rkmd-slider.slider-light input[type="range"]:disabled + .slider {
+    background-color: #5c5c5c !important;
+  }
+  .rkmd-slider.slider-light input[type="range"]:disabled + .slider .slider-fill,
+  .rkmd-slider.slider-light input[type="range"]:disabled + .slider .slider-handle {
+    background-color: #5c5c5c !important;
+  }
+
+*/
