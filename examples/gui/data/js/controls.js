@@ -6,6 +6,8 @@ const UI_PAD = 4;
 const UI_CPAD = 5;
 const UPDATE_LABEL = 6;
 const UPDATE_SWITCHER = 7;
+const UI_SLIDER = 8;
+const UPDATE_SLIDER = 9;
 
 const FOR = 0;
 const BACK = 1;
@@ -214,6 +216,25 @@ function start() {
                 else
                     switcher(data.id, 1);
                 break;
+            case UI_SLIDER:
+                $('#row').append(
+                    "<div class='two columns card tcenter " + colorClass(data.color) + "'>" +
+                    "<h5 id='" + data.id + "'>" + data.label + "</h5><hr />" +
+                    "<div id='sl" + data.id + "' class='rkmd-slider slider-discrete slider-" + colorClass(data.color) + "'>" +
+                    "<input type='range' min='0' max='100' value='" + data.value + "'>" +
+                    "</div>" +
+                    "</div>"
+                );
+                $('#row').append(
+                  "<script>" +
+                  "rkmd_rangeSlider('#sl" + data.id + "');" +
+                  "</script>"
+                );
+                break;
+
+            case UPDATE_SLIDER:
+                slider(data.id, data.value);
+                break;
             default:
                 console.error('Unknown type or event');
                 break;
@@ -251,6 +272,10 @@ function padclick(type, number, isdown) {
             break;
 
     }
+}
+
+function slider(number, value) {
+  console.log('Should update slider: ' + value);
 }
 
 function switcher(number, state) {
