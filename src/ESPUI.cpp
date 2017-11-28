@@ -1,6 +1,46 @@
 #include "ESPUI.h"
+
+#include "uploadDataIndex.h"
+#include "uploadDataControls.h"
+#include "uploadDataStyle.h"
+
+#include "uploadDataZepto.h"
+#include "uploadDataNormalize.h"
+
 #include <ESPAsyncWebServer.h>
 #include <functional>
+
+void ESPUIClass::prepareFileSystem(){
+// this function should only be used once, maybe even halt the system
+/*
+Needed Things
+index.htm HTML_INDEX
+
+style/style.css
+stye/normalize.css
+
+js/controls.js
+js/zepto.js
+
+*/
+if(!SPIFFS.begin()){
+    if(debug) Serial.println("SPIFFS Mount Failed");
+    return;
+}
+
+/*
+listDir(SPIFFS, "/", 0);
+writeFile(SPIFFS, "/hello.txt", "Hello ");
+appendFile(SPIFFS, "/hello.txt", "World!\n");
+readFile(SPIFFS, "/hello.txt");
+deleteFile(SPIFFS, "/foo.txt");
+renameFile(SPIFFS, "/hello.txt", "/foo.txt");
+readFile(SPIFFS, "/foo.txt");
+testFileIO(SPIFFS, "/test.txt");
+*/
+
+}
+
 
 // Handle Websockets Communication
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
@@ -22,48 +62,37 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     for (size_t i = 0; i < len; i++) {
       msg += (char)data[i];
     }
+    
+    Control *c = ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
+
     if (msg.startsWith("bdown:")) {
-      Control *c = ESPUI.controls[msg.substring(6).toInt()];
       c->callback(*c, B_DOWN);
     } else if (msg.startsWith("bup:")) {
-      Control *c = ESPUI.controls[msg.substring(4).toInt()];
       c->callback(*c, B_UP);
     } else if (msg.startsWith("pfdown:")) {
-      Control *c = ESPUI.controls[msg.substring(7).toInt()];
       c->callback(*c, P_FOR_DOWN);
     } else if (msg.startsWith("pfup:")) {
-      Control *c = ESPUI.controls[msg.substring(5).toInt()];
       c->callback(*c, P_FOR_UP);
     } else if (msg.startsWith("pldown:")) {
-      Control *c = ESPUI.controls[msg.substring(7).toInt()];
       c->callback(*c, P_LEFT_DOWN);
     } else if (msg.startsWith("plup:")) {
-      Control *c = ESPUI.controls[msg.substring(5).toInt()];
       c->callback(*c, P_LEFT_UP);
     } else if (msg.startsWith("prdown:")) {
-      Control *c = ESPUI.controls[msg.substring(7).toInt()];
       c->callback(*c, P_RIGHT_DOWN);
     } else if (msg.startsWith("prup:")) {
-      Control *c = ESPUI.controls[msg.substring(5).toInt()];
       c->callback(*c, P_RIGHT_UP);
     } else if (msg.startsWith("pbdown:")) {
-      Control *c = ESPUI.controls[msg.substring(7).toInt()];
       c->callback(*c, P_BACK_DOWN);
     } else if (msg.startsWith("pbup:")) {
-      Control *c = ESPUI.controls[msg.substring(5).toInt()];
       c->callback(*c, P_BACK_UP);
     } else if (msg.startsWith("pcdown:")) {
-      Control *c = ESPUI.controls[msg.substring(7).toInt()];
       c->callback(*c, P_CENTER_DOWN);
     } else if (msg.startsWith("pcup:")) {
-      Control *c = ESPUI.controls[msg.substring(5).toInt()];
       c->callback(*c, P_CENTER_UP);
     } else if (msg.startsWith("sactive:")) {
-      Control *c = ESPUI.controls[msg.substring(8).toInt()];
       ESPUI.updateSwitcher(c->id, true);
       c->callback(*c, S_ACTIVE);
     } else if (msg.startsWith("sinactive:")) {
-      Control *c = ESPUI.controls[msg.substring(10).toInt()];
       ESPUI.updateSwitcher(c->id, false);
       c->callback(*c, S_INACTIVE);
     }
@@ -90,6 +119,29 @@ void ESPUIClass::label(const char *label, int color, String value) {
   newL->callback = NULL;
   newL->id = cIndex;
   controls[cIndex] = newL;
+  cIndex++;
+}
+
+// TODO: this still needs a range setting
+void ESPUIClass::slider(const char *label, void (*callBack)(Control, int), int color, String value) {
+  if (labelExists(label)) {
+    if (debug)
+      Serial.println("UI ERROR: Element " + String(label) +
+                     " exists, skipping creating element!");
+    return;
+  }
+
+  Control *newSL = new Control();
+  newSL->type = UI_SLIDER;
+  newSL->label = label;
+  newSL->color = color;
+  if (value != "")
+    newSL->value = value;
+  else
+    newSL->value = ""; // TODO: init with half value
+  newSL->callback = callBack;
+  newSL->id = cIndex;
+  controls[cIndex] = newSL;
   cIndex++;
 }
 
@@ -253,6 +305,7 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
 }
 
 void ESPUIClass::begin(const char *_title) {
+
   ui_title = _title;
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");

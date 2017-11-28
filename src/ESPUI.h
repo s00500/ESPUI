@@ -36,6 +36,8 @@ typedef struct Control {
 #define UI_CPAD 5
 #define UPDATE_LABEL 6
 #define UPDATE_SWITCH 7
+#define UI_SLIDER 8
+#define UPDATE_SLIDER 9
 
 // Values
 #define B_DOWN -1
@@ -71,6 +73,8 @@ class ESPUIClass {
 public:
   void begin(const char *_title); // Setup servers and page
 
+  void prepareFileSystem(); // Initially preps the filesystem and loads a lot of stuff into SPIFFS
+
   // Creating Elements
   void label(const char *label, int color, String value = ""); // Create Label
   void button(const char *label, void (*callBack)(Control, int), int color,
@@ -80,6 +84,7 @@ public:
                 int color); // Create Toggle Button
   void pad(const char *label, bool centerButton, void (*callBack)(Control, int),
            int color); // Create Pad Control
+  void slider(const char *label, void (*callBack)(Control, int), int color, String value); // Create Slider Control
 
   // Update Elements
   void print(int id, String value);
@@ -87,6 +92,9 @@ public:
 
   void updateSwitcher(int id, bool nValue);
   void updateSwitcher(String label, bool nValue);
+
+  void updateSlider(int id, int nValue);
+  void updateSlider(String label, int nValue);
 
   // Variables ---
   const char *ui_title = "ESPUI"; // Store UI Title and Header Name
