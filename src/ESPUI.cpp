@@ -1,59 +1,83 @@
 #include "ESPUI.h"
 
 #include "uploadDataIndex.h"
-#include "uploadDataControls.h"
-#include "uploadDataStyle.h"
 
-#include "uploadDataZepto.h"
+
+#include "uploadDataStyle.h"
 #include "uploadDataNormalize.h"
+
+#include "uploadDataControls.h"
+#include "uploadDataZepto.h"
+#include "uploadDataSlider.h"
 
 #include <ESPAsyncWebServer.h>
 #include <functional>
 
-void ESPUIClass::prepareFileSystem(){
-// this function should only be used once, maybe even halt the system
-/*
-Needed Things
-index.htm HTML_INDEX
+// ################# Spiffs functions
+void deleteFile(fs::FS &fs, const char * path){
+    if(!fs.exists(path)){
+      Serial.printf("File: %s does not exist, not deleting\n", path);
+      return;
+    }
 
-style/style.css
-stye/normalize.css
+    Serial.printf("Deleting file: %s\n", path);
 
-js/controls.js
-js/zepto.js
-
-
-if(!SPIFFS.begin()){
-    if(debug) Serial.println("SPIFFS Mount Failed");
-    return;
+    if(fs.remove(path)){
+        Serial.println("File deleted");
+    } else {
+        Serial.println("Delete failed");
+    }
 }
 
-SPIFFS.remove(path);
+void writeFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Writing file: %s\n", path);
 
-File file = SPIFFS.open(path, FILE_WRITE);
-
+    File file = fs.open(path, FILE_WRITE);
     if(!file){
         Serial.println("Failed to open file for writing");
         return;
     }
-
     if(file.print(message)){
         Serial.println("File written");
     } else {
         Serial.println("Write failed");
     }
-*/
-/*
-listDir(SPIFFS, "/", 0);
-writeFile(SPIFFS, "/hello.txt", "Hello ");
-appendFile(SPIFFS, "/hello.txt", "World!\n");
-readFile(SPIFFS, "/hello.txt");
-deleteFile(SPIFFS, "/foo.txt");
-renameFile(SPIFFS, "/hello.txt", "/foo.txt");
-readFile(SPIFFS, "/foo.txt");
-testFileIO(SPIFFS, "/test.txt");
-*/
+}
 
+// end Spiffs functions
+
+void ESPUIClass::prepareFileSystem(){
+// this function should only be used once
+
+Serial.println('About to prepare filesystem...');
+if(!SPIFFS.begin()) {
+    Serial.println("SPIFFS Mount Failed");
+    return;
+}
+
+deleteFile(SPIFFS, "/index.htm");
+
+deleteFile(SPIFFS, "/css/style.css");
+deleteFile(SPIFFS, "/css/normalize.css");
+
+deleteFile(SPIFFS, "/js/controls.js");
+deleteFile(SPIFFS, "/js/zepto.js");
+deleteFile(SPIFFS, "/js/slider.js");
+
+Serial.println('Cleanup done');
+
+// Now write
+
+writeFile(SPIFFS, "/index.htm", HTML_INDEX);
+
+writeFile(SPIFFS, "/css/style.css", CSS_STYLE);
+writeFile(SPIFFS, "/css/normalize.css", CSS_NORMALIZE);
+
+writeFile(SPIFFS, "/js/controls.js", JS_CONTROLS);
+writeFile(SPIFFS, "/js/zepto.js", JS_ZEPTO);
+writeFile(SPIFFS, "/js/slider.js", JS_SLIDER);
+
+Serial.println("Done Initializing filesystem :-)");
 }
 
 
@@ -358,7 +382,16 @@ void ESPUIClass::begin(const char *_title) {
   ui_title = _title;
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
-  SPIFFS.begin();
+  if(!SPIFFS.begin()) {
+      Serial.println("SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO PREPARE YOUR ESP!!!!!!!");
+      return;
+  }
+
+  if(!SPIFFS.exists( "/index.htm")) {
+    Serial.println("Please read the README!!!!!!!, Make sure to ESPUI.prepareFileSystem() once in an empty sketch");
+    return;
+  }
+
   ws->onEvent(onWsEvent);
   server->addHandler(ws);
   server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
@@ -369,7 +402,9 @@ void ESPUIClass::begin(const char *_title) {
   });
 
   server->onNotFound(
-      [](AsyncWebServerRequest *request) { request->send(404); });
+      [](AsyncWebServerRequest *request) {
+        request->send(404);
+      });
 
   server->begin();
   if (debug)

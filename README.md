@@ -44,10 +44,21 @@ Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), G
 ## Getting started (Filesystem upload)
 
 ESPUI **NEEDS** its files burnt on the SPIFFS filesystem on the ESP. **Without this ESPUI will NOT work at all**
+There are now two ways to do this: you can either use the upload tool or you use the library function `ESPUI.prepareFileSystem()`
+
+#### Simple filesystem preparation (recomended)
+
+Just open the example sketch **prepareFileSystem** and run it on the ESP, (give it 5 - 10 seconds),
+The library will create all needed files.
+Congratulations, you are done, from now on you just need to to this again when there is a library update, or when you want to use another chip :-)
+Now you can upload your normal sketch, when you do not call the `ESPUI.prepareFileSystem()` function the compiler will strip out all the unnecessary that is already saved in the chip's filesystem and you have more programm memory to work with.
+
+
+#### Manual way (mainly for development)
 
 To do this download and install me-no-devs wonderful [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin)
 
-Then open the example sketch and select "ESP32 Upload Sketch Data" from the Tools menu.
+Then open the **gui** example sketch and select "ESP32 Upload Sketch Data" from the Tools menu.
 Now you are set to go and use any code you want to with this library
 
 ## User interface Elements
@@ -63,7 +74,10 @@ Now you are set to go and use any code you want to with this library
 ## Roadmap :
 
 - Document slider
-- setup spiffs using values in program memory ? (if you have feedback to this idea let me know)
+- proper return value (as int and not as string) for slider
+- Maybe a slider range setting, meanwhile please use map()
+- Improve slider stability
+- ~~setup spiffs using values in program memory~~
 - ESP8266 support
 
 ## Documentation
