@@ -35,7 +35,7 @@ typedef struct Control {
 #define UI_PAD 4
 #define UI_CPAD 5
 #define UPDATE_LABEL 6
-#define UPDATE_SWITCH 7
+#define UPDATE_SWITCHER 7
 #define UI_SLIDER 8
 #define UPDATE_SLIDER 9
 
@@ -53,8 +53,11 @@ typedef struct Control {
 #define P_BACK_UP 5
 #define P_CENTER_DOWN -6
 #define P_CENTER_UP 6
+
 #define S_ACTIVE -7
 #define S_INACTIVE 7
+
+#define SL_VALUE 8
 
 
 // Colors
@@ -90,11 +93,13 @@ public:
   void print(int id, String value);
   void print(String label, String value);
 
-  void updateSwitcher(int id, bool nValue);
-  void updateSwitcher(String label, bool nValue);
+  void updateSwitcher(int id, bool nValue, int clientId = -1);
+  void updateSwitcher(String label, bool nValue, int clientId = -1);
 
-  void updateSlider(int id, int nValue);
-  void updateSlider(String label, int nValue);
+  void updateSlider(int id, int nValue, int clientId = -1);
+  void updateSlider(String label, int nValue, int clientId = -1);
+
+  void textThem(String text, int clientId);
 
   // Variables ---
   const char *ui_title = "ESPUI"; // Store UI Title and Header Name

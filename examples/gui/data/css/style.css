@@ -21,6 +21,10 @@
     color: #fff;
   }
 
+  .card-slider {
+      padding-bottom: 10px
+  }
+
   .turquoise {
     background: #1abc9c;
     border-bottom: #16a085 3px solid;

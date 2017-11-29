@@ -22,12 +22,27 @@ stye/normalize.css
 js/controls.js
 js/zepto.js
 
-*/
+
 if(!SPIFFS.begin()){
     if(debug) Serial.println("SPIFFS Mount Failed");
     return;
 }
 
+SPIFFS.remove(path);
+
+File file = SPIFFS.open(path, FILE_WRITE);
+
+    if(!file){
+        Serial.println("Failed to open file for writing");
+        return;
+    }
+
+    if(file.print(message)){
+        Serial.println("File written");
+    } else {
+        Serial.println("Write failed");
+    }
+*/
 /*
 listDir(SPIFFS, "/", 0);
 writeFile(SPIFFS, "/hello.txt", "Hello ");
@@ -62,7 +77,11 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     for (size_t i = 0; i < len; i++) {
       msg += (char)data[i];
     }
-    
+    int id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
+    if (id >= ESPUI.cIndex){
+      if(debug) Serial.println("Maleformated id in websocket message");
+      return;
+    }
     Control *c = ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
 
     if (msg.startsWith("bdown:")) {
@@ -95,6 +114,10 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
     } else if (msg.startsWith("sinactive:")) {
       ESPUI.updateSwitcher(c->id, false);
       c->callback(*c, S_INACTIVE);
+    } else if (msg.startsWith("slvalue:")) {
+      int value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
+      ESPUI.updateSlider(c->id, value, client->id());
+      c->callback(*c, SL_VALUE);
     }
     break;
   }
@@ -239,17 +262,17 @@ void ESPUIClass::print(String label, String value) {
   print(getIdByLabel(label), value);
 }
 
-void ESPUIClass::updateSwitcher(int id, bool nValue) {
+void ESPUIClass::updateSwitcher(int id, bool nValue, int clientId ) {
   if (id < cIndex && controls[id]->type == UI_SWITCHER) {
     controls[id]->value = nValue ? 1 : 0;
     String json;
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_SWITCH;
+    root["type"] = UPDATE_SWITCHER;
     root["value"] = nValue ? 1 : 0;
     root["id"] = String(id);
     root.printTo(json);
-    this->ws->textAll(json);
+    textThem(json, clientId);
   } else {
     if (debug)
       Serial.println(String("Error: ") + String(id) +
@@ -257,14 +280,40 @@ void ESPUIClass::updateSwitcher(int id, bool nValue) {
   }
 }
 
-void ESPUIClass::updateSwitcher(String label, bool nValue) {
+void ESPUIClass::updateSlider(int id, int nValue, int clientId ) {
+  if (id < cIndex && controls[id]->type == UI_SLIDER) {
+    controls[id]->value = nValue;
+    String json;
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["type"] = UPDATE_SLIDER;
+    root["value"] = nValue;
+    root["id"] = String(id);
+    root.printTo(json);
+    textThem(json, clientId);
+  } else {
+    if (debug)
+      Serial.println(String("Error: ") + String(id) +
+                     String(" is no slider"));
+  }
+}
+
+void ESPUIClass::updateSwitcher(String label, bool nValue, int clientId) {
   if (!labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element does not " + String(label) +
                      " exist, cannot update!");
     return;
   }
-  updateSwitcher(getIdByLabel(label), nValue);
+  updateSwitcher(getIdByLabel(label), nValue, clientId);
+}
+
+void ESPUIClass::textThem(String text, int clientId){
+  for(int i = 1; i <= this->ws->count(); i++){
+    if(clientId!=i){
+      this->ws->client(i)->text(text);
+    }
+  }
 }
 
 int ESPUIClass::getIdByLabel(String label) {

@@ -218,7 +218,7 @@ function start() {
                 break;
             case UI_SLIDER:
                 $('#row').append(
-                    "<div class='two columns card tcenter " + colorClass(data.color) + "'>" +
+                    "<div class='two columns card tcenter card-slider " + colorClass(data.color) + "'>" +
                     "<h5 id='" + data.id + "'>" + data.label + "</h5><hr />" +
                     "<div id='sl" + data.id + "' class='rkmd-slider slider-discrete slider-" + colorClass(data.color) + "'>" +
                     "<input type='range' min='0' max='100' value='" + data.value + "'>" +
@@ -233,7 +233,7 @@ function start() {
                 break;
 
             case UPDATE_SLIDER:
-                slider(data.id, data.value);
+                slider_move($('#sl'+data.id), data.value ,'100', false);
                 break;
             default:
                 console.error('Unknown type or event');
@@ -272,10 +272,6 @@ function padclick(type, number, isdown) {
             break;
 
     }
-}
-
-function slider(number, value) {
-  console.log('Should update slider: ' + value);
 }
 
 function switcher(number, state) {
