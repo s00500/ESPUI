@@ -40,6 +40,8 @@ void setup(void) {
   ESPUI.pad("Pad without center", false, &padExample, COLOR_CARROT);
   ESPUI.switcher("Switch one", false, &switchExample, COLOR_ALIZARIN);
   ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_NONE);
+  ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, "30");
+  ESPUI.slider("Slider two", &slider, COLOR_NONE, "100");
 
   ESPUI.begin("ESP32 Control");
 }
@@ -51,6 +53,10 @@ void loop(void) {
     ESPUI.updateSwitcher("Switch one", switchi);
     oldTime = millis();
   }
+}
+
+void slider(Control sender, int type) {
+  Serial.println(sender.value);
 }
 
 void buttonCallback(Control sender, int type) {

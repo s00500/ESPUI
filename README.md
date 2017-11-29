@@ -56,16 +56,13 @@ Now you are set to go and use any code you want to with this library
   - Switch (updateable)
   - Control pad
   - Control pad with center button
+  - Slider
 
   Checkout the example for the usage
 
 ## Roadmap :
 
-- refactor id system
-- make button colour customisable
-- do a proper redesign
-- cleanup unnecessary CSS
-- gzip files to make them load faster
+- Document slider
 - setup spiffs using values in program memory ? (if you have feedback to this idea let me know)
 - ESP8266 support
 
@@ -106,6 +103,10 @@ Button pads come in two flavours: with or without a center button. They are very
 ![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_labels.png)
 
 Labels are a nice tool to get information from the robot to the user interface. This can be done to show states, values of sensors and configuration parameters. To send data from the code use ESP.print(labelId, “Text”); . Labels get a name on creation and a initial value. The name is not changeable once the UI initialized.
+
+#### Slider
+
+There is also an slider component now, needs to be documented though
 
 #### Initialization of the UI
 
