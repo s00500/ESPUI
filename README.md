@@ -2,7 +2,7 @@
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
 
 
-ESPUI is a simple library to make a web user interface for your projects using the **ESP32**
+ESPUI is a simple library to make a web user interface for your projects using the **ESP8266** or the **ESP32**
 It uses web sockets and lets you create, control, and update elements on your GUI through multiple devices like phones and tablets.
 
 ESPUI uses simple Arduino-style syntax for creating a solid, functioning user interface without too much boilerplate code.
@@ -11,13 +11,18 @@ So if you either don't know how or just don't want to waste time: this is your s
 
 I completely rewrote the EasyUI Library created by ayushsharma82 [Here](https://github.com/ayushsharma82/)
 Now it uses ESPAsyncWebserver and is mainly to be used with the ESP32 Processor.
-ESP8266 support will be interesting maybe in the future.
 
 ## Dependencies
 This library is dependent on the following libraries to function properly.
-  - [ESP32 Core Library](https://github.com/espressif/arduino-esp32)
-  - [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
-  - [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+
+- [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson)
+
+**Plus for ESP8266**
+- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
+
+**Additionally necessary for ESP32**
+- [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
 
 
 ## How to Install
@@ -27,7 +32,7 @@ Make sure all the dependencies are installed, then install like so:
 #### Directly Through Arduino IDE
 
 You can find this Library in the Arduino IDE library manager
-Go to Sketch > Include Library > Library Manager > Search for "EasyUI" > Install
+Go to Sketch > Include Library > Library Manager > Search for "ESPUI" > Install
 
 #### Manual Install
 
@@ -56,9 +61,9 @@ Now you can upload your normal sketch, when you do not call the `ESPUI.prepareFi
 
 #### Manual way (mainly for development)
 
-To do this download and install me-no-devs wonderful [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin)
+To do this download and install me-no-devs wonderful [ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin) or for ESP8266 [ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin)
 
-Then open the **gui** example sketch and select "ESP32 Upload Sketch Data" from the Tools menu.
+Then open the **gui** example sketch and select "Upload Sketch Data" from the Tools menu for your processor.
 Now you are set to go and use any code you want to with this library
 
 ## User interface Elements
@@ -73,12 +78,13 @@ Now you are set to go and use any code you want to with this library
 
 ## Roadmap :
 
+- ~~Setup SPIFFS using values in program memory~~
+- ~~ESP8266 support~~
 - Document slider
 - proper return value (as int and not as string) for slider
 - Maybe a slider range setting, meanwhile please use map()
 - Improve slider stability
-- ~~setup spiffs using values in program memory~~
-- ESP8266 support
+- Improve general stability
 
 ## Documentation
 
@@ -88,7 +94,7 @@ ESPUI does not need network access and can be used in standalone access point mo
 All assets are loaded from the internal SPIFFS filesystem of the ESP32.
 
 This section will explain in detail how the Library is to be used from the Arduino code side. As of now the Facilino blocks are not implemented.
-In the arduino setup() routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object ESPUI. Eg: ESPUI.button(“button”, &myCallback); creates a button in the interface that calls the “my-Callback” function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To seperate different events an integer number with the event name is passed to the callback function that can be handled in a switch(){}case{} statement. Here is an overview of the currently implemented different elements of the UI library:
+In the arduino setup() routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object ESPUI. Eg: ESPUI.button(“button”, &myCallback); creates a button in the interface that calls the “myCallback” function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events an integer number with the event name is passed to the callback function that can be handled in a switch(){}case{} statement. Here is an overview of the currently implemented different elements of the UI library:
 
 
 #### Button
@@ -116,15 +122,15 @@ Button pads come in two flavours: with or without a center button. They are very
 
 ![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_labels.png)
 
-Labels are a nice tool to get information from the robot to the user interface. This can be done to show states, values of sensors and configuration parameters. To send data from the code use ESP.print(labelId, “Text”); . Labels get a name on creation and a initial value. The name is not changeable once the UI initialized.
+Labels are a nice tool to get information from the robot to the user interface. This can be done to show states, values of sensors and configuration parameters. To send data from the code use ESP.print(labelId, “Text”); . Labels get a name on creation and a initial value. The name is not changeable once the UI initialised.
 
 #### Slider
 
 There is also an slider component now, needs to be documented though
 
-#### Initialization of the UI
+#### Initialisation of the UI
 
-After all the elements are configured you can use ESPUI.begin(“Some Title”); to start the UI interface. The web interface can then be used from multiple devices at once and also shows an connection status in the top bar.
+After all the elements are configured you can use ESPUI.begin(“Some Title”); to start the UI interface. Make sure you setup a working network connection or AccesPoint **before** (See example). The web interface can then be used from multiple devices at once and also shows an connection status in the top bar.
 The library is designed to be easy to use and can still be extended with a lot of more functionality.
 
 
