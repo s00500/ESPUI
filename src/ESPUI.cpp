@@ -29,7 +29,7 @@ void deleteFile(fs::FS &fs, const char * path){
     }
 }
 
-void writeFile(fs::FS &fs, const char * path, const char * message){
+void writeFile(fs::FS &fs, const char * path, const char * data){
     Serial.printf("Writing file: %s\n", path);
 
     File file = fs.open(path, FILE_WRITE);
@@ -37,7 +37,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
         Serial.println("Failed to open file for writing");
         return;
     }
-    if(file.print(message)){
+    if(file.print(FPSTR(data))){
         Serial.println("File written");
     } else {
         Serial.println("Write failed");
@@ -67,14 +67,13 @@ deleteFile(SPIFFS, "/js/slider.js");
 Serial.println('Cleanup done');
 
 // Now write
-
 writeFile(SPIFFS, "/index.htm", HTML_INDEX);
 
 writeFile(SPIFFS, "/css/style.css", CSS_STYLE);
 writeFile(SPIFFS, "/css/normalize.css", CSS_NORMALIZE);
 
-writeFile(SPIFFS, "/js/controls.js", JS_CONTROLS);
 writeFile(SPIFFS, "/js/zepto.js", JS_ZEPTO);
+writeFile(SPIFFS, "/js/controls.js", JS_CONTROLS);
 writeFile(SPIFFS, "/js/slider.js", JS_SLIDER);
 
 Serial.println("Done Initializing filesystem :-)");

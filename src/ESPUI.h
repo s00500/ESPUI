@@ -1,22 +1,34 @@
 #ifndef ESPUI_h
 #define ESPUI_h
 
-#define HARDWARE "esp32"
-
 #define debug true
-
-// ifdef 8266
-//#include "Hash.h"
 
 #include "Arduino.h"
 #include "ArduinoJson.h"
 #include "FS.h"
-#include "SPIFFS.h"
-#include "WiFi.h"
 #include "stdlib_noniso.h"
 
+#if defined(ESP32)
+
+#include "SPIFFS.h"
+#include "WiFi.h"
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+
+#else
+
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
+#include <ArduinoOTA.h>
+#include <FS.h>
+#include <Hash.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <SPIFFSEditor.h>
+
+#define FILE_WRITE "w"
+
+#endif
 
 typedef struct Control {
   unsigned int type;

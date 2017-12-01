@@ -1,7 +1,12 @@
 #include <ESPUI.h>
-#include <WiFi.h>
 
-const char *ssid = "ESP32";
+#if defined(ESP32)
+  #include <WiFi.h>
+#else
+  #include <ESP8266WiFi.h>
+#endif
+
+const char *ssid = "ESPUI";
 const char *password = "";
 
 long oldTime = 0;
@@ -10,7 +15,13 @@ bool switchi = false;
 void setup(void) {
   Serial.begin(115200);
   WiFi.mode(WIFI_AP);
-  WiFi.setHostname(ssid);
+  
+  #if defined(ESP32)
+    WiFi.setHostname(ssid);
+  #else
+    WiFi.hostname(ssid);
+  #endif
+
   WiFi.softAP(ssid);
   // WiFi.softAP(ssid, password);
   Serial.println("");
