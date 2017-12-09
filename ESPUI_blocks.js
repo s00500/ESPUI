@@ -1,6 +1,7 @@
 // This is a block definition for projects like roboblocks
 //
 // Main Block
+Facilino.LANG_COLOUR_HTML = '#BDBDBD';
 Facilino.LANG_COLOUR_ESPUI = '#B1B1B1';
 
 Blockly.Blocks['espui'] = {
