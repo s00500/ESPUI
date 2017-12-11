@@ -1,0 +1,27 @@
+{
+	"langs": 
+	{
+		"en-GB": 
+		{
+			"keys": 
+			{
+				"LANG_SUBCATERGORY_ESPUI": "User Interface",
+				"LANG_ESPUI_ESPUI_TITLE": "Title",
+				"LANG_ESPUI_ESPUI_HOTSPOT": "Enable Wifi Hotspot Code",
+				"LANG_ESPUI_ESPUI_TOOLTIP": "Creates a webinterface on the ESP32/ESP8266",
+				"LANG_ESPUI_BUTTON_BUTTON": "UI Button",
+				"LANG_ESPUI_NAME": "name",
+				"LANG_ESPUI_COLOR": "Color",
+				"LANG_ESPUI_TEXT": "Text",
+				"LANG_ESPUI_BUTTON_TOOLTIP": "A web interface button",
+				"LANG_ESPUI_LABEL_LABEL": "UI Label",
+				"LANG_ESPUI_LABEL": "Label",
+				"LANG_ESPUI_LABEL_TOOLTIP": "A web interface label you can update from your code",
+				"LANG_ESPUI_STATE": "State",
+				"LANG_ESPUI_SWITCH_SWITCH": "UI Switch",
+				"LANG_ESPUI_PAD_PAD": "UI Pad",
+				"LANG_ESPUI_PAD_CENTER": "Center button?"
+			}
+		}
+	}
+}
