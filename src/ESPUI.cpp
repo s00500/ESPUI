@@ -50,7 +50,7 @@ void ESPUIClass::prepareFileSystem(){
 // this function should only be used once
 
 Serial.println('About to prepare filesystem...');
-if(!SPIFFS.begin()) {
+if(!SPIFFS.begin(true)) {
     Serial.println("SPIFFS Mount Failed");
     return;
 }
