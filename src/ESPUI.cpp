@@ -50,10 +50,16 @@ void ESPUIClass::prepareFileSystem(){
 // this function should only be used once
 
 Serial.println('About to prepare filesystem...');
-if(!SPIFFS.begin(true)) {
-    Serial.println("SPIFFS Mount Failed");
-    return;
-}
+
+#if defined(ESP32)
+  if(!SPIFFS.begin(true)) {
+      Serial.println("SPIFFS Mount Failed");
+      return;
+  }
+#else
+  SPIFFS.begin();
+  SPIFFS.format();
+#endif
 
 deleteFile(SPIFFS, "/index.htm");
 
