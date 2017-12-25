@@ -67,7 +67,7 @@ deleteFile(SPIFFS, "/css/style.css");
 deleteFile(SPIFFS, "/css/normalize.css");
 
 deleteFile(SPIFFS, "/js/controls.js");
-deleteFile(SPIFFS, "/js/zepto.js");
+deleteFile(SPIFFS, "/js/zepto.min.js");
 deleteFile(SPIFFS, "/js/slider.js");
 
 Serial.println('Cleanup done');
@@ -78,7 +78,7 @@ writeFile(SPIFFS, "/index.htm", HTML_INDEX);
 writeFile(SPIFFS, "/css/style.css", CSS_STYLE);
 writeFile(SPIFFS, "/css/normalize.css", CSS_NORMALIZE);
 
-writeFile(SPIFFS, "/js/zepto.js", JS_ZEPTO);
+writeFile(SPIFFS, "/js/zepto.min.js", JS_ZEPTO);
 writeFile(SPIFFS, "/js/controls.js", JS_CONTROLS);
 writeFile(SPIFFS, "/js/slider.js", JS_SLIDER);
 
