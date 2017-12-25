@@ -10,7 +10,7 @@ const char HTML_INDEX[] PROGMEM = R"=====(
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/style.css">
 
-    <script src="/js/zepto.js"></script>
+    <script src="/js/zepto.min.js"></script>
     <script src="/js/slider.js"></script>
     <script src="/js/controls.js"></script>
   </head>
