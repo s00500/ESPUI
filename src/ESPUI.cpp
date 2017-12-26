@@ -49,7 +49,7 @@ void writeFile(fs::FS &fs, const char * path, const char * data){
 void ESPUIClass::prepareFileSystem(){
 // this function should only be used once
 
-Serial.println('About to prepare filesystem...');
+Serial.println("About to prepare filesystem...");
 
 #if defined(ESP32)
   if(!SPIFFS.begin(true)) {
