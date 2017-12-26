@@ -95,12 +95,17 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
       Serial.printf("Disconnected!\n");
     break;
   case WS_EVT_CONNECT: {
-    if (debug)
-      Serial.println("Connected");
+    if (debug){
+      Serial.print("Connected: ");
+      Serial.println(client->id());
+    }
+
     ESPUI.jsonDom(client);
-    if (debug)
+    if (debug){
       Serial.println("JSON Data Sent to Client!");
-  } break;
+    }
+  }
+  break;
   case WS_EVT_DATA:
     String msg = "";
     for (size_t i = 0; i < len; i++) {
@@ -337,11 +342,17 @@ void ESPUIClass::updateSwitcher(String label, bool nValue, int clientId) {
   updateSwitcher(getIdByLabel(label), nValue, clientId);
 }
 
+// This is a hacky workaround because ESPAsyncWebServer does not have a function like this and it's clients array is private
 void ESPUIClass::textThem(String text, int clientId){
-  for(int i = 1; i <= this->ws->count(); i++){
-    if(clientId!=i){
-      this->ws->client(i)->text(text);
+  int tryId = 0;
+  for(int count = 0; count < this->ws->count();){
+    if(this->ws->hasClient(tryId)) {
+      if(clientId!=tryId){
+        this->ws->client(tryId)->text(text);
+      }
+      count++;
     }
+    tryId++;
   }
 }
 
