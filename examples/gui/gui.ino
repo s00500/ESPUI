@@ -12,60 +12,6 @@ const char *password = "";
 long oldTime = 0;
 bool switchi = false;
 
-void setup(void) {
-  Serial.begin(115200);
-  WiFi.mode(WIFI_AP);
-  
-  #if defined(ESP32)
-    WiFi.setHostname(ssid);
-  #else
-    WiFi.hostname(ssid);
-  #endif
-
-  WiFi.softAP(ssid);
-  // WiFi.softAP(ssid, password);
-  Serial.println("");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.softAPIP());
-
-  // change the beginning to this if you want to join an existing network
-  /*
-    Serial.begin(115200);
-    WiFi.begin(ssid, password);
-    Serial.println("");
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-  */
-
-  ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
-  ESPUI.label("Millis:", COLOR_EMERALD, "0");
-  ESPUI.button("Push Button", &buttonCallback, COLOR_PETERRIVER);
-  ESPUI.button("Other Button", &buttonExample, COLOR_WETASPHALT, "Press");
-  ESPUI.pad("Pad with center", true, &padExample, COLOR_SUNFLOWER);
-  ESPUI.pad("Pad without center", false, &padExample, COLOR_CARROT);
-  ESPUI.switcher("Switch one", false, &switchExample, COLOR_ALIZARIN);
-  ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_NONE);
-  ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, "30");
-  ESPUI.slider("Slider two", &slider, COLOR_NONE, "100");
-
-  ESPUI.begin("ESP32 Control");
-}
-
-void loop(void) {
-  if (millis() - oldTime > 5000) {
-    ESPUI.print("Millis:", String(millis()));
-    switchi = !switchi;
-    ESPUI.updateSwitcher("Switch one", switchi);
-    oldTime = millis();
-  }
-}
-
 void slider(Control sender, int type) {
   Serial.println(sender.value);
 }
@@ -154,4 +100,58 @@ void otherSwitchExample(Control sender, int value) {
   }
   Serial.print(" ");
   Serial.println(sender.id);
+}
+
+void setup(void) {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_AP);
+
+  #if defined(ESP32)
+    WiFi.setHostname(ssid);
+  #else
+    WiFi.hostname(ssid);
+  #endif
+
+  WiFi.softAP(ssid);
+  // WiFi.softAP(ssid, password);
+  Serial.println("");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.softAPIP());
+
+  // change the beginning to this if you want to join an existing network
+  /*
+    Serial.begin(115200);
+    WiFi.begin(ssid, password);
+    Serial.println("");
+    // Wait for connection
+    while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    }
+    Serial.println("");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
+  */
+
+  ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
+  ESPUI.label("Millis:", COLOR_EMERALD, "0");
+  ESPUI.button("Push Button", &buttonCallback, COLOR_PETERRIVER);
+  ESPUI.button("Other Button", &buttonExample, COLOR_WETASPHALT, "Press");
+  ESPUI.pad("Pad with center", true, &padExample, COLOR_SUNFLOWER);
+  ESPUI.pad("Pad without center", false, &padExample, COLOR_CARROT);
+  ESPUI.switcher("Switch one", false, &switchExample, COLOR_ALIZARIN);
+  ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_NONE);
+  ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, "30");
+  ESPUI.slider("Slider two", &slider, COLOR_NONE, "100");
+
+  ESPUI.begin("ESP32 Control");
+}
+
+void loop(void) {
+  if (millis() - oldTime > 5000) {
+    ESPUI.print("Millis:", String(millis()));
+    switchi = !switchi;
+    ESPUI.updateSwitcher("Switch one", switchi);
+    oldTime = millis();
+  }
 }
