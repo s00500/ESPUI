@@ -89,7 +89,7 @@ public:
   void begin(const char *_title); // Setup servers and page
 
   void prepareFileSystem(); // Initially preps the filesystem and loads a lot of stuff into SPIFFS
-
+void list();
   // Creating Elements
   void label(const char *label, int color, String value = ""); // Create Label
   void button(const char *label, void (*callBack)(Control, int), int color,

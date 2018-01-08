@@ -14,25 +14,58 @@
 #include <functional>
 
 // ################# Spiffs functions
-void deleteFile(fs::FS &fs, const char * path){
-    if(!fs.exists(path)){
+
+void listDir(const char * dirname, uint8_t levels){
+    Serial.printf("Listing directory: %s\n", dirname);
+
+    File root = SPIFFS.open(dirname);
+    if(!root){
+        Serial.println("Failed to open directory");
+        return;
+    }
+    if(!root.isDirectory()){
+        Serial.println("Not a directory");
+        return;
+    }
+
+    File file = root.openNextFile();
+    while(file){
+        if(file.isDirectory()){
+            Serial.print("  DIR : ");
+            Serial.println(file.name());
+            if(levels){
+                listDir(file.name(), levels -1);
+            }
+        } else {
+            Serial.print("  FILE: ");
+            Serial.print(file.name());
+            Serial.print("  SIZE: ");
+            Serial.println(file.size());
+        }
+        file = root.openNextFile();
+    }
+}
+
+void deleteFile(const char * path) {
+  Serial.print(SPIFFS.exists(path));
+    if(!SPIFFS.exists(path)){
       Serial.printf("File: %s does not exist, not deleting\n", path);
       return;
     }
 
     Serial.printf("Deleting file: %s\n", path);
 
-    if(fs.remove(path)){
+    if(SPIFFS.remove(path)){
         Serial.println("File deleted");
     } else {
         Serial.println("Delete failed");
     }
 }
 
-void writeFile(fs::FS &fs, const char * path, const char * data){
+void writeFile(const char * path, const char * data) {
     Serial.printf("Writing file: %s\n", path);
 
-    File file = fs.open(path, FILE_WRITE);
+    File file = SPIFFS.open(path, FILE_WRITE);
     if(!file){
         Serial.println("Failed to open file for writing");
         return;
@@ -42,6 +75,7 @@ void writeFile(fs::FS &fs, const char * path, const char * data){
     } else {
         Serial.println("Write failed");
     }
+    file.close();
 }
 
 // end Spiffs functions
@@ -52,37 +86,58 @@ void ESPUIClass::prepareFileSystem(){
 Serial.println("About to prepare filesystem...");
 
 #if defined(ESP32)
+  SPIFFS.format();
   if(!SPIFFS.begin(true)) {
       Serial.println("SPIFFS Mount Failed");
       return;
   }
+    Serial.println("SPIFFS Mount ESP32 Done");
 #else
-  SPIFFS.begin();
   SPIFFS.format();
+  SPIFFS.begin();
+  Serial.println("SPIFFS Mount ESP8266 Done");
 #endif
 
-deleteFile(SPIFFS, "/index.htm");
+listDir("/", 1);
 
-deleteFile(SPIFFS, "/css/style.css");
-deleteFile(SPIFFS, "/css/normalize.css");
+//TODO: This is a workaround, have to find out why SPIFFS on ESP32 behaves incredibly strangely, see issue #6
+/*
+deleteFile("/index.htm");
 
-deleteFile(SPIFFS, "/js/controls.js");
-deleteFile(SPIFFS, "/js/zepto.min.js");
-deleteFile(SPIFFS, "/js/slider.js");
+deleteFile("/css/style.css");
+deleteFile("/css/normalize.css");
 
-Serial.println('Cleanup done');
+deleteFile("/js/zepto.min.js");
+deleteFile("/js/controls.js");
+deleteFile("/js/slider.js");
+*/
+
+Serial.println("Cleanup done");
 
 // Now write
-writeFile(SPIFFS, "/index.htm", HTML_INDEX);
+writeFile("/index.htm", HTML_INDEX);
 
-writeFile(SPIFFS, "/css/style.css", CSS_STYLE);
-writeFile(SPIFFS, "/css/normalize.css", CSS_NORMALIZE);
+writeFile("/css/style.css", CSS_STYLE);
+writeFile("/css/normalize.css", CSS_NORMALIZE);
 
-writeFile(SPIFFS, "/js/zepto.min.js", JS_ZEPTO);
-writeFile(SPIFFS, "/js/controls.js", JS_CONTROLS);
-writeFile(SPIFFS, "/js/slider.js", JS_SLIDER);
+writeFile("/js/zepto.min.js", JS_ZEPTO);
+writeFile("/js/controls.js", JS_CONTROLS);
+writeFile("/js/slider.js", JS_SLIDER);
 
 Serial.println("Done Initializing filesystem :-)");
+listDir("/", 1);
+SPIFFS.end();
+}
+
+void ESPUIClass::list() {
+  if(!SPIFFS.begin()) {
+      Serial.println("SPIFFS Mount Failed");
+      return;
+  }
+  listDir("/", 1);
+
+  Serial.println(SPIFFS.totalBytes());
+  Serial.println(SPIFFS.usedBytes());
 }
 
 
@@ -398,10 +453,12 @@ void ESPUIClass::begin(const char *_title) {
   ui_title = _title;
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
+
   if(!SPIFFS.begin()) {
       Serial.println("SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO PREPARE YOUR ESP!!!!!!!");
       return;
   }
+  listDir("/", 1);
 
   if(!SPIFFS.exists( "/index.htm")) {
     Serial.println("Please read the README!!!!!!!, Make sure to ESPUI.prepareFileSystem() once in an empty sketch");
