@@ -108,11 +108,19 @@ void writeFile(const char *path, const char *data) {
     Serial.println("Failed to open file for writing");
     return;
   }
+  #if defined(ESP32)
+  if (file.print(data)) {
+    Serial.println("File written");
+  } else {
+    Serial.println("Write failed");
+  }
+  #else
   if (file.print(FPSTR(data))) {
     Serial.println("File written");
   } else {
     Serial.println("Write failed");
   }
+  #endif
   file.close();
 }
 
@@ -140,15 +148,15 @@ void ESPUIClass::prepareFileSystem() {
   // TODO: This is a workaround, have to find out why SPIFFS on ESP32 behaves
   // incredibly strangely, see issue #6
   /*
-  deleteFile("/index.htm");
+     deleteFile("/index.htm");
 
-  deleteFile("/css/style.css");
-  deleteFile("/css/normalize.css");
+     deleteFile("/css/style.css");
+     deleteFile("/css/normalize.css");
 
-  deleteFile("/js/zepto.min.js");
-  deleteFile("/js/controls.js");
-  deleteFile("/js/slider.js");
-  */
+     deleteFile("/js/zepto.min.js");
+     deleteFile("/js/controls.js");
+     deleteFile("/js/slider.js");
+   */
 
   Serial.println("Cleanup done");
 
@@ -202,7 +210,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
       return;
     }
     Control *c =
-        ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
+      ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
 
     if (msg.startsWith("bdown:")) {
       c->callback(*c, B_DOWN);
@@ -236,7 +244,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
       c->callback(*c, S_INACTIVE);
     } else if (msg.startsWith("slvalue:")) {
       int value =
-          msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
+        msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
       ESPUI.updateSlider(c->id, value, client->id());
       c->callback(*c, SL_VALUE);
     }
@@ -244,7 +252,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
   }
 }
 
-void ESPUIClass::label(const char *label, int color, String value) {
+int ESPUIClass::label(const char *label, int color, String value) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -264,11 +272,12 @@ void ESPUIClass::label(const char *label, int color, String value) {
   newL->id = cIndex;
   controls[cIndex] = newL;
   cIndex++;
+  return cIndex - 1;
 }
 
 // TODO: this still needs a range setting
-void ESPUIClass::slider(const char *label, void (*callBack)(Control, int),
-                        int color, String value) {
+int ESPUIClass::slider(const char *label, void (*callBack)(Control, int),
+                       int color, String value) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -288,10 +297,11 @@ void ESPUIClass::slider(const char *label, void (*callBack)(Control, int),
   newSL->id = cIndex;
   controls[cIndex] = newSL;
   cIndex++;
+  return cIndex - 1;
 }
 
-void ESPUIClass::button(const char *label, void (*callBack)(Control, int),
-                        int color, String value) {
+int ESPUIClass::button(const char *label, void (*callBack)(Control, int),
+                       int color, String value) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -313,10 +323,11 @@ void ESPUIClass::button(const char *label, void (*callBack)(Control, int),
   newB->id = cIndex;
   controls[cIndex] = newB;
   cIndex++;
+  return cIndex - 1;
 }
 
-void ESPUIClass::switcher(const char *label, bool startState,
-                          void (*callBack)(Control, int), int color) {
+int ESPUIClass::switcher(const char *label, bool startState,
+                         void (*callBack)(Control, int), int color) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -333,10 +344,11 @@ void ESPUIClass::switcher(const char *label, bool startState,
   newS->id = cIndex;
   controls[cIndex] = newS;
   cIndex++;
+  return cIndex - 1;
 }
 
-void ESPUIClass::pad(const char *label, bool center,
-                     void (*callBack)(Control, int), int color) {
+int ESPUIClass::pad(const char *label, bool center,
+                    void (*callBack)(Control, int), int color) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -355,6 +367,7 @@ void ESPUIClass::pad(const char *label, bool center,
   newP->id = cIndex;
   controls[cIndex] = newP;
   cIndex++;
+  return cIndex - 1;
 }
 
 void ESPUIClass::print(int id, String value) {
@@ -510,7 +523,9 @@ void ESPUIClass::begin(const char *_title) {
   });
 
   server->onNotFound(
-      [](AsyncWebServerRequest *request) { request->send(404); });
+    [](AsyncWebServerRequest *request) {
+    request->send(404);
+  });
 
   server->begin();
   if (debug)

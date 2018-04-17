@@ -86,44 +86,44 @@ typedef struct Control {
 class ESPUIClass {
 
 public:
-  void begin(const char *_title); // Setup servers and page
+void begin(const char *_title);   // Setup servers and page
 
-  void prepareFileSystem(); // Initially preps the filesystem and loads a lot of stuff into SPIFFS
+void prepareFileSystem();   // Initially preps the filesystem and loads a lot of stuff into SPIFFS
 void list();
-  // Creating Elements
-  void label(const char *label, int color, String value = ""); // Create Label
-  void button(const char *label, void (*callBack)(Control, int), int color,
-              String value = ""); // Create Event Button
-  void switcher(const char *label, bool startState,
-                void (*callBack)(Control, int),
-                int color); // Create Toggle Button
-  void pad(const char *label, bool centerButton, void (*callBack)(Control, int),
-           int color); // Create Pad Control
-  void slider(const char *label, void (*callBack)(Control, int), int color, String value); // Create Slider Control
+// Creating Elements
+int label(const char *label, int color, String value = "");   // Create Label
+int button(const char *label, void (*callBack)(Control, int), int color,
+           String value = "");    // Create Event Button
+int switcher(const char *label, bool startState,
+             void (*callBack)(Control, int),
+             int color);    // Create Toggle Button
+int pad(const char *label, bool centerButton, void (*callBack)(Control, int),
+        int color);    // Create Pad Control
+int slider(const char *label, void (*callBack)(Control, int), int color, String value);   // Create Slider Control
 
-  // Update Elements
-  void print(int id, String value);
-  void print(String label, String value);
+// Update Elements
+void print(int id, String value);
+void print(String label, String value);
 
-  void updateSwitcher(int id, bool nValue, int clientId = -1);
-  void updateSwitcher(String label, bool nValue, int clientId = -1);
+void updateSwitcher(int id, bool nValue, int clientId = -1);
+void updateSwitcher(String label, bool nValue, int clientId = -1);
 
-  void updateSlider(int id, int nValue, int clientId = -1);
-  void updateSlider(String label, int nValue, int clientId = -1);
+void updateSlider(int id, int nValue, int clientId = -1);
+void updateSlider(String label, int nValue, int clientId = -1);
 
-  void textThem(String text, int clientId);
+void textThem(String text, int clientId);
 
-  // Variables ---
-  const char *ui_title = "ESPUI"; // Store UI Title and Header Name
-  int cIndex = 0;                 // Control index
-  Control *controls[25];
-  void jsonDom(AsyncWebSocketClient *client);
-  int getIdByLabel(String label);
-  bool labelExists(String label);
+// Variables ---
+const char *ui_title = "ESPUI";   // Store UI Title and Header Name
+int cIndex = 0;                   // Control index
+Control *controls[25];
+void jsonDom(AsyncWebSocketClient *client);
+int getIdByLabel(String label);
+bool labelExists(String label);
 
 private:
-  AsyncWebServer *server;
-  AsyncWebSocket *ws;
+AsyncWebServer *server;
+AsyncWebSocket *ws;
 };
 
 extern ESPUIClass ESPUI;
