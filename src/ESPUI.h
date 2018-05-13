@@ -39,7 +39,7 @@ typedef struct Control {
   unsigned int color;
 } Control;
 
-// Types
+// Message Types (and control types)
 #define UI_TITEL 0
 #define UI_LABEL 1
 #define UI_BUTTON 2
@@ -50,6 +50,12 @@ typedef struct Control {
 #define UPDATE_SWITCHER 7
 #define UI_SLIDER 8
 #define UPDATE_SLIDER 9
+#define UI_NUMBER 10
+#define UPDATE_NUMBER 11
+#define UI_GRAPH 12
+#define CLEAR_GRAPH 13
+#define ADD_GRAPH_POINT 14
+
 
 // Values
 #define B_DOWN -1
@@ -70,7 +76,7 @@ typedef struct Control {
 #define S_INACTIVE 7
 
 #define SL_VALUE 8
-
+#define N_VALUE 9
 
 // Colors
 #define COLOR_TURQUOISE 0
@@ -92,15 +98,16 @@ void beginSPIFFS(const char *_title); // Setup servers and page in SPIFFSmode
 void prepareFileSystem();   // Initially preps the filesystem and loads a lot of stuff into SPIFFS
 void list();
 // Creating Elements
-int label(const char *label, int color, String value = "");   // Create Label
-int button(const char *label, void (*callBack)(Control, int), int color,
-           String value = "");    // Create Event Button
-int switcher(const char *label, bool startState,
-             void (*callBack)(Control, int),
-             int color);    // Create Toggle Button
-int pad(const char *label, bool centerButton, void (*callBack)(Control, int),
-        int color);    // Create Pad Control
-int slider(const char *label, void (*callBack)(Control, int), int color, String value);   // Create Slider Control
+
+int button(const char *label, void (*callBack)(Control, int), int color, String value = "");   // Create Event Button
+int switcher(const char *label, bool startState, void (*callBack)(Control, int), int color);   // Create Toggle Button
+int pad(const char *label, bool centerButton, void (*callBack)(Control, int), int color);  // Create Pad Control
+int slider(const char *label, void (*callBack)(Control, int), int color, String value);    // Create Slider Control
+int number(const char *label, void (*callBack)(Control, int), int color, int number, int min, int max);    // Create a Number Input Control
+
+// Output only
+int label(const char *label, int color, String value = ""); // Create Label
+int graph(const char *label, int color); // Create Graph display
 
 // Update Elements
 void print(int id, String value);
@@ -111,6 +118,16 @@ void updateSwitcher(String label, bool nValue, int clientId = -1);
 
 void updateSlider(int id, int nValue, int clientId = -1);
 void updateSlider(String label, int nValue, int clientId = -1);
+
+void updateNumber(int id, int nValue, int clientId = -1);
+void updateNumber(String label, int nValue, int clientId = -1);
+
+void clearGraph(int id, int clientId = -1);
+void clearGraph(String label, int clientId = -1);
+
+void addGraphPoint(int id, int nValue, int clientId = -1);
+void addGraphPoint(String label, int nValue, int clientId = -1);
+
 
 void textThem(String text, int clientId);
 
