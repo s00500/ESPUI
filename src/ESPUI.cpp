@@ -183,10 +183,21 @@ void ESPUIClass::prepareFileSystem() {
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
-  case WS_EVT_DISCONNECT:
+  case WS_EVT_DISCONNECT: {
     if (debug)
       Serial.printf("Disconnected!\n");
     break;
+  }
+  case WS_EVT_PONG: {
+    if (debug)
+      Serial.printf("Received PONG!\n");
+    break;
+  }
+  case WS_EVT_ERROR: {
+    if (debug)
+      Serial.printf("WebSocket Error!\n");
+    break;
+  }
   case WS_EVT_CONNECT: {
     if (debug) {
       Serial.print("Connected: ");
@@ -198,19 +209,20 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
       Serial.println("JSON Data Sent to Client!");
     }
   } break;
-  case WS_EVT_DATA:
+  case WS_EVT_DATA: {
     String msg = "";
     for (size_t i = 0; i < len; i++) {
       msg += (char)data[i];
     }
+
     int id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
     if (id >= ESPUI.cIndex) {
       if (debug)
         Serial.println("Maleformated id in websocket message");
       return;
     }
-    Control *c =
-      ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
+
+    Control *c = ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
 
     if (msg.startsWith("bdown:")) {
       c->callback(*c, B_DOWN);
@@ -248,6 +260,9 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
       ESPUI.updateSlider(c->id, value, client->id());
       c->callback(*c, SL_VALUE);
     }
+  }
+  break;
+  default:
     break;
   }
 }
