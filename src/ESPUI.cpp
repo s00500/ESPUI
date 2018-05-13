@@ -257,7 +257,7 @@ int ESPUIClass::label(const char *label, int color, String value) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
-    return;
+    return -1;
   }
 
   Control *newL = new Control();
@@ -282,7 +282,7 @@ int ESPUIClass::slider(const char *label, void (*callBack)(Control, int),
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
-    return;
+    return -1;
   }
 
   Control *newSL = new Control();
@@ -306,7 +306,7 @@ int ESPUIClass::button(const char *label, void (*callBack)(Control, int),
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
-    return;
+    return -1;
   }
 
   Control *newB = new Control();
@@ -332,7 +332,7 @@ int ESPUIClass::switcher(const char *label, bool startState,
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
-    return;
+    return -1;
   }
 
   Control *newS = new Control();
@@ -353,7 +353,7 @@ int ESPUIClass::pad(const char *label, bool center,
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
-    return;
+    return -1;
   }
 
   Control *newP = new Control();
