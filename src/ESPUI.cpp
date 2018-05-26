@@ -85,7 +85,7 @@ void ESPUIClass::list() {
 }
 
 void deleteFile(const char *path) {
-  Serial.print(SPIFFS.exists(path));
+  if (debug) Serial.print(SPIFFS.exists(path));
   if (!SPIFFS.exists(path)) {
     Serial.printf("File: %s does not exist, not deleting\n", path);
     return;
@@ -145,18 +145,14 @@ void ESPUIClass::prepareFileSystem() {
   Serial.println("SPIFFS Mount ESP8266 Done");
 #endif
 
-  // TODO: This is a workaround, have to find out why SPIFFS on ESP32 behaves
-  // incredibly strangely, see issue #6
-  /*
-     deleteFile("/index.htm");
+  deleteFile("/index.htm");
 
-     deleteFile("/css/style.css");
-     deleteFile("/css/normalize.css");
+  deleteFile("/css/style.css");
+  deleteFile("/css/normalize.css");
 
-     deleteFile("/js/zepto.min.js");
-     deleteFile("/js/controls.js");
-     deleteFile("/js/slider.js");
-   */
+  deleteFile("/js/zepto.min.js");
+  deleteFile("/js/controls.js");
+  deleteFile("/js/slider.js");
 
   Serial.println("Cleanup done");
 
@@ -173,7 +169,7 @@ void ESPUIClass::prepareFileSystem() {
   Serial.println("Done Initializing filesystem :-)");
 
 #if defined(ESP32)
-  listDir("/", 1);
+  if(debug) listDir("/", 1);
 #endif
 
   SPIFFS.end();

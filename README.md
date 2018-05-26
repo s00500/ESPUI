@@ -51,7 +51,7 @@ Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), G
 ESPUI **NEEDS** its files burnt on the SPIFFS filesystem on the ESP. **Without this ESPUI will NOT work at all**
 There are now two ways to do this: you can either use the upload tool or you use the library function `ESPUI.prepareFileSystem()`
 
-#### Simple filesystem preparation (recomended, but currently not working well on esp32, see issues)
+#### Simple filesystem preparation (recomended)
 
 Just open the example sketch **prepareFileSystem** and run it on the ESP, (give it 5 - 10 seconds),
 The library will create all needed files.
@@ -80,6 +80,10 @@ Now you are set to go and use any code you want to with this library
 
 - ~~Setup SPIFFS using values in program memory~~
 - ~~ESP8266 support~~
+- ~~PlattformIO Integration~~
+- Datagraph output -> *WIP*
+- Number input -> *WIP*
+- GZip Files to improve loadspeed and reduce server load
 - Document slider
 - New images in docu
 - proper return value (as int and not as string) for slider
@@ -87,7 +91,6 @@ Now you are set to go and use any code you want to with this library
 - Improve slider stability
 - Improve general stability
 - Multiline Labels
-- PlattformIO Integration
 
 ## Documentation
 
