@@ -496,24 +496,31 @@
   }
 
   .switch input[type="checkbox"] {
+    display: none;
     cursor: pointer;
-    height: 10px;
-    left: 12px;
+  	height: 10px;
+  	left: 12px;
+  	position: absolute;
+  	top: 8px;
+  	width: 10px;
+  }
+
+  .in {
     position: absolute;
     top: 8px;
-    -webkit-transition: left 0.05s ease-in-out;
-    -moz-transition: left 0.05s ease-in-out;
-    -o-transition: left 0.05s ease-in-out;
-    -ms-transition: left 0.05s ease-in-out;
-    transition: left 0.05s ease-in-out;
-    width: 10px;
+    left: 12px;
+    -webkit-transition: left 0.08s ease-in-out;
+  	-moz-transition: left 0.08s ease-in-out;
+  	-o-transition: left 0.08s ease-in-out;
+  	-ms-transition: left 0.08s ease-in-out;
+  	transition: left 0.08s ease-in-out;
   }
 
-  .switch.checked input[type="checkbox"] {
-    left: 38px;
+  .switch.checked div {
+  	left: 38px;
   }
 
-  .switch input:before {
+  .switch .in:before {
     background: #fff;
     background: -moz-linear-gradient(top, #fff 0%, #f0f0f0 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #fff), color-stop(100%, #f0f0f0));
@@ -532,7 +539,7 @@
     width: 26px;
   }
 
-  .switch input:after {
+  .switch .in:after {
     background: #f0f0f0;
     background: -moz-linear-gradient(top, #f0f0f0 0%, #fff 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f0f0f0), color-stop(100%, #fff));
@@ -546,20 +553,6 @@
     margin: -1px 0 0 -1px;
     position: absolute;
     width: 12px;
-  }
-
-  .switch .icon-ok, .switch .icon-remove {
-    line-height: 28px;
-    text-shadow: 0 -2px 0 rgba(0, 0, 0, 0.2);
-    margin: 0 9px;
-  }
-
-  .switch .icon-ok {
-    float: left;
-  }
-
-  .switch .icon-remove {
-    float: right;
   }
 
   /* ----------------------------------------------------------------------

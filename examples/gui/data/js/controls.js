@@ -116,15 +116,14 @@ function start() {
                 break;
             case UI_SWITCHER:
                 var label = "<label id='sl" + data.id + "' class='switch checked'>";
-                var input = "<input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' checked>";
+                var input = "<div class='in'><input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' checked></div>";
                 if (data.value == "0") {
                     label = "<label id='sl" + data.id + "' class='switch'>";
-                    input = "<input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' >";
+                    input = "<div class='in'><input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' ></div>";
                 }
                 $('#row').append(
                     "<div id='" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
-                    label + "<i class='icon-ok'></i>" +
-                    "<i class='icon-remove'></i>" + input +
+                    label + input +
                     "</label>" +
                     "</div>");
                 break;
@@ -226,14 +225,14 @@ function start() {
                     "</div>"
                 );
                 $('#row').append(
-                  "<script>" +
-                  "rkmd_rangeSlider('#sl" + data.id + "');" +
-                  "</script>"
+                    "<script>" +
+                    "rkmd_rangeSlider('#sl" + data.id + "');" +
+                    "</script>"
                 );
                 break;
 
             case UPDATE_SLIDER:
-                slider_move($('#sl'+data.id), data.value ,'100', false);
+                slider_move($('#sl' + data.id), data.value, '100', false);
                 break;
             default:
                 console.error('Unknown type or event');
