@@ -86,7 +86,8 @@ typedef struct Control {
 class ESPUIClass {
 
 public:
-void begin(const char *_title);   // Setup servers and page
+void begin(const char *_title);   // Setup servers and page in Memorymode
+void beginSPIFFS(const char *_title); // Setup servers and page in SPIFFSmode
 
 void prepareFileSystem();   // Initially preps the filesystem and loads a lot of stuff into SPIFFS
 void list();

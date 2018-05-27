@@ -505,7 +505,7 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
   }
 }
 
-void ESPUIClass::begin(const char *_title) {
+void ESPUIClass::beginSPIFFS(const char *_title) {
 
   ui_title = _title;
   server = new AsyncWebServer(80);
@@ -530,7 +530,76 @@ void ESPUIClass::begin(const char *_title) {
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", String(ESP.getFreeHeap()));
+    request->send(200, "text/plain", String(ESP.getFreeHeap()+ " In SPIFFSmode"));
+  });
+
+  server->onNotFound(
+    [](AsyncWebServerRequest *request) {
+    request->send(404);
+  });
+
+  server->on("/zepto.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->begin();
+  if (debug)
+    Serial.println("UI Initialized");
+}
+
+void ESPUIClass::begin(const char *_title) {
+
+  ui_title = _title;
+  server = new AsyncWebServer(80);
+  ws = new AsyncWebSocket("/ws");
+
+  ws->onEvent(onWsEvent);
+  server->addHandler(ws);
+
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", HTML_INDEX);
+    request->send(response);
+  });
+
+  // Javascript files
+
+  server->on("/js/zepto.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->on("/js/controls.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_CONTROLS_GZIP, sizeof(JS_CONTROLS_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->on("/js/slider.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  // Stylesheets
+
+  server->on("/css/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", CSS_STYLE_GZIP, sizeof(CSS_STYLE_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->on("/css/normalize.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", CSS_NORMALIZE_GZIP, sizeof(CSS_NORMALIZE_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  // Heap for general Servertest
+  server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(200, "text/plain", String(ESP.getFreeHeap() + " In Memorymode"));
   });
 
   server->onNotFound(
