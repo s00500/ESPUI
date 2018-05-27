@@ -251,10 +251,13 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
       ESPUI.updateSwitcher(c->id, false);
       c->callback(*c, S_INACTIVE);
     } else if (msg.startsWith("slvalue:")) {
-      int value =
-        msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
+      int value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
       ESPUI.updateSlider(c->id, value, client->id());
       c->callback(*c, SL_VALUE);
+    } else if (msg.startsWith("nvalue:")) {
+      int value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
+      ESPUI.updateNumber(c->id, value, client->id());
+      c->callback(*c, N_VALUE);
     }
   }
   break;
@@ -265,9 +268,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
 
 int ESPUIClass::label(const char *label, int color, String value) {
   if (labelExists(label)) {
-    if (debug)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
+    if (debug) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
     return -1;
   }
 
@@ -286,9 +287,24 @@ int ESPUIClass::label(const char *label, int color, String value) {
   return cIndex - 1;
 }
 
+int ESPUIClass::graph(const char *label, int color) {
+  if (labelExists(label)) {
+    if (debug) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
+    return -1;
+  }
+
+  Control *newG = new Control();
+  newG->type = UI_GRAPH;
+  newG->label = label;
+  newG->color = color;
+  newG->id = cIndex;
+  controls[cIndex] = newG;
+  cIndex++;
+  return cIndex - 1;
+}
+
 // TODO: this still needs a range setting
-int ESPUIClass::slider(const char *label, void (*callBack)(Control, int),
-                       int color, String value) {
+int ESPUIClass::slider(const char *label, void (*callBack)(Control, int), int color, String value) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -337,8 +353,7 @@ int ESPUIClass::button(const char *label, void (*callBack)(Control, int),
   return cIndex - 1;
 }
 
-int ESPUIClass::switcher(const char *label, bool startState,
-                         void (*callBack)(Control, int), int color) {
+int ESPUIClass::switcher(const char *label, bool startState, void (*callBack)(Control, int), int color) {
   if (labelExists(label)) {
     if (debug)
       Serial.println("UI ERROR: Element " + String(label) +
@@ -381,6 +396,26 @@ int ESPUIClass::pad(const char *label, bool center,
   return cIndex - 1;
 }
 
+// TODO: min and max need to be saved, they also need to be sent to the frontend
+int ESPUIClass::number(const char *label, void (*callBack)(Control, int), int color, int number, int min, int max) {
+  if (labelExists(label)) {
+    if (debug)
+      Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
+    return -1;
+  }
+
+  Control *newN = new Control();
+  newN->type = UI_NUMBER;
+  newN->label = label;
+  newN->color = color;
+  newN->value = String(number);
+  newN->callback = callBack;
+  newN->id = cIndex;
+  controls[cIndex] = newN;
+  cIndex++;
+  return cIndex - 1;
+}
+
 void ESPUIClass::print(int id, String value) {
   if (id < cIndex && controls[id]->type == UI_LABEL) {
     controls[id]->value = value;
@@ -408,24 +443,6 @@ void ESPUIClass::print(String label, String value) {
   print(getIdByLabel(label), value);
 }
 
-void ESPUIClass::updateSwitcher(int id, bool nValue, int clientId) {
-  if (id < cIndex && controls[id]->type == UI_SWITCHER) {
-    controls[id]->value = nValue ? 1 : 0;
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_SWITCHER;
-    root["value"] = nValue ? 1 : 0;
-    root["id"] = String(id);
-    root.printTo(json);
-    textThem(json, clientId);
-  } else {
-    if (debug)
-      Serial.println(String("Error: ") + String(id) +
-                     String(" is no switcher"));
-  }
-}
-
 void ESPUIClass::updateSlider(int id, int nValue, int clientId) {
   if (id < cIndex && controls[id]->type == UI_SLIDER) {
     controls[id]->value = nValue;
@@ -443,14 +460,53 @@ void ESPUIClass::updateSlider(int id, int nValue, int clientId) {
   }
 }
 
+void ESPUIClass::updateSwitcher(int id, bool nValue, int clientId) {
+  if (id < cIndex && controls[id]->type == UI_SWITCHER) {
+    controls[id]->value = nValue ? 1 : 0;
+    String json;
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["type"] = UPDATE_SWITCHER;
+    root["value"] = nValue ? 1 : 0;
+    root["id"] = String(id);
+    root.printTo(json);
+    textThem(json, clientId);
+  } else {
+    if (debug) Serial.println(String("Error: ") + String(id) + String(" is no switcher"));
+  }
+}
+
 void ESPUIClass::updateSwitcher(String label, bool nValue, int clientId) {
   if (!labelExists(label)) {
     if (debug)
-      Serial.println("UI ERROR: Element does not " + String(label) +
-                     " exist, cannot update!");
+      Serial.println("UI ERROR: Element does not " + String(label) + " exist, cannot update!");
     return;
   }
   updateSwitcher(getIdByLabel(label), nValue, clientId);
+}
+
+void ESPUIClass::updateNumber(int id, int number, int clientId) {
+  if (id < cIndex && controls[id]->type == UI_NUMBER) {
+    controls[id]->value = number;
+    String json;
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["type"] = UPDATE_NUMBER;
+    root["value"] = String(number);
+    root["id"] = String(id);
+    root.printTo(json);
+    textThem(json, clientId);
+  } else {
+    if (debug) Serial.println(String("Error: ") + String(id) + String(" is no number"));
+  }
+}
+
+void ESPUIClass::updateNumber(String label, int number, int clientId) {
+  if (!labelExists(label)) {
+    if (debug) Serial.println("UI ERROR: Element does not " + String(label) + " exist, cannot update!");
+    return;
+  }
+  updateNumber(getIdByLabel(label), number, clientId);
 }
 
 // This is a hacky workaround because ESPAsyncWebServer does not have a function

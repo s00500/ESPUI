@@ -29,7 +29,7 @@ This library is dependent on the following libraries to function properly.
 
 Make sure all the dependencies are installed, then install like so:
 
-#### Directly Through Arduino IDE
+#### Directly Through Arduino IDE (*recommended*)
 
 You can find this Library in the Arduino IDE library manager
 Go to Sketch > Include Library > Library Manager > Search for "ESPUI" > Install
@@ -46,14 +46,19 @@ For macOs: Download the [Repository](https://github.com/s00500/ESPUI/archive/mas
 
 Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
 
-## Getting started (Filesystem upload)
+## Getting started
 
-ESPUI **NEEDS** its files burnt on the SPIFFS filesystem on the ESP. **Without this ESPUI will NOT work at all**
-There are now two ways to do this: you can either use the upload tool or you use the library function `ESPUI.prepareFileSystem()`
+ESPUI serves several Files to the browser to build up its webinterface. This can be achieved in 2 wasy: 
+*PROGMEM* or *SPIFFS*
 
-#### Simple filesystem preparation (recomended)
+*When ESPUI.begin() is called the default is serving files from Memory and ESPUI should work out of the box!*
 
-Just open the example sketch **prepareFileSystem** and run it on the ESP, (give it 5 - 10 seconds),
+But if this causes your program to *use too much memory* you can burn the files into the SPIFFS filesystem on the ESP.
+There are now two ways to do this: you can either use the ESP file upload tool or you use the library function `ESPUI.prepareFileSystem()`
+
+#### Simple filesystem preparation (*recommended*)
+
+Just open the example sketch **prepareFileSystem** and run it on the ESP, (give it up to 30 seconds, you can see the status on the Serial Monitor),
 The library will create all needed files.
 Congratulations, you are done, from now on you just need to to this again when there is a library update, or when you want to use another chip :-)
 Now you can upload your normal sketch, when you do not call the `ESPUI.prepareFileSystem()` function the compiler will strip out all the unnecessary that is already saved in the chip's filesystem and you have more programm memory to work with.
@@ -75,22 +80,34 @@ Now you are set to go and use any code you want to with this library
   - Slider
 
   Checkout the example for the usage
+  
+## Available colors:
+
+- COLOR_TURQUOISE
+- COLOR_EMERALD
+- COLOR_PETERRIVER
+- COLOR_WETASPHALT
+- COLOR_SUNFLOWER
+- COLOR_CARROT
+- COLOR_ALIZARIN
+- COLOR_NONE
 
 ## Roadmap :
 
 - ~~Setup SPIFFS using values in program memory~~
 - ~~ESP8266 support~~
 - ~~PlattformIO Integration~~
+- ~~Multiline Labels~~
+- ~~GZip Files and serve from memory~~
 - Datagraph output -> *WIP*
 - Number input -> *WIP*
-- GZip Files to improve loadspeed and reduce server load
+- Text input -> *WIP*
 - Document slider
 - New images in docu
 - proper return value (as int and not as string) for slider
 - Maybe a slider range setting, meanwhile please use map()
 - Improve slider stability
 - Improve general stability
-- Multiline Labels
 
 ## Documentation
 
@@ -130,6 +147,8 @@ Button pads come in two flavours: with or without a center button. They are very
 
 Labels are a nice tool to get information from the robot to the user interface. This can be done to show states, values of sensors and configuration parameters. To send data from the code use ESP.print(labelId, “Text”); . Labels get a name on creation and a initial value. The name is not changeable once the UI initialised.
 
+Labels automatically wrap your text. If you want them to have multiple lines use the normal `<br>` tag in the string you print to the label
+
 #### Slider
 
 There is also an slider component now, needs to be documented though
@@ -139,6 +158,9 @@ There is also an slider component now, needs to be documented though
 After all the elements are configured you can use ESPUI.begin(“Some Title”); to start the UI interface. Make sure you setup a working network connection or AccesPoint **before** (See example). The web interface can then be used from multiple devices at once and also shows an connection status in the top bar.
 The library is designed to be easy to use and can still be extended with a lot of more functionality.
 
+
+# Notes for Development
+All changes to the client side files can be made in the examples/gui/data directory. Using the file uploader thin can be used for development. After this you have to compress them and then you can gzip them. I wrote a little useful jsfiddle for this, [CHECK IT OUT](https://jsfiddle.net/s00500/yvLbhuuv/)
 
 # Contribute
 Liked this Library? You can **support** me by sending me a :coffee: [Coffee](https://paypal.me/lukasbachschwell/3).
