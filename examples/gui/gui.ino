@@ -144,6 +144,10 @@ void setup(void) {
   ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, "30");
   ESPUI.slider("Slider two", &slider, COLOR_NONE, "100");
 
+  /*
+     .begin loads and serves all files from PROGMEM directly.
+     If you want to serve the files from SPIFFS use .beginSPIFFS (.prepareFileSystem has to be run in an empty sketch before)
+   */
   ESPUI.begin("ESPUI Control");
 }
 

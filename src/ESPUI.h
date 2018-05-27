@@ -41,20 +41,31 @@ typedef struct Control {
 
 // Message Types (and control types)
 #define UI_TITEL 0
+
 #define UI_LABEL 1
+#define UPDATE_LABEL 6
+
 #define UI_BUTTON 2
+
 #define UI_SWITCHER 3
+#define UPDATE_SWITCHER 7
+
 #define UI_PAD 4
 #define UI_CPAD 5
-#define UPDATE_LABEL 6
-#define UPDATE_SWITCHER 7
+
+
 #define UI_SLIDER 8
 #define UPDATE_SLIDER 9
+
 #define UI_NUMBER 10
 #define UPDATE_NUMBER 11
-#define UI_GRAPH 12
-#define CLEAR_GRAPH 13
-#define ADD_GRAPH_POINT 14
+
+#define UI_TEXT_INPUT 12
+#define UPDATE_TEXT_INPUT 13
+
+#define UI_GRAPH 14
+#define CLEAR_GRAPH 15
+#define ADD_GRAPH_POINT 16
 
 
 // Values
