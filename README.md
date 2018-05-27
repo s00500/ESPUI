@@ -51,7 +51,7 @@ Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), G
 ESPUI serves several Files to the browser to build up its webinterface. This can be achieved in 2 wasy: 
 *PROGMEM* or *SPIFFS*
 
-*When ESPUI.begin() is called the default is serving files from Memory and ESPUI should work out of the box!*
+*When `ESPUI.begin()` is called the default is serving files from Memory and ESPUI should work out of the box!*
 
 But if this causes your program to *use too much memory* you can burn the files into the SPIFFS filesystem on the ESP.
 There are now two ways to do this: you can either use the ESP file upload tool or you use the library function `ESPUI.prepareFileSystem()`
@@ -114,7 +114,7 @@ ESPUI does not need network access and can be used in standalone access point mo
 All assets are loaded from the internal SPIFFS filesystem of the ESP32.
 
 This section will explain in detail how the Library is to be used from the Arduino code side. As of now the Facilino blocks are not implemented.
-In the arduino setup() routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object ESPUI. Eg: ESPUI.button(“button”, &myCallback); creates a button in the interface that calls the “myCallback” function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events an integer number with the event name is passed to the callback function that can be handled in a switch(){}case{} statement. Here is an overview of the currently implemented different elements of the UI library:
+In the arduino setup() routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object ESPUI. Eg: `ESPUI.button(“button”, &myCallback);` creates a button in the interface that calls the “myCallback” function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events an integer number with the event name is passed to the callback function that can be handled in a `switch(){}case{}` statement. Here is an overview of the currently implemented different elements of the UI library:
 
 
 #### Button
@@ -142,7 +142,7 @@ Button pads come in two flavours: with or without a center button. They are very
 
 ![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_labels.png)
 
-Labels are a nice tool to get information from the robot to the user interface. This can be done to show states, values of sensors and configuration parameters. To send data from the code use ESP.print(labelId, “Text”); . Labels get a name on creation and a initial value. The name is not changeable once the UI initialised.
+Labels are a nice tool to get information from the robot to the user interface. This can be done to show states, values of sensors and configuration parameters. To send data from the code use `ESP.print(labelId, “Text”);` . Labels get a name on creation and a initial value. The name is not changeable once the UI initialised.
 
 Labels automatically wrap your text. If you want them to have multiple lines use the normal `<br>` tag in the string you print to the label
 
