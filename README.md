@@ -154,7 +154,7 @@ The Slider can be used to slide through a value from 1 to 100. Slides provide re
 
 #### Initialisation of the UI
 
-After all the elements are configured you can use ESPUI.begin(“Some Title”); to start the UI interface. Make sure you setup a working network connection or AccesPoint **before** (See example). The web interface can then be used from multiple devices at once and also shows an connection status in the top bar.
+After all the elements are configured you can use `ESPUI.begin(“Some Title”);` to start the UI interface. (Or `ESPUI.beginSPIFFS(“Some Title”);` respectively) Make sure you setup a working network connection or AccesPoint **before** (See example). The web interface can then be used from multiple devices at once and also shows an connection status in the top bar.
 The library is designed to be easy to use and can still be extended with a lot of more functionality.
 
 
