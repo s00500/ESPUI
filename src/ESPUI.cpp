@@ -1,13 +1,13 @@
 #include "ESPUI.h"
 
-#include "uploadDataIndex.h"
+#include "dataIndexHTML.h"
 
-#include "uploadDataNormalize.h"
-#include "uploadDataStyle.h"
+#include "dataNormalizeCSS.h"
+#include "dataStyleCSS.h"
 
-#include "uploadDataControls.h"
-#include "uploadDataSlider.h"
-#include "uploadDataZepto.h"
+#include "dataControlsJS.h"
+#include "dataSliderJS.h"
+#include "dataZeptoJS.h"
 
 #include <ESPAsyncWebServer.h>
 #include <functional>
@@ -586,7 +586,7 @@ void ESPUIClass::beginSPIFFS(const char *_title) {
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", String(ESP.getFreeHeap()+ " In SPIFFSmode"));
+    request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In SPIFFSmode");
   });
 
   server->onNotFound(
@@ -655,7 +655,7 @@ void ESPUIClass::begin(const char *_title) {
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", String(ESP.getFreeHeap() + " In Memorymode"));
+    request->send(200, "text/plain", String(ESP.getFreeHeap())+ " In Memorymode");
   });
 
   server->onNotFound(

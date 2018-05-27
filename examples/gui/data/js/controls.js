@@ -1,13 +1,30 @@
 const UI_TITEL = 0;
+
 const UI_LABEL = 1;
+const UPDATE_LABEL = 6;
+
 const UI_BUTTON = 2;
+
 const UI_SWITCHER = 3;
+const UPDATE_SWITCHER = 7;
+
 const UI_PAD = 4;
 const UI_CPAD = 5;
-const UPDATE_LABEL = 6;
-const UPDATE_SWITCHER = 7;
+
 const UI_SLIDER = 8;
 const UPDATE_SLIDER = 9;
+
+
+
+const UI_NUMBER = 10;
+const UPDATE_NUMBER = 11;
+
+const UI_TEXT_INPUT = 12;
+const UPDATE_TEXT_INPUT = 13;
+
+const UI_GRAPH = 14;
+const CLEAR_GRAPH = 15;
+const ADD_GRAPH_POINT = 16;
 
 const FOR = 0;
 const BACK = 1;
@@ -97,7 +114,7 @@ function start() {
                 $('#mainHeader').html(data.label);
                 break;
             case UI_LABEL:
-                $('#row').append("<div class='two columns card tcenter " + colorClass(data.color) + "'><h5 id='" + data.id + "'>" + data.label + "</h5><hr /><span id='l" + data.id + "' class='label'>" + data.value + "</span></div>");
+                $('#row').append("<div class='two columns card tcenter " + colorClass(data.color) + "'><h5 id='" + data.id + "'>" + data.label + "</h5><hr /><span id='l" + data.id + "' class='label label-wrap'>" + data.value + "</span></div>");
                 break;
             case UI_BUTTON:
                 $('#row').append("<div class='one columns card tcenter " + colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/><button onmousedown='buttonclick(" + data.id + ", true)' onmouseup='buttonclick(" + data.id + ", false)' id='" + data.id + "'>" + data.value + "</button></div>");
@@ -234,11 +251,44 @@ function start() {
             case UPDATE_SLIDER:
                 slider_move($('#sl' + data.id), data.value, '100', false);
                 break;
+
+            case UI_NUMBER:
+                $('#row').append(
+                    "<div class='two columns card tcenter" + colorClass(data.color) + "'>" +
+                    "<h5 id='" + data.id + "'>" + data.label + "</h5><hr />" +
+                    "<input id='num" + data.id + "' type='number' value='" + data.value + "' onchange='numberchange(" + data.id + ")' />" +
+                    "</div>"
+                );
+                break;
+
+            case UPDATE_NUMBER:
+                $('#num' + data.id).val(data.value);
+                break;
+
+            case UI_TEXT_INPUT:
+                $('#row').append(
+                    "<div class='two columns card tcenter" + colorClass(data.color) + "'>" +
+                    "<h5 id='" + data.id + "'>" + data.label + "</h5><hr />" +
+                    "<input id='num" + data.id + "' type='number' value='" + data.value + "' onchange='numberchange(" + data.id + ")' />" +
+                    "</div>"
+                );
+                break;
+
+            case UPDATE_TEXT_INPUT:
+                $('#num' + data.id).val(data.value);
+                break;
+
             default:
                 console.error('Unknown type or event');
                 break;
         }
     };
+}
+
+function numberchange(number) {
+    var val = $('#num' + data.id).val();
+    websock.send("nchange:" + number + ":" + val);
+    console.log(val);
 }
 
 

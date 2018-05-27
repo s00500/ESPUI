@@ -78,6 +78,12 @@
     background-color: #999999;
     margin-bottom: 10px;
   }
+  
+  .label-wrap {
+    width: 90%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
 
   .label.color-blue {
     background-color: #6f9ad1;
