@@ -107,9 +107,9 @@ void setup(void) {
   WiFi.mode(WIFI_AP);
 
   #if defined(ESP32)
-    WiFi.setHostname(ssid);
+  WiFi.setHostname(ssid);
   #else
-    WiFi.hostname(ssid);
+  WiFi.hostname(ssid);
   #endif
 
   WiFi.softAP(ssid);
@@ -120,18 +120,18 @@ void setup(void) {
 
   // change the beginning to this if you want to join an existing network
   /*
-    Serial.begin(115200);
-    WiFi.begin(ssid, password);
-    Serial.println("");
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    }
-    Serial.println("");
-    Serial.print("IP address: ");
-    Serial.println(WiFi.localIP());
-  */
+     Serial.begin(115200);
+     WiFi.begin(ssid, password);
+     Serial.println("");
+     // Wait for connection
+     while (WiFi.status() != WL_CONNECTED) {
+     delay(500);
+     Serial.print(".");
+     }
+     Serial.println("");
+     Serial.print("IP address: ");
+     Serial.println(WiFi.localIP());
+   */
 
   ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
   ESPUI.label("Millis:", COLOR_EMERALD, "0");
@@ -144,7 +144,7 @@ void setup(void) {
   ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, "30");
   ESPUI.slider("Slider two", &slider, COLOR_NONE, "100");
 
-  ESPUI.begin("ESP32 Control");
+  ESPUI.begin("ESPUI Control");
 }
 
 void loop(void) {
