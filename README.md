@@ -102,12 +102,9 @@ Now you are set to go and use any code you want to with this library
 - Datagraph output -> *WIP*
 - Number input -> *WIP*
 - Text input -> *WIP*
-- Document slider
-- New images in docu
 - proper return value (as int and not as string) for slider
-- Maybe a slider range setting, meanwhile please use map()
+- Maybe a slider range setting, meanwhile please use *map()*
 - Improve slider stability
-- Improve general stability
 
 ## Documentation
 
@@ -151,7 +148,9 @@ Labels automatically wrap your text. If you want them to have multiple lines use
 
 #### Slider
 
-There is also an slider component now, needs to be documented though
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_slider.png)
+
+The Slider can be used to slide through a value from 1 to 100. Slides provide realtime data, are touch compatible and can be used to for example control a Servo. The current value is shown while the slider is dragged in a little bubble over the handle.
 
 #### Initialisation of the UI
 
