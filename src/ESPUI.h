@@ -1,7 +1,7 @@
 #ifndef ESPUI_h
 #define ESPUI_h
 
-#define debug true
+#define DEBUG_ESPUI true
 
 #include "Arduino.h"
 #include "ArduinoJson.h"

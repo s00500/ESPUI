@@ -85,7 +85,7 @@ void ESPUIClass::list() {
 }
 
 void deleteFile(const char *path) {
-  if (debug) Serial.print(SPIFFS.exists(path));
+  if (DEBUG_ESPUI) Serial.print(SPIFFS.exists(path));
   if (!SPIFFS.exists(path)) {
     Serial.printf("File: %s does not exist, not deleting\n", path);
     return;
@@ -169,7 +169,7 @@ void ESPUIClass::prepareFileSystem() {
   Serial.println("Done Initializing filesystem :-)");
 
 #if defined(ESP32)
-  if(debug) listDir("/", 1);
+  if(DEBUG_ESPUI) listDir("/", 1);
 #endif
 
   SPIFFS.end();
@@ -180,28 +180,28 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
   case WS_EVT_DISCONNECT: {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.printf("Disconnected!\n");
     break;
   }
   case WS_EVT_PONG: {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.printf("Received PONG!\n");
     break;
   }
   case WS_EVT_ERROR: {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.printf("WebSocket Error!\n");
     break;
   }
   case WS_EVT_CONNECT: {
-    if (debug) {
+    if (DEBUG_ESPUI) {
       Serial.print("Connected: ");
       Serial.println(client->id());
     }
 
     ESPUI.jsonDom(client);
-    if (debug) {
+    if (DEBUG_ESPUI) {
       Serial.println("JSON Data Sent to Client!");
     }
   } break;
@@ -213,7 +213,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
 
     int id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
     if (id >= ESPUI.cIndex) {
-      if (debug)
+      if (DEBUG_ESPUI)
         Serial.println("Maleformated id in websocket message");
       return;
     }
@@ -268,7 +268,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
 
 int ESPUIClass::label(const char *label, int color, String value) {
   if (labelExists(label)) {
-    if (debug) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
+    if (DEBUG_ESPUI) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
     return -1;
   }
 
@@ -289,7 +289,7 @@ int ESPUIClass::label(const char *label, int color, String value) {
 
 int ESPUIClass::graph(const char *label, int color) {
   if (labelExists(label)) {
-    if (debug) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
+    if (DEBUG_ESPUI) Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
     return -1;
   }
 
@@ -306,7 +306,7 @@ int ESPUIClass::graph(const char *label, int color) {
 // TODO: this still needs a range setting
 int ESPUIClass::slider(const char *label, void (*callBack)(Control, int), int color, String value) {
   if (labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
     return -1;
@@ -330,7 +330,7 @@ int ESPUIClass::slider(const char *label, void (*callBack)(Control, int), int co
 int ESPUIClass::button(const char *label, void (*callBack)(Control, int),
                        int color, String value) {
   if (labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
     return -1;
@@ -355,7 +355,7 @@ int ESPUIClass::button(const char *label, void (*callBack)(Control, int),
 
 int ESPUIClass::switcher(const char *label, bool startState, void (*callBack)(Control, int), int color) {
   if (labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
     return -1;
@@ -376,7 +376,7 @@ int ESPUIClass::switcher(const char *label, bool startState, void (*callBack)(Co
 int ESPUIClass::pad(const char *label, bool center,
                     void (*callBack)(Control, int), int color) {
   if (labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element " + String(label) +
                      " exists, skipping creating element!");
     return -1;
@@ -399,7 +399,7 @@ int ESPUIClass::pad(const char *label, bool center,
 // TODO: min and max need to be saved, they also need to be sent to the frontend
 int ESPUIClass::number(const char *label, void (*callBack)(Control, int), int color, int number, int min, int max) {
   if (labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element " + String(label) + " exists, skipping creating element!");
     return -1;
   }
@@ -428,14 +428,14 @@ void ESPUIClass::print(int id, String value) {
     root.printTo(json);
     this->ws->textAll(json);
   } else {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println(String("Error: ") + String(id) + String(" is no label"));
   }
 }
 
 void ESPUIClass::print(String label, String value) {
   if (!labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element does not " + String(label) +
                      " exist, cannot update!");
     return;
@@ -455,7 +455,7 @@ void ESPUIClass::updateSlider(int id, int nValue, int clientId) {
     root.printTo(json);
     textThem(json, clientId);
   } else {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println(String("Error: ") + String(id) + String(" is no slider"));
   }
 }
@@ -472,13 +472,13 @@ void ESPUIClass::updateSwitcher(int id, bool nValue, int clientId) {
     root.printTo(json);
     textThem(json, clientId);
   } else {
-    if (debug) Serial.println(String("Error: ") + String(id) + String(" is no switcher"));
+    if (DEBUG_ESPUI) Serial.println(String("Error: ") + String(id) + String(" is no switcher"));
   }
 }
 
 void ESPUIClass::updateSwitcher(String label, bool nValue, int clientId) {
   if (!labelExists(label)) {
-    if (debug)
+    if (DEBUG_ESPUI)
       Serial.println("UI ERROR: Element does not " + String(label) + " exist, cannot update!");
     return;
   }
@@ -497,13 +497,13 @@ void ESPUIClass::updateNumber(int id, int number, int clientId) {
     root.printTo(json);
     textThem(json, clientId);
   } else {
-    if (debug) Serial.println(String("Error: ") + String(id) + String(" is no number"));
+    if (DEBUG_ESPUI) Serial.println(String("Error: ") + String(id) + String(" is no number"));
   }
 }
 
 void ESPUIClass::updateNumber(String label, int number, int clientId) {
   if (!labelExists(label)) {
-    if (debug) Serial.println("UI ERROR: Element does not " + String(label) + " exist, cannot update!");
+    if (DEBUG_ESPUI) Serial.println("UI ERROR: Element does not " + String(label) + " exist, cannot update!");
     return;
   }
   updateNumber(getIdByLabel(label), number, clientId);
@@ -601,7 +601,7 @@ void ESPUIClass::beginSPIFFS(const char *_title) {
   });
 
   server->begin();
-  if (debug)
+  if (DEBUG_ESPUI)
     Serial.println("UI Initialized");
 }
 
@@ -664,7 +664,7 @@ void ESPUIClass::begin(const char *_title) {
   });
 
   server->begin();
-  if (debug)
+  if (DEBUG_ESPUI)
     Serial.println("UI Initialized");
 }
 
