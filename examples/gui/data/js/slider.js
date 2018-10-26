@@ -39,8 +39,8 @@ function rkmd_rangeSlider(selector) {
         $(this).addClass('is-active');
         var moveFu =
             function(e) {
-                var slider_new_width = e.pageX - slider_offset;
-
+                var pageX = e.pageX || e.changedTouches[0].pageX;
+                var slider_new_width = pageX - slider_offset;
                 if (slider_new_width <= slider_width && !(slider_new_width < '0')) {
                     slider_move(parents, slider_new_width, slider_width, true);
                 }
