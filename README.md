@@ -2,10 +2,10 @@
 > 
 > Current upstream basis is v1.5.3, adding the following features:
 > 
-> - Fixed touchmove bug on some mobile browsers (1a45b311e023a084a90bd3cc3d79c47073235916, merged upstream)
-> - Dev Tool: Python script ([tools/prepare_static_ui_resources.py](https://github.com/orithena/ESPUI/blob/master/tools/prepare_static_ui_sources.py)) to regenerate minified and gzipped HTML/CSS/JS files (557bdd862c0b0128adbe036b1bd6bb6dbbc738b8, merged upstream)
-> - The 'no connection' label can now be clicked to reinitialize and reconnect the UI (615665d9c57ea8ac746169d1a7f1be39ef16df16)
-> - Enlarged slider controls on touchscreen devices (aaf6240220f4763be6e1753a5f11b2ee5b8d0d37)
+> - Fixed touchmove bug on some mobile browsers ([1a45b31](https://github.com/orithena/ESPUI/commit/1a45b311e023a084a90bd3cc3d79c47073235916), merged upstream)
+> - Dev Tool: Python script ([tools/prepare_static_ui_resources.py](https://github.com/orithena/ESPUI/blob/master/tools/prepare_static_ui_sources.py)) to regenerate minified and gzipped HTML/CSS/JS files ([557bdd8](https://github.com/orithena/ESPUI/commit/557bdd862c0b0128adbe036b1bd6bb6dbbc738b8), merged upstream)
+> - The 'no connection' label can now be clicked to reinitialize and reconnect the UI ([615665d](https://github.com/orithena/ESPUI/commit/615665d9c57ea8ac746169d1a7f1be39ef16df16), pull request pending)
+> - Enlarged slider controls on touchscreen devices ([aaf6240](https://github.com/orithena/ESPUI/commit/aaf6240220f4763be6e1753a5f11b2ee5b8d0d37), pull request pending)
 
 # ESPUI
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
