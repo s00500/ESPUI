@@ -84,6 +84,23 @@ function colorClass(colorId) {
 
 var websock;
 
+function restart() {
+    $(document).add('*').off();
+    $("#row").html("");
+    websock.close();
+    start();
+}
+
+function conStatusError() {
+        $("#conStatus").removeClass("color-green");
+        $("#conStatus").addClass("color-red");
+        $("#conStatus").text("Error / No Connection");
+        $("#conStatus").off();
+        $("#conStatus").on({
+            'click': restart
+        });
+}
+
 function start() {
     websock = new WebSocket('ws://' + window.location.hostname + '/ws');
     websock.onopen = function(evt) {
@@ -93,15 +110,11 @@ function start() {
     };
     websock.onclose = function(evt) {
         console.log('websock close');
-        $("#conStatus").removeClass("color-green");
-        $("#conStatus").addClass("color-red");
-        $("#conStatus").text("Error / No Connection");
+        conStatusError();
     };
     websock.onerror = function(evt) {
         console.log(evt);
-        $("#conStatus").removeClass("color-green");
-        $("#conStatus").addClass("color-red");
-        $("#conStatus").text("Error / No Connection");
+        conStatusError();
     };
     websock.onmessage = function(evt) {
         console.log(evt);
