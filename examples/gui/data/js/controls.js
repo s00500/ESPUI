@@ -92,13 +92,13 @@ function restart() {
 }
 
 function conStatusError() {
-        $("#conStatus").removeClass("color-green");
-        $("#conStatus").addClass("color-red");
-        $("#conStatus").text("Error / No Connection");
-        $("#conStatus").off();
-        $("#conStatus").on({
-            'click': restart
-        });
+    $("#conStatus").removeClass("color-green");
+    $("#conStatus").addClass("color-red");
+    $("#conStatus").text("Error / No Connection (click me to retry)");
+    $("#conStatus").off();
+    $("#conStatus").on({
+        'click': restart
+    });
 }
 
 function start() {
