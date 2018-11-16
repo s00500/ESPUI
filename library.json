@@ -17,11 +17,18 @@
     }
   ],
   "dependencies":
-  {
-    "name": "ESP Async WebServer",
-    "authors": "Hristo Gochkov",
-    "frameworks": "arduino"
-  },
+  [
+    {
+      "name": "ESP Async WebServer",
+      "authors": "Hristo Gochkov",
+      "frameworks": "arduino"
+    },
+    {
+      "name": "ArduinoJson",
+      "authors": "Benoit Blanchon",
+      "frameworks": "arduino"
+    }
+  ],
   "version": "1.5.4",
   "frameworks": "arduino",
   "platforms": "*"
