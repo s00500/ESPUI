@@ -83,6 +83,7 @@ function colorClass(colorId) {
 }
 
 var websock;
+var websockConnected = false;
 
 function restart() {
     $(document).add('*').off();
@@ -92,6 +93,7 @@ function restart() {
 }
 
 function conStatusError() {
+    websockConnected = false;
     $("#conStatus").removeClass("color-green");
     $("#conStatus").addClass("color-red");
     $("#conStatus").text("Error / No Connection (click me to retry)");
@@ -101,12 +103,20 @@ function conStatusError() {
     });
 }
 
+function handleVisibilityChange() {
+  if (!websockConnected && !document.hidden) {
+    restart();
+  }
+}
+
 function start() {
+    document.addEventListener("visibilitychange", handleVisibilityChange, false);
     websock = new WebSocket('ws://' + window.location.hostname + '/ws');
     websock.onopen = function(evt) {
         console.log('websock open');
         $("#conStatus").addClass("color-green");
         $("#conStatus").text("Connected");
+        websockConnected = true;
     };
     websock.onclose = function(evt) {
         console.log('websock close');
