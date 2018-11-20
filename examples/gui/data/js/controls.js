@@ -96,7 +96,7 @@ function conStatusError() {
     websockConnected = false;
     $("#conStatus").removeClass("color-green");
     $("#conStatus").addClass("color-red");
-    $("#conStatus").text("Error / No Connection &#8635;");
+    $("#conStatus").html("Error / No Connection &#8635;");
     $("#conStatus").off();
     $("#conStatus").on({
         'click': restart
