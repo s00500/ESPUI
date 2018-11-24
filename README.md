@@ -159,7 +159,7 @@ The library is designed to be easy to use and can still be extended with a lot o
 
 
 # Notes for Development
-All changes to the client side files can be made in the examples/gui/data directory. Using the file uploader thin can be used for development. After this you have to compress them and then you can gzip them. I wrote a little useful jsfiddle for this, [CHECK IT OUT](https://jsfiddle.net/s00500/yvLbhuuv/)
+All changes to the client side files can be made in the `examples/gui/data` directory. Using the file uploader then can be used for development. After this you have to compress them and then you can gzip them. I wrote a little useful jsfiddle for this, [CHECK IT OUT](https://jsfiddle.net/s00500/yvLbhuuv/)... or there is the `prepare_static_ui_sources.py` script in the `tools` directory, if you have a python3 environment available (you also need the modules jsmin, htmlmin and csscompressor).
 
 # Contribute
 Liked this Library? You can **support** me by sending me a :coffee: [Coffee](https://paypal.me/lukasbachschwell/3).

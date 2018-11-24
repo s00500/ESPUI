@@ -19,21 +19,27 @@ const uint8_t {constant}_GZIP[{gziplen}] PROGMEM = {{ {gzipdata} }};
 
 def parse_arguments(args=None):
     parser = argparse.ArgumentParser(
-        description="Prepares ESPUI header files by minifying and gzipping JS and CSS source files.")
-    parser.add_argument("--sources", "-s", dest="sources", default="../examples/gui/data",
-                        help="Sources directory containing CSS or JS files")
-    parser.add_argument("--target", "-t", dest="target", default="../src",
-                        help="Target directory containing header files")
+        description="Prepares ESPUI header files by minifying and gzipping HTML, JS and CSS source files.")
+    parser.add_argument("--auto", "--all", "-a", dest="auto", action="store_true",
+                        help="Automatically find all source files in examples/gui/data/ and write C header files to src/")
+    parser.add_argument("--source", "--sources", "-s", dest="sources", default=None,
+                        help="Sources directory containing CSS or JS files OR one specific file to minify")
+    parser.add_argument("--target", "-t", dest="target", default=None,
+                        help="Target directory containing C header files OR one C header file")
     parser.add_argument("--nostoremini", "-m", action="store_false", dest="storemini",
-                        help="Store intermediate minified files")
+                        help="Do not store intermediate minified (but not gzipped) files next to the originals")
     args = parser.parse_args(args)
+    if not args.auto and (not args.sources or not args.target):
+        print("ERROR: You need to specify either --auto or both --source and --target\n")
+        parser.print_help()
+        sys.exit(1)
     return args
 
 def get_context(infile, outfile):
     infile	= os.path.realpath(infile)
     dir, name, type 	= (os.path.basename(os.path.dirname(infile)), os.path.basename(infile).split(os.path.extsep)[0], os.path.basename(infile).split(os.path.extsep)[-1] )
-    type = type.strip(".")
-    if dir == type:
+    type = type.strip(".").lower()
+    if dir.lower() == type:
         dir = os.path.basename(os.path.dirname(os.path.dirname(infile)))
     if type == "htm":
         type = 'html'
@@ -60,7 +66,11 @@ def perform_gzip(c):
     
 def perform_minify(c):
     with open(c['infile']) as infile:
-        minifier = cssminify if c['type'] == 'css' else jsminify if c['type'] == 'js' else htmlminify
+        minifier = {
+            'css': cssminify, 
+            'js': jsminify, 
+            'html': htmlminify
+        }.get(c['type']) or htmlminify
         print("  Using %s minifier" % c['type'])
         c['minidata'] = minifier(infile.read())
     return perform_gzip(c)
@@ -93,15 +103,32 @@ def process_dir(sourcedir, outdir, recursive=True, storemini=True):
             process_file(f, outdir, storemini)
         elif not os.path.isfile(f.replace(".min.", ".")):
             process_file(f, outdir, storemini)
+            
+def check_args(args):
+    abort = 0
+    if not os.path.exists(args.sources):
+        print("ERROR: Source %s does not exist" % args.sources)
+        abort += 2
+    if not os.path.isdir(os.path.dirname(args.target)):
+        print("ERROR: Parent directory of target %s does not exist" % args.target)
+        abort += 4
+    if os.path.isdir(args.sources) and not os.path.isdir(args.target):
+        print("ERROR: Source %s is a directory, target %s is not" % (args.sources, args.target))
+        abort += 8
+    if abort > 0:
+        print("Aborting.")
+        sys.exit(abort)
 
 def main(args):
-    if not args.sources is None:
-        if os.path.isfile(args.sources):
-            print("Source %s is a file, will process one file only." % args.sources)
-            process_file(args.sources, args.target, storemini = args.storemini)
-        elif os.path.isdir(args.sources):
-            print("Source %s is a directory, searching for files recursively..." % args.sources)
-            process_dir(args.sources, args.target, recursive = True, storemini = args.storemini)
+    args.sources = os.path.realpath(args.sources or os.sep.join((os.path.dirname(os.path.realpath(__file__)), "..", "examples", "gui", "data")))
+    args.target  = os.path.realpath(args.target  or os.sep.join((os.path.dirname(os.path.realpath(__file__)), "..", "src")))
+    check_args(args)
+    if os.path.isfile(args.sources):
+        print("Source %s is a file, will process one file only." % args.sources)
+        process_file(args.sources, args.target, storemini = args.storemini)
+    elif os.path.isdir(args.sources):
+        print("Source %s is a directory, searching for files recursively..." % args.sources)
+        process_dir(args.sources, args.target, recursive = True, storemini = args.storemini)
 
 if __name__ == "__main__" and "get_ipython" not in dir():
     main(parse_arguments())
