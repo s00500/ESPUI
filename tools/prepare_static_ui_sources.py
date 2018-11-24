@@ -27,7 +27,7 @@ def parse_arguments(args=None):
     parser.add_argument("--target", "-t", dest="target", default=None,
                         help="Target directory containing C header files OR one C header file")
     parser.add_argument("--nostoremini", "-m", action="store_false", dest="storemini",
-                        help="Do not store intermediate minified (but not gzipped) files next to the originals")
+                        help="Do not store intermediate minified files next to the originals (i.e. only write to the C header files)")
     args = parser.parse_args(args)
     if not args.auto and (not args.sources or not args.target):
         print("ERROR: You need to specify either --auto or both --source and --target\n")
