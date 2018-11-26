@@ -48,7 +48,7 @@ Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip), G
 
 ## Getting started
 
-ESPUI serves several Files to the browser to build up its webinterface. This can be achieved in 2 wasy: 
+ESPUI serves several files to the browser to build up its webinterface. This can be achieved in 2 ways: 
 *PROGMEM* or *SPIFFS*
 
 *When `ESPUI.begin()` is called the default is serving files from Memory and ESPUI should work out of the box!*
@@ -159,7 +159,14 @@ The library is designed to be easy to use and can still be extended with a lot o
 
 
 # Notes for Development
-All changes to the client side files can be made in the examples/gui/data directory. Using the file uploader thin can be used for development. After this you have to compress them and then you can gzip them. I wrote a little useful jsfiddle for this, [CHECK IT OUT](https://jsfiddle.net/s00500/yvLbhuuv/)
+If you want to work on the HTML/CSS/JS files, do make changes in the `examples/gui/data` directory. When you need to transfer that code to the ESP, run `tools/prepare_static_ui_sources.py -a` (this script needs python3 with the modules htmlmin, jsmin and csscompressor).
+This will generate a) minified files next to the original files to be uploaded with the ESP32 sketch data uploader mentioned above and b) the C header files in `src` that contain the minified and gzipped HTML/CSS/JS data (which are used by the **prepareFileSystem** example sketch or when they are served from PROGMEM; see above in the section "Getting started").
+Alternatively, you can duplicate the `examples/gui` directory and work on the copy. Then specify the `--source` and `--target` arguments to the `prepare_static_ui_sources.py` script (run the script without arguments for help).
+
+If you don't have a python environment, you need to minify and gzip the HTML/CSS/JS files manually. I wrote a little useful jsfiddle for this, [see here](https://jsfiddle.net/s00500/yvLbhuuv/).
+
+If you change something in HTML/CSS/JS and want to create a pull request, please do include the minified versions and corresponding C header files in your commits.
+
 
 # Contribute
 Liked this Library? You can **support** me by sending me a :coffee: [Coffee](https://paypal.me/lukasbachschwell/3).
