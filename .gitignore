@@ -33,3 +33,6 @@ Temporary Items
 # Backup files produced by some editors
 *~
 *.bak
+
+
+.vscode/
