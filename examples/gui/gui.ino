@@ -17,6 +17,10 @@ const char *password = "";
 long oldTime = 0;
 bool switchi = false;
 
+void numberCall(Control sender, int type) { Serial.println(sender.value); }
+
+void textCall(Control sender, int type) { Serial.println(sender.value); }
+
 void slider(Control sender, int type) { Serial.println(sender.value); }
 
 void buttonCallback(Control sender, int type) {
@@ -148,12 +152,15 @@ void setup(void) {
   ESPUI.switcher("Switch two", true, &otherSwitchExample, COLOR_NONE);
   ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, "30");
   ESPUI.slider("Slider two", &slider, COLOR_NONE, "100");
+  ESPUI.text("Text Test:", &textCall, COLOR_ALIZARIN, "a Text Field");
+  ESPUI.number("Numbertest", &numberCall, COLOR_ALIZARIN, 5, 0, 10);
 
   /*
      .begin loads and serves all files from PROGMEM directly.
      If you want to serve the files from SPIFFS use .beginSPIFFS
      (.prepareFileSystem has to be run in an empty sketch before)
    */
+
   dnsServer.start(DNS_PORT, "*", apIP);
   ESPUI.begin("ESPUI Control");
 }

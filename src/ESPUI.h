@@ -10,20 +10,20 @@
 
 #if defined(ESP32)
 
-#include "SPIFFS.h"
-#include "WiFi.h"
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include "SPIFFS.h"
+#include "WiFi.h"
 
 #else
 
+#include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
-#include <ArduinoOTA.h>
-#include <FS.h>
-#include <Hash.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <FS.h>
+#include <Hash.h>
 #include <SPIFFSEditor.h>
 
 #define FILE_WRITE "w"
@@ -32,7 +32,7 @@
 
 typedef struct Control {
   unsigned int type;
-  unsigned int id; // just mirroring the id here for practical reasons
+  unsigned int id;  // just mirroring the id here for practical reasons
   const char *label;
   void (*callback)(Control, int);
   String value;
@@ -53,7 +53,6 @@ typedef struct Control {
 #define UI_PAD 4
 #define UI_CPAD 5
 
-
 #define UI_SLIDER 8
 #define UPDATE_SLIDER 9
 
@@ -66,7 +65,6 @@ typedef struct Control {
 #define UI_GRAPH 14
 #define CLEAR_GRAPH 15
 #define ADD_GRAPH_POINT 16
-
 
 // Values
 #define B_DOWN -1
@@ -88,6 +86,7 @@ typedef struct Control {
 
 #define SL_VALUE 8
 #define N_VALUE 9
+#define T_VALUE 10
 
 // Colors
 #define COLOR_TURQUOISE 0
@@ -99,60 +98,69 @@ typedef struct Control {
 #define COLOR_ALIZARIN 6
 #define COLOR_NONE 6
 
-
 class ESPUIClass {
+ public:
+  void begin(const char *_title);        // Setup servers and page in Memorymode
+  void beginSPIFFS(const char *_title);  // Setup servers and page in SPIFFSmode
 
-public:
-void begin(const char *_title);   // Setup servers and page in Memorymode
-void beginSPIFFS(const char *_title); // Setup servers and page in SPIFFSmode
+  void prepareFileSystem();  // Initially preps the filesystem and loads a lot
+                             // of stuff into SPIFFS
+  void list();
+  // Creating Elements
 
-void prepareFileSystem();   // Initially preps the filesystem and loads a lot of stuff into SPIFFS
-void list();
-// Creating Elements
+  int button(const char *label, void (*callBack)(Control, int), int color,
+             String value = "");  // Create Event Button
+  int switcher(const char *label, bool startState,
+               void (*callBack)(Control, int),
+               int color);  // Create Toggle Button
+  int pad(const char *label, bool centerButton, void (*callBack)(Control, int),
+          int color);  // Create Pad Control
+  int slider(const char *label, void (*callBack)(Control, int), int color,
+             String value);  // Create Slider Control
+  int number(const char *label, void (*callBack)(Control, int), int color,
+             int number, int min, int max);  // Create a Number Input Control
+  int text(const char *label, void (*callBack)(Control, int), int color,
+           String value = "");  // Create a Text Input Control
 
-int button(const char *label, void (*callBack)(Control, int), int color, String value = "");   // Create Event Button
-int switcher(const char *label, bool startState, void (*callBack)(Control, int), int color);   // Create Toggle Button
-int pad(const char *label, bool centerButton, void (*callBack)(Control, int), int color);  // Create Pad Control
-int slider(const char *label, void (*callBack)(Control, int), int color, String value);    // Create Slider Control
-int number(const char *label, void (*callBack)(Control, int), int color, int number, int min, int max);    // Create a Number Input Control
+  // Output only
+  int label(const char *label, int color, String value = "");  // Create Label
+  int graph(const char *label, int color);  // Create Graph display
 
-// Output only
-int label(const char *label, int color, String value = ""); // Create Label
-int graph(const char *label, int color); // Create Graph display
+  // Update Elements
+  void print(int id, String value);
+  void print(String label, String value);
 
-// Update Elements
-void print(int id, String value);
-void print(String label, String value);
+  void updateSwitcher(int id, bool nValue, int clientId = -1);
+  void updateSwitcher(String label, bool nValue, int clientId = -1);
 
-void updateSwitcher(int id, bool nValue, int clientId = -1);
-void updateSwitcher(String label, bool nValue, int clientId = -1);
+  void updateSlider(int id, int nValue, int clientId = -1);
+  void updateSlider(String label, int nValue, int clientId = -1);
 
-void updateSlider(int id, int nValue, int clientId = -1);
-void updateSlider(String label, int nValue, int clientId = -1);
+  void updateNumber(int id, int nValue, int clientId = -1);
+  void updateNumber(String label, int nValue, int clientId = -1);
 
-void updateNumber(int id, int nValue, int clientId = -1);
-void updateNumber(String label, int nValue, int clientId = -1);
+  void updateText(int id, String nValue, int clientId = -1);
+  void updateText(String label, String nValue, int clientId = -1);
 
-void clearGraph(int id, int clientId = -1);
-void clearGraph(String label, int clientId = -1);
+  void clearGraph(int id, int clientId = -1);
+  void clearGraph(String label, int clientId = -1);
 
-void addGraphPoint(int id, int nValue, int clientId = -1);
-void addGraphPoint(String label, int nValue, int clientId = -1);
+  void addGraphPoint(int id, int nValue, int clientId = -1);
+  void addGraphPoint(String label, int nValue, int clientId = -1);
 
+  void textThem(String text, int clientId);
 
-void textThem(String text, int clientId);
+  // Variables ---
+  const char *ui_title = "ESPUI";  // Store UI Title and Header Name
+  int cIndex = 0;                  // Control index
+  Control *controls[25];
+  void jsonDom(AsyncWebSocketClient *client);
+  int getIdByLabel(String label);
+  bool labelExists(String label);
 
-// Variables ---
-const char *ui_title = "ESPUI";   // Store UI Title and Header Name
-int cIndex = 0;                   // Control index
-Control *controls[25];
-void jsonDom(AsyncWebSocketClient *client);
-int getIdByLabel(String label);
-bool labelExists(String label);
-
-private:
-AsyncWebServer *server;
-AsyncWebSocket *ws;
+ private:
+  AsyncWebServer *server;
+  AsyncWebSocket *ws;
 };
 
 extern ESPUIClass ESPUI;
