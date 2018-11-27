@@ -78,6 +78,8 @@ Now you are set to go and use any code you want to with this library
   - Control pad
   - Control pad with center button
   - Slider
+  - Text Input (updateable)
+  - Numberinput (updateable)
 
   Checkout the example for the usage
   
