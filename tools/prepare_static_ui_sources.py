@@ -1,14 +1,36 @@
 #!/usr/bin/env python3
 
-from jsmin import jsmin as jsminify
-from htmlmin import minify as htmlminify
-from csscompressor import compress as cssminify
-import gzip
 import sys
 import os.path
 import argparse
 import re
 from glob import glob
+
+missing = []
+try:
+    from jsmin import jsmin as jsminify
+except ModuleNotFoundError as e:
+    missing.append(e)
+try:
+    from htmlmin import minify as htmlminify
+except ModuleNotFoundError as e:
+    missing.append(e)
+try:
+    from csscompressor import compress as cssminify
+except ModuleNotFoundError as e:
+    missing.append(e)
+try:
+    import gzip
+except ModuleNotFoundError as e:
+    missing.append(e)
+if len(missing) > 0:
+    for m in missing:
+        print("Cannot find module '%s'." % m.name)
+    print("Can't find %s required python module%s. Please install %s. If you're not sure how, a web search" % (len(missing), "s" if len(missing) > 1 else "", "them" if len(missing) > 1 else "it"))
+    print("for 'python', your operating system/python distribution and 'install modules' should help.")
+    print("For most people on unix-y systems, this line should work (possibly w/o the '3'):\n  pip3 install %s" % " ".join(m.name for m in missing))
+    print("Here's the long documentation: https://packaging.python.org/tutorials/installing-packages/")
+    sys.exit(0)
 
 TARGET_TEMPLATE = '''const char {constant}[] PROGMEM = R"=====(
 {minidata}
