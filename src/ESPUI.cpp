@@ -492,6 +492,16 @@ void ESPUIClass::updateSlider(int id, int nValue, int clientId) {
   }
 }
 
+void ESPUIClass::updateSlider(String label, int nValue, int clientId) {
+  if (!labelExists(label)) {
+    if (DEBUG_ESPUI)
+      Serial.println("UI ERROR: Element does not " + String(label) +
+                     " exist, cannot update!");
+    return;
+  }
+  updateSlider(getIdByLabel(label), nValue, clientId);
+}
+
 void ESPUIClass::updateSwitcher(int id, bool nValue, int clientId) {
   if (id < cIndex && controls[id]->type == UI_SWITCHER) {
     controls[id]->value = nValue ? 1 : 0;
