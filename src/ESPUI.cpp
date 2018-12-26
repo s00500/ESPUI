@@ -613,25 +613,39 @@ bool ESPUIClass::labelExists(String label) {
   return false;
 }
 
-// Convert & Transfer Arduino elements to JSON elements
+/*
+Convert & Transfer Arduino elements to JSON elements
+Initially this function used to send the control element data individually.
+Due to a change in the ESPAsyncWebserver library this had top be changed to be
+sent as one blob at the beginning. Therefore a new type is used as well
+*/
 void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
+  String json;
+  DynamicJsonBuffer jsonBuffer(2000);
+  JsonObject &root = jsonBuffer.createObject();
+  root["type"] = UI_INITIAL_GUI;
+  JsonArray &items = jsonBuffer.createArray();
+
   for (int i = -1; i < cIndex; i++) {
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &item = jsonBuffer.createObject();
+
     if (i == -1) {
-      root["type"] = UI_TITEL;
-      root["label"] = String(ui_title);
+      item["type"] = UI_TITEL;
+      item["label"] = String(ui_title);
     } else {
-      root["type"] = controls[i]->type;
-      root["label"] = String(controls[i]->label);
-      root["value"] = String(controls[i]->value);
-      root["color"] = String(controls[i]->color);
-      root["id"] = String(i);
+      item["type"] = controls[i]->type;
+      item["label"] = String(controls[i]->label);
+      item["value"] = String(controls[i]->value);
+      item["color"] = String(controls[i]->color);
+      item["id"] = String(i);
     }
-    root.printTo(json);
-    client->text(json);
+    items.add(item);
   }
+
+  // Send as one big bunch
+  root["controls"] = items;
+  root.printTo(json);
+  client->text(json);
 }
 
 void ESPUIClass::beginSPIFFS(const char *_title) {

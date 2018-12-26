@@ -40,6 +40,7 @@ typedef struct Control {
 } Control;
 
 // Message Types (and control types)
+#define UI_INITIAL_GUI 100
 #define UI_TITEL 0
 
 #define UI_LABEL 1
