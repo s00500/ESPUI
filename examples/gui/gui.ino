@@ -157,11 +157,19 @@ void setup(void) {
 
   /*
      .begin loads and serves all files from PROGMEM directly.
-     If you want to serve the files from SPIFFS use .beginSPIFFS
+     If you want to serve the files from SPIFFS use ESPUI.beginSPIFFS
      (.prepareFileSystem has to be run in an empty sketch before)
    */
 
   dnsServer.start(DNS_PORT, "*", apIP);
+
+  /*
+   * Optionally you can use HTTP BasicAuth. Keep in mind that this is NOT a
+   SECURE way of limiting access.
+   * Anyone who is able to sniff traffic will be able to intercept your password
+   since it is transmitted in cleartext ESPUI.begin("ESPUI Control", "myuser",
+   "mypassword");
+  */
   ESPUI.begin("ESPUI Control");
 }
 

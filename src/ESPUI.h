@@ -101,8 +101,12 @@ typedef struct Control {
 
 class ESPUIClass {
  public:
-  void begin(const char *_title);        // Setup servers and page in Memorymode
+  void begin(const char *_title);  // Setup servers and page in Memorymode
+  void begin(const char *_title, const char *username, const char *password);
+
   void beginSPIFFS(const char *_title);  // Setup servers and page in SPIFFSmode
+  void beginSPIFFS(const char *_title, const char *username,
+                   const char *password);
 
   void prepareFileSystem();  // Initially preps the filesystem and loads a lot
                              // of stuff into SPIFFS
@@ -160,6 +164,9 @@ class ESPUIClass {
   bool labelExists(String label);
 
  private:
+  const char *basicAuthUsername;
+  const char *basicAuthPassword;
+  bool basicAuth = true;
   AsyncWebServer *server;
   AsyncWebSocket *ws;
 };

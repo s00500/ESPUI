@@ -649,6 +649,12 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
 }
 
 void ESPUIClass::beginSPIFFS(const char *_title) {
+  begin(_title, NULL, NULL);
+  basicAuth = false;
+}
+
+void ESPUIClass::beginSPIFFS(const char *_title, const char *username,
+                             const char *password) {
   ui_title = _title;
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
@@ -670,10 +676,28 @@ void ESPUIClass::beginSPIFFS(const char *_title) {
 
   ws->onEvent(onWsEvent);
   server->addHandler(ws);
-  server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
+
+  if (basicAuth && username != NULL && password != NULL) {
+    basicAuthPassword = password;
+    basicAuthUsername = username;
+    basicAuth = true;
+    ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
+    server->serveStatic("/", SPIFFS, "/")
+        .setDefaultFile("index.htm")
+        .setAuthentication(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword);
+
+  } else if (basicAuth) {
+    Serial.println(
+        "Could not enable BasicAuth: Username or password are not set");
+  } else {
+    server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
+  }
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     request->send(200, "text/plain",
                   String(ESP.getFreeHeap()) + " In SPIFFSmode");
   });
@@ -681,26 +705,49 @@ void ESPUIClass::beginSPIFFS(const char *_title) {
   server->onNotFound(
       [](AsyncWebServerRequest *request) { request->send(404); });
 
-  server->on("/zepto.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
-    response->addHeader("Content-Encoding", "gzip");
-    request->send(response);
-  });
-
   server->begin();
   if (DEBUG_ESPUI) Serial.println("UI Initialized");
 }
 
 void ESPUIClass::begin(const char *_title) {
+  begin(_title, NULL, NULL);
+  basicAuth = false;
+}
+
+void ESPUIClass::begin(const char *_title, const char *username,
+                       const char *password) {
+  if (basicAuth && username != NULL && password != NULL) {
+    basicAuthPassword = password;
+    basicAuthUsername = username;
+    basicAuth = true;
+  } else if (basicAuth) {
+    Serial.println(
+        "Could not enable BasicAuth: Username or password are not set");
+  }
+
   ui_title = _title;
+
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
 
   ws->onEvent(onWsEvent);
   server->addHandler(ws);
 
+  if (basicAuth && username != NULL && password != NULL) {
+    basicAuthPassword = password;
+    basicAuthUsername = username;
+    basicAuth = true;
+    ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
+
+  } else if (basicAuth) {
+    Serial.println(
+        "Could not enable BasicAuth: Username or password are not set");
+  }
+
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     AsyncWebServerResponse *response =
         request->beginResponse_P(200, "text/html", HTML_INDEX);
     request->send(response);
@@ -709,6 +756,9 @@ void ESPUIClass::begin(const char *_title) {
   // Javascript files
 
   server->on("/js/zepto.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     AsyncWebServerResponse *response = request->beginResponse_P(
         200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
     response->addHeader("Content-Encoding", "gzip");
@@ -716,6 +766,9 @@ void ESPUIClass::begin(const char *_title) {
   });
 
   server->on("/js/controls.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     AsyncWebServerResponse *response =
         request->beginResponse_P(200, "application/javascript",
                                  JS_CONTROLS_GZIP, sizeof(JS_CONTROLS_GZIP));
@@ -724,6 +777,9 @@ void ESPUIClass::begin(const char *_title) {
   });
 
   server->on("/js/slider.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     AsyncWebServerResponse *response = request->beginResponse_P(
         200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
     response->addHeader("Content-Encoding", "gzip");
@@ -733,6 +789,9 @@ void ESPUIClass::begin(const char *_title) {
   // Stylesheets
 
   server->on("/css/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     AsyncWebServerResponse *response = request->beginResponse_P(
         200, "text/css", CSS_STYLE_GZIP, sizeof(CSS_STYLE_GZIP));
     response->addHeader("Content-Encoding", "gzip");
@@ -741,6 +800,9 @@ void ESPUIClass::begin(const char *_title) {
 
   server->on(
       "/css/normalize.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+        if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                      ESPUI.basicAuthPassword))
+          return request->requestAuthentication();
         AsyncWebServerResponse *response = request->beginResponse_P(
             200, "text/css", CSS_NORMALIZE_GZIP, sizeof(CSS_NORMALIZE_GZIP));
         response->addHeader("Content-Encoding", "gzip");
@@ -749,6 +811,9 @@ void ESPUIClass::begin(const char *_title) {
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
+                                                  ESPUI.basicAuthPassword))
+      return request->requestAuthentication();
     request->send(200, "text/plain",
                   String(ESP.getFreeHeap()) + " In Memorymode");
   });
