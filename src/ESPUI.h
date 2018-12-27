@@ -2,6 +2,7 @@
 #define ESPUI_h
 
 #define DEBUG_ESPUI true
+#define WS_AUTHENTICATION false
 
 #include "Arduino.h"
 #include "ArduinoJson.h"

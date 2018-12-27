@@ -681,7 +681,8 @@ void ESPUIClass::beginSPIFFS(const char *_title, const char *username,
     basicAuthPassword = password;
     basicAuthUsername = username;
     basicAuth = true;
-    ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
+    if (WS_AUTHENTICATION)
+      ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
     server->serveStatic("/", SPIFFS, "/")
         .setDefaultFile("index.htm")
         .setAuthentication(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword);
@@ -737,7 +738,8 @@ void ESPUIClass::begin(const char *_title, const char *username,
     basicAuthPassword = password;
     basicAuthUsername = username;
     basicAuth = true;
-    ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
+    if (WS_AUTHENTICATION)
+      ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
 
   } else if (basicAuth) {
     Serial.println(
