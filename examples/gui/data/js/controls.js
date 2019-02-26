@@ -40,41 +40,36 @@ const C_SUNFLOWER = 4;
 const C_CARROT = 5;
 const C_ALIZARIN = 6;
 const C_NONE = 7;
+const C_DARK = 8;
 
 function colorClass(colorId) {
   colorId = Number(colorId);
   switch (colorId) {
     case C_TURQUOISE:
       return "turquoise";
-      break;
 
     case C_EMERALD:
       return "emerald";
-      break;
 
     case C_PETERRIVER:
       return "peterriver";
-      break;
 
     case C_WETASPHALT:
       return "wetasphalt";
-      break;
 
     case C_SUNFLOWER:
       return "sunflower";
-      break;
 
     case C_CARROT:
       return "carrot";
-      break;
 
     case C_ALIZARIN:
       return "alizarin";
-      break;
 
     case C_NONE:
       return "";
-      break;
+    case C_DARK:
+      return "dark";
 
     default:
       return "";
