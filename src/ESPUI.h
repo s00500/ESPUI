@@ -99,7 +99,6 @@ typedef struct Control {
 #define COLOR_CARROT 5
 #define COLOR_ALIZARIN 6
 #define COLOR_NONE 7
-#define COLOR_DARK 8
 
 class ESPUIClass {
  public:

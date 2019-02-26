@@ -67,10 +67,7 @@ function colorClass(colorId) {
       return "alizarin";
 
     case C_NONE:
-      return "";
-    case C_DARK:
       return "dark";
-
     default:
       return "";
   }
@@ -108,24 +105,24 @@ function handleVisibilityChange() {
 function start() {
   document.addEventListener("visibilitychange", handleVisibilityChange, false);
   websock = new WebSocket("ws://" + window.location.hostname + "/ws");
-  websock.onopen = function (evt) {
+  websock.onopen = function(evt) {
     console.log("websock open");
     $("#conStatus").addClass("color-green");
     $("#conStatus").text("Connected");
     websockConnected = true;
   };
 
-  websock.onclose = function (evt) {
+  websock.onclose = function(evt) {
     console.log("websock close");
     conStatusError();
   };
 
-  websock.onerror = function (evt) {
+  websock.onerror = function(evt) {
     console.log(evt);
     conStatusError();
   };
 
-  var handleEvent = function (evt) {
+  var handleEvent = function(evt) {
     //console.log(evt);
     var data = JSON.parse(evt.data);
     var e = document.body;
@@ -146,42 +143,42 @@ function start() {
       case UI_LABEL:
         $("#row").append(
           "<div class='two columns card tcenter " +
-          colorClass(data.color) +
-          "'><h5 id='" +
-          data.id +
-          "'>" +
-          data.label +
-          "</h5><hr /><span id='l" +
-          data.id +
-          "' class='label label-wrap'>" +
-          data.value +
-          "</span></div>"
+            colorClass(data.color) +
+            "'><h5 id='" +
+            data.id +
+            "'>" +
+            data.label +
+            "</h5><hr /><span id='l" +
+            data.id +
+            "' class='label label-wrap'>" +
+            data.value +
+            "</span></div>"
         );
         break;
       case UI_BUTTON:
         $("#row").append(
           "<div class='one columns card tcenter " +
-          colorClass(data.color) +
-          "'><h5>" +
-          data.label +
-          "</h5><hr/><button onmousedown='buttonclick(" +
-          data.id +
-          ", true)' onmouseup='buttonclick(" +
-          data.id +
-          ", false)' id='" +
-          data.id +
-          "'>" +
-          data.value +
-          "</button></div>"
+            colorClass(data.color) +
+            "'><h5>" +
+            data.label +
+            "</h5><hr/><button onmousedown='buttonclick(" +
+            data.id +
+            ", true)' onmouseup='buttonclick(" +
+            data.id +
+            ", false)' id='" +
+            data.id +
+            "'>" +
+            data.value +
+            "</button></div>"
         );
         $("#" + data.id).on({
-          touchstart: function (e) {
+          touchstart: function(e) {
             e.preventDefault();
             buttonclick(data.id, true);
           }
         });
         $("#" + data.id).on({
-          touchend: function (e) {
+          touchend: function(e) {
             e.preventDefault();
             buttonclick(data.id, false);
           }
@@ -206,16 +203,16 @@ function start() {
         }
         $("#row").append(
           "<div id='" +
-          data.id +
-          "' class='one columns card tcenter " +
-          colorClass(data.color) +
-          "'><h5>" +
-          data.label +
-          "</h5><hr/>" +
-          label +
-          input +
-          "</label>" +
-          "</div>"
+            data.id +
+            "' class='one columns card tcenter " +
+            colorClass(data.color) +
+            "'><h5>" +
+            data.label +
+            "</h5><hr/>" +
+            label +
+            input +
+            "</label>" +
+            "</div>"
         );
         break;
       case UI_CPAD:
@@ -227,106 +224,106 @@ function start() {
           ", false)' href='#' id='pc" +
           data.id +
           "'>OK</a>";
-        //NO BREAK
+      //NO BREAK
       case UI_PAD:
         $("#row").append(
           "<div class='two columns card tcenter " +
-          colorClass(data.color) +
-          "'><h5>" +
-          data.label +
-          "</h5><hr/>" +
-          "<nav class='control'>" +
-          "<ul>" +
-          "<li><a onmousedown='padclick(FOR, " +
-          data.id +
-          ", true)' onmouseup='padclick(FOR, " +
-          data.id +
-          ", false)' href='#' id='pf" +
-          data.id +
-          "'>▲</a></li>" +
-          "<li><a onmousedown='padclick(RIGHT, " +
-          data.id +
-          ", true)' onmouseup='padclick(RIGHT, " +
-          data.id +
-          ", false)' href='#' id='pr" +
-          data.id +
-          "'>▲</a></li>" +
-          "<li><a onmousedown='padclick(LEFT, " +
-          data.id +
-          ", true)' onmouseup='padclick(LEFT, " +
-          data.id +
-          ", false)' href='#' id='pl" +
-          data.id +
-          "'>▲</a></li>" +
-          "<li><a onmousedown='padclick(BACK, " +
-          data.id +
-          ", true)' onmouseup='padclick(BACK, " +
-          data.id +
-          ", false)' href='#' id='pb" +
-          data.id +
-          "'>▲</a></li>" +
-          "</ul>" +
-          center +
-          "</nav>" +
-          "</div>"
+            colorClass(data.color) +
+            "'><h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<nav class='control'>" +
+            "<ul>" +
+            "<li><a onmousedown='padclick(FOR, " +
+            data.id +
+            ", true)' onmouseup='padclick(FOR, " +
+            data.id +
+            ", false)' href='#' id='pf" +
+            data.id +
+            "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(RIGHT, " +
+            data.id +
+            ", true)' onmouseup='padclick(RIGHT, " +
+            data.id +
+            ", false)' href='#' id='pr" +
+            data.id +
+            "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(LEFT, " +
+            data.id +
+            ", true)' onmouseup='padclick(LEFT, " +
+            data.id +
+            ", false)' href='#' id='pl" +
+            data.id +
+            "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(BACK, " +
+            data.id +
+            ", true)' onmouseup='padclick(BACK, " +
+            data.id +
+            ", false)' href='#' id='pb" +
+            data.id +
+            "'>▲</a></li>" +
+            "</ul>" +
+            center +
+            "</nav>" +
+            "</div>"
         );
 
         $("#pf" + data.id).on({
-          touchstart: function (e) {
+          touchstart: function(e) {
             e.preventDefault();
             padclick(FOR, data.id, true);
           }
         });
         $("#pf" + data.id).on({
-          touchend: function (e) {
+          touchend: function(e) {
             e.preventDefault();
             padclick(FOR, data.id, false);
           }
         });
         $("#pl" + data.id).on({
-          touchstart: function (e) {
+          touchstart: function(e) {
             e.preventDefault();
             padclick(LEFT, data.id, true);
           }
         });
         $("#pl" + data.id).on({
-          touchend: function (e) {
+          touchend: function(e) {
             e.preventDefault();
             padclick(LEFT, data.id, false);
           }
         });
         $("#pr" + data.id).on({
-          touchstart: function (e) {
+          touchstart: function(e) {
             e.preventDefault();
             padclick(RIGHT, data.id, true);
           }
         });
         $("#pr" + data.id).on({
-          touchend: function (e) {
+          touchend: function(e) {
             e.preventDefault();
             padclick(RIGHT, data.id, false);
           }
         });
         $("#pb" + data.id).on({
-          touchstart: function (e) {
+          touchstart: function(e) {
             e.preventDefault();
             padclick(BACK, data.id, true);
           }
         });
         $("#pb" + data.id).on({
-          touchend: function (e) {
+          touchend: function(e) {
             e.preventDefault();
             padclick(BACK, data.id, false);
           }
         });
         $("#pc" + data.id).on({
-          touchstart: function (e) {
+          touchstart: function(e) {
             e.preventDefault();
             padclick(CENTER, data.id, true);
           }
         });
         $("#pc" + data.id).on({
-          touchend: function (e) {
+          touchend: function(e) {
             e.preventDefault();
             padclick(CENTER, data.id, false);
           }
@@ -343,23 +340,23 @@ function start() {
       case UI_SLIDER:
         $("#row").append(
           "<div class='two columns card tcenter card-slider " +
-          colorClass(data.color) +
-          "'>" +
-          "<h5 id='" +
-          data.id +
-          "'>" +
-          data.label +
-          "</h5><hr />" +
-          "<div id='sl" +
-          data.id +
-          "' class='rkmd-slider slider-discrete slider-" +
-          colorClass(data.color) +
-          "'>" +
-          "<input type='range' min='0' max='100' value='" +
-          data.value +
-          "'>" +
-          "</div>" +
-          "</div>"
+            colorClass(data.color) +
+            "'>" +
+            "<h5 id='" +
+            data.id +
+            "'>" +
+            data.label +
+            "</h5><hr />" +
+            "<div id='sl" +
+            data.id +
+            "' class='rkmd-slider slider-discrete slider-" +
+            colorClass(data.color) +
+            "'>" +
+            "<input type='range' min='0' max='100' value='" +
+            data.value +
+            "'>" +
+            "</div>" +
+            "</div>"
         );
         $("#row").append(
           "<script>" + "rkmd_rangeSlider('#sl" + data.id + "');" + "</script>"
@@ -373,21 +370,21 @@ function start() {
       case UI_NUMBER:
         $("#row").append(
           "<div class='two columns card tcenter " +
-          colorClass(data.color) +
-          "'>" +
-          "<h5 id='" +
-          data.id +
-          "'>" +
-          data.label +
-          "</h5><hr />" +
-          "<input style='color:black;' id='num" +
-          data.id +
-          "' type='number' value='" +
-          data.value +
-          "' onchange='numberchange(" +
-          data.id +
-          ")' />" +
-          "</div>"
+            colorClass(data.color) +
+            "'>" +
+            "<h5 id='" +
+            data.id +
+            "'>" +
+            data.label +
+            "</h5><hr />" +
+            "<input style='color:black;' id='num" +
+            data.id +
+            "' type='number' value='" +
+            data.value +
+            "' onchange='numberchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
         );
         break;
 
@@ -398,21 +395,21 @@ function start() {
       case UI_TEXT_INPUT:
         $("#row").append(
           "<div class='two columns card tcenter " +
-          colorClass(data.color) +
-          "'>" +
-          "<h5 id='" +
-          data.id +
-          "'>" +
-          data.label +
-          "</h5><hr />" +
-          "<input style='color:black;' id='text" +
-          data.id +
-          "' value='" +
-          data.value +
-          "' onchange='textchange(" +
-          data.id +
-          ")' />" +
-          "</div>"
+            colorClass(data.color) +
+            "'>" +
+            "<h5 id='" +
+            data.id +
+            "'>" +
+            data.label +
+            "</h5><hr />" +
+            "<input style='color:black;' id='text" +
+            data.id +
+            "' value='" +
+            data.value +
+            "' onchange='textchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
         );
         break;
 
