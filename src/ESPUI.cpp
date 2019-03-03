@@ -359,12 +359,13 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
 }
 
 int ESPUIClass::addControl( ControlType type, const char* label,
-                            void ( *callback )( Control, int ),
-                            String value, ControlColor color ) {
+                            String value, ControlColor color,
+                            void ( *callback )( Control, int ) ) {
   if ( this->getControl( label ) != nullptr ) {
-    if ( this->verbosity ){
+    if ( this->verbosity ) {
       Serial.println( "UI ERROR: Element " + String( label ) +
-                      " exists, skipping creating element!" );}
+                      " exists, skipping creating element!" );
+    }
 
     return -1;
   }
@@ -387,47 +388,47 @@ int ESPUIClass::addControl( ControlType type, const char* label,
 }
 
 int ESPUIClass::label( const char* label, ControlColor color, String value ) {
-  return addControl( ControlType::Label, label, nullptr, value, color );
+  return addControl( ControlType::Label, label, value, color );
 }
 
 int ESPUIClass::graph( const char* label, ControlColor color ) {
-  return addControl( ControlType::Graph, label, nullptr, "", color );
+  return addControl( ControlType::Graph, label, "", color );
 }
 
 // TODO: this still needs a range setting
 int ESPUIClass::slider( const char* label, void ( *callback )( Control, int ),
                         ControlColor color, String value ) {
-  return addControl( ControlType::Button, label, callback, "", color );
+  return addControl( ControlType::Button, label, "", color, callback );
 }
 
 int ESPUIClass::button( const char* label, void ( *callback )( Control, int ),
                         ControlColor color, String value ) {
-  return addControl( ControlType::Button, label, callback, value, color );
+  return addControl( ControlType::Button, label, value, color, callback );
 }
 
 int ESPUIClass::switcher( const char* label, bool startState,
                           void ( *callback )( Control, int ), ControlColor color ) {
-  return addControl( ControlType::Switcher, label, callback, "", color );
+  return addControl( ControlType::Switcher, label, "", color, callback );
 }
 
 int ESPUIClass::pad( const char* label, bool center,
                      void ( *callback )( Control, int ), ControlColor color ) {
   if ( center ) {
-    return addControl( ControlType::Cpad, label, callback, "", color );
+    return addControl( ControlType::Cpad, label, "", color, callback );
   } else {
-    return addControl( ControlType::Pad, label, callback, "", color );
+    return addControl( ControlType::Pad, label, "", color, callback );
   }
 }
 
 // TODO: min and max need to be saved, they also need to be sent to the frontend
 int ESPUIClass::number( const char* label, void ( *callback )( Control, int ),
                         ControlColor color, int number, int min, int max ) {
-  return addControl( ControlType::Number, label, callback, String( number ), color );
+  return addControl( ControlType::Number, label, String( number ), color, callback );
 }
 
 int ESPUIClass::text( const char* label, void ( *callback )( Control, int ),
                       ControlColor color, String value ) {
-  return addControl( ControlType::Text, label, callback, value, color );
+  return addControl( ControlType::Text, label, value, color, callback );
 }
 
 

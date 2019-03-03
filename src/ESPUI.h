@@ -151,9 +151,9 @@ class Control {
 #define T_VALUE 10
 
 enum Verbosity : uint8_t {
-      Quiet = 0,
-      Verbose,
-      VerboseJSON  
+  Quiet = 0,
+  Verbose,
+  VerboseJSON
 };
 
 class ESPUIClass {
@@ -173,8 +173,8 @@ class ESPUIClass {
     // Creating Elements
 
     int addControl( ControlType type, const char* label,
-                    void ( *callback )( Control, int ),
-                    String value, ControlColor color );
+                    String value = String( "" ), ControlColor color = ControlColor::Turquoise,
+                    void ( *callback )( Control, int ) = nullptr );
 
     int button( const char* label,
                 void ( *callback )( Control, int ), ControlColor color,
