@@ -880,3 +880,44 @@ input[id^="num"] {
   font-weight: bold;
   font-size: 115%;
 }
+
+body div > ul {
+  margin: 0;
+  padding: 0;
+  border-bottom: 3px solid #666;
+  overflow: hidden;
+}
+ul li {
+  list-style: none;
+  float: left;
+  margin-right: 4px;
+}
+ul li.controls {
+  float: right;
+}
+ul li a {
+  font-weight: bold;
+  display: inline-block;
+  padding: 6px 12px;
+  color: #888;
+  outline: 0;
+  text-decoration: none;
+  background: #f3f3f3;
+  background: -webkit-gradient(linear,0 0,0 bottom,from(#eee),to(#e4e4e4));
+  background: -moz-linear-gradient(#eee,#e4e4e4);
+  background: linear-gradient(#eee,#e4e4e4);
+  -pie-background: linear-gradient(#eee,#e4e4e4);
+}
+
+ul li.active a {
+  pointer-events: none;
+  color: white;
+  background: #666;
+  background: -webkit-gradient(linear,0 0,0 bottom,from(#888),to(#666));
+  background: -moz-linear-gradient(#888,#666);
+  background: linear-gradient(#888,#666);
+  -pie-background: linear-gradient(#888,#666);
+}
+div.tabscontent > div {
+  padding: 0 15px;
+}

@@ -24,6 +24,9 @@ const UI_GRAPH = 9;
 const ADD_GRAPH_POINT = 10;
 const CLEAR_GRAPH = 109;
 
+const UI_TAB = 11;
+const UPDATE_TAB = 111;
+
 const FOR = 0;
 const BACK = 1;
 const LEFT = 2;
@@ -140,7 +143,13 @@ function start() {
         $("#mainHeader").html(data.label);
         break;
       case UI_LABEL:
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div class='two columns card tcenter " +
             colorClass(data.color) +
             "'><h5 id='" +
@@ -155,7 +164,13 @@ function start() {
         );
         break;
       case UI_BUTTON:
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div class='one columns card tcenter " +
             colorClass(data.color) +
             "'><h5>" +
@@ -200,7 +215,13 @@ function start() {
             data.id +
             ",null)' ></div>";
         }
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div id='" +
             data.id +
             "' class='one columns card tcenter " +
@@ -225,7 +246,13 @@ function start() {
           "'>OK</a>";
       //NO BREAK
       case UI_PAD:
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div class='two columns card tcenter " +
             colorClass(data.color) +
             "'><h5>" +
@@ -271,9 +298,7 @@ function start() {
           touchstart: function(e) {
             e.preventDefault();
             padclick(FOR, data.id, true);
-          }
-        });
-        $("#pf" + data.id).on({
+          },
           touchend: function(e) {
             e.preventDefault();
             padclick(FOR, data.id, false);
@@ -283,9 +308,7 @@ function start() {
           touchstart: function(e) {
             e.preventDefault();
             padclick(LEFT, data.id, true);
-          }
-        });
-        $("#pl" + data.id).on({
+          },
           touchend: function(e) {
             e.preventDefault();
             padclick(LEFT, data.id, false);
@@ -295,9 +318,7 @@ function start() {
           touchstart: function(e) {
             e.preventDefault();
             padclick(RIGHT, data.id, true);
-          }
-        });
-        $("#pr" + data.id).on({
+          },
           touchend: function(e) {
             e.preventDefault();
             padclick(RIGHT, data.id, false);
@@ -307,9 +328,7 @@ function start() {
           touchstart: function(e) {
             e.preventDefault();
             padclick(BACK, data.id, true);
-          }
-        });
-        $("#pb" + data.id).on({
+          },
           touchend: function(e) {
             e.preventDefault();
             padclick(BACK, data.id, false);
@@ -319,9 +338,7 @@ function start() {
           touchstart: function(e) {
             e.preventDefault();
             padclick(CENTER, data.id, true);
-          }
-        });
-        $("#pc" + data.id).on({
+          },
           touchend: function(e) {
             e.preventDefault();
             padclick(CENTER, data.id, false);
@@ -337,7 +354,13 @@ function start() {
         else switcher(data.id, 1);
         break;
       case UI_SLIDER:
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div class='two columns card tcenter card-slider " +
             colorClass(data.color) +
             "'>" +
@@ -357,7 +380,13 @@ function start() {
             "</div>" +
             "</div>"
         );
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<script>" + "rkmd_rangeSlider('#sl" + data.id + "');" + "</script>"
         );
         break;
@@ -367,7 +396,13 @@ function start() {
         break;
 
       case UI_NUMBER:
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
@@ -392,7 +427,13 @@ function start() {
         break;
 
       case UI_TEXT_INPUT:
-        $("#row").append(
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
           "<div class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
@@ -414,6 +455,27 @@ function start() {
 
       case UPDATE_TEXT_INPUT:
         $("#text" + data.id).val(data.value);
+        break;
+        
+      case UI_TAB:
+        $("#tabsnav").append(
+          "<li><a href='#tab" + data.id + "'>" + data.value + "</a></li>"
+        );
+        $("#tabscontent").append(
+          "<div id='tab" + data.id + "'></div>"
+        );
+        
+        tabs = $('.tabscontent').tabbedContent({loop: true}).data('api');
+            // switch to tab...
+            $('a').filter(function() {
+                return $(this).attr('href') === '#click-to-switch';
+            }).on('click', function(e) {
+                var tab = prompt('Tab to switch to (number or id)?');
+                if (!tabs.switchTab(tab)) {
+                    alert('That tab does not exist :\\');
+                }
+                e.preventDefault();
+            });
         break;
 
       default:

@@ -34,10 +34,13 @@
 // Message Types (and control types)
 
 enum ControlType : uint8_t {
+  // fixed controls
   Title = 0,
   Button,
   Pad,
-  Cpad,
+  PadWithCenter,
+  
+  // updatable controls
   Label,
   Switcher,
   Slider,
@@ -45,6 +48,7 @@ enum ControlType : uint8_t {
   Text,
   Graph,
   GraphPoint,
+  Tab,
 
   UpdateOffset = 100,
   UpdateLabel = 104,
@@ -53,6 +57,7 @@ enum ControlType : uint8_t {
   UpdateNumber,
   UpdateText,
   ClearGraph,
+  UpdateTab,
 
   InitialGui = 200
 };
@@ -108,23 +113,22 @@ class Control {
     void ( *callback )( Control, int );
     String value;
     ControlColor color;
-    
-    
+    uint16_t parentControl;
     
     Control* next;
 
     Control(
       ControlType type, const char* label,
       void ( *callback )( Control, int ),
-      String value, ControlColor color )
-      : type( type ), label( label ), callback( callback ), value( value ), color( color ), next( nullptr ) {
+      String value, ControlColor color, uint16_t parentControl = 0xffff )
+      : type( type ), label( label ), callback( callback ), value( value ), color( color ), parentControl(parentControl), next( nullptr ) {
       id = idCounter++;
     }
 
     Control( const Control& control )
       : type( control.type ), id( control.id ), label( control.label ),
         callback( control.callback ), value( control.value ),
-        color( control.color ), next( control.next ) {}
+        color( control.color ), parentControl(control.parentControl), next( control.next ) {}
 
   private:
     static uint16_t idCounter;
@@ -175,9 +179,9 @@ class ESPUIClass {
     void list();
     // Creating Elements
 
-    int addControl( ControlType type, const char* label,
+    uint16_t addControl( ControlType type, const char* label,
                     String value = String( "" ), ControlColor color = ControlColor::Turquoise,
-                    void ( *callback )( Control, int ) = nullptr );
+                    void ( *callback )( Control, int ) = nullptr, uint16_t parentControl = 0xffff );
 
     int button( const char* label,
                 void ( *callback )( Control, int ), ControlColor color,
@@ -255,3 +259,4 @@ class ESPUIClass {
 
 extern ESPUIClass ESPUI;
 #endif
+

@@ -361,9 +361,11 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
   }
 }
 
-int ESPUIClass::addControl( ControlType type, const char* label,
-                            String value, ControlColor color,
-                            void ( *callback )( Control, int ) ) {
+uint16_t ESPUIClass::addControl( ControlType type, const char* label,
+                                 String value, ControlColor color,
+                                 void ( *callback )( Control, int ),
+                                 uint16_t parentControl
+                               ) {
   if ( this->getControl( label ) != nullptr ) {
     if ( this->verbosity ) {
       Serial.println( "UI ERROR: Element " + String( label ) +
@@ -373,7 +375,7 @@ int ESPUIClass::addControl( ControlType type, const char* label,
     return -1;
   }
 
-  Control* control = new Control( type, label, callback, value, color );
+  Control* control = new Control( type, label, callback, value, color, parentControl );
 
   if ( this->controls == nullptr ) {
     this->controls = control;
@@ -417,7 +419,7 @@ int ESPUIClass::switcher( const char* label, bool startState,
 int ESPUIClass::pad( const char* label, bool center,
                      void ( *callback )( Control, int ), ControlColor color ) {
   if ( center ) {
-    return addControl( ControlType::Cpad, label, "", color, callback );
+    return addControl( ControlType::PadWithCenter, label, "", color, callback );
   } else {
     return addControl( ControlType::Pad, label, "", color, callback );
   }
@@ -607,6 +609,10 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
     item["label"] = String( control->label );
     item["value"] = String( control->value );
     item["color"] = ( int )control->color;
+
+    if ( control->parentControl != 0xffff ) {
+      item["parentControl"] = String( control->parentControl );
+    }
 
     items.add( item );
 
