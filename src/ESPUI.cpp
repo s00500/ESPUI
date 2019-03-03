@@ -432,7 +432,7 @@ int ESPUIClass::text( const char* label, void ( *callback )( Control, int ),
 }
 
 
-Control* ESPUIClass::getControl( int id ) {
+Control* ESPUIClass::getControl( uint16_t id ) {
   Control* control = this->controls;
 
   while ( control != nullptr ) {
@@ -501,7 +501,7 @@ void ESPUIClass::updateControl( Control* control, String value, int clientId ) {
     }
   }
 }
-void ESPUIClass::updateControl( int id, String value, int clientId ) {
+void ESPUIClass::updateControl( uint16_t id, String value, int clientId ) {
   Control* control = getControl( id );
 
   if ( control ) {
@@ -526,7 +526,7 @@ void ESPUIClass::updateControl( String label, String value, int clientId ) {
 
 
 
-void ESPUIClass::print( int id, String value ) {
+void ESPUIClass::print( uint16_t id, String value ) {
   updateControl( id, value );
 }
 
@@ -534,7 +534,7 @@ void ESPUIClass::print( String label, String value ) {
   updateControl( label, value );
 }
 
-void ESPUIClass::updateLabel( int id, String value ) {
+void ESPUIClass::updateLabel( uint16_t id, String value ) {
   updateControl( id, value );
 }
 
@@ -542,7 +542,7 @@ void ESPUIClass::updateLabel( String label, String value ) {
   updateControl( label, value );
 }
 
-void ESPUIClass::updateSlider( int id, int nValue, int clientId ) {
+void ESPUIClass::updateSlider( uint16_t id, int nValue, int clientId ) {
   updateControl( id, String( nValue ), clientId );
 }
 
@@ -550,7 +550,7 @@ void ESPUIClass::updateSlider( String label, int nValue, int clientId ) {
   updateControl( label, String( nValue ), clientId );
 }
 
-void ESPUIClass::updateSwitcher( int id, bool nValue, int clientId ) {
+void ESPUIClass::updateSwitcher( uint16_t id, bool nValue, int clientId ) {
   updateControl( id, String( int( nValue ? 1 : 0 ) ), clientId );
 }
 
@@ -558,7 +558,7 @@ void ESPUIClass::updateSwitcher( String label, bool nValue, int clientId ) {
   updateControl( label, String( int( nValue ? 1 : 0 ) ), clientId );
 }
 
-void ESPUIClass::updateNumber( int id, int number, int clientId ) {
+void ESPUIClass::updateNumber( uint16_t id, int number, int clientId ) {
   updateControl( id, String( number ), clientId );
 }
 
@@ -566,7 +566,7 @@ void ESPUIClass::updateNumber( String label, int number, int clientId ) {
   updateControl( label, String( number ), clientId );
 }
 
-void ESPUIClass::updateText( int id, String text, int clientId ) {
+void ESPUIClass::updateText( uint16_t id, String text, int clientId ) {
   updateControl( id, text, clientId );
 }
 
