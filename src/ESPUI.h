@@ -212,6 +212,9 @@ class ESPUIClass {
     void print( int id, String value );
     void print( String label, String value );
 
+    void updateLabel( int id, String value );
+    void updateLabel( String label, String value );
+
     void updateSwitcher( int id, bool nValue, int clientId = -1 );
     void updateSwitcher( String label, bool nValue, int clientId = -1 );
 

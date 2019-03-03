@@ -533,6 +533,14 @@ void ESPUIClass::print( String label, String value ) {
   updateControl( label, value );
 }
 
+void ESPUIClass::updateLabel( int id, String value ) {
+  updateControl( id, value );
+}
+
+void ESPUIClass::updateLabel( String label, String value ) {
+  updateControl( label, value );
+}
+
 void ESPUIClass::updateSlider( int id, int nValue, int clientId ) {
   updateControl( id, String( nValue ), clientId );
 }
