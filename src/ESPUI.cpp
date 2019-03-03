@@ -7,6 +7,7 @@
 
 #include "dataControlsJS.h"
 #include "dataSliderJS.h"
+#include "dataTabbedcontentJS.h"
 #include "dataZeptoJS.h"
 
 #include <ESPAsyncWebServer.h>
@@ -218,6 +219,7 @@ void ESPUIClass::prepareFileSystem() {
   deleteFile( "/js/zepto.min.js" );
   deleteFile( "/js/controls.js" );
   deleteFile( "/js/slider.js" );
+  deleteFile( "/js/tabbedcontent.js" );
 
   if ( this->verbosity ) {
     Serial.println( "Cleanup done" );
@@ -231,7 +233,8 @@ void ESPUIClass::prepareFileSystem() {
 
   writeFile( "/js/zepto.min.js", JS_ZEPTO );
   writeFile( "/js/controls.js", JS_CONTROLS );
-  writeFile( "/js/slider.js", JS_SLIDER );
+  writeFile( "/js/slider.js", JS_SLIDER );;
+  writeFile( "/js/tabbedcontent.js", JS_TABBEDCONTENT );
 
   if ( this->verbosity ) {
     Serial.println( "Done Initializing filesystem :-)" );
@@ -765,6 +768,18 @@ void ESPUIClass::begin( const char* _title, const char* username, const char* pa
     AsyncWebServerResponse* response =
       request->beginResponse_P(
         200, "application/javascript", JS_SLIDER_GZIP, sizeof( JS_SLIDER_GZIP ) );
+    response->addHeader( "Content-Encoding", "gzip" );
+    request->send( response );
+  } );
+
+  server->on( "/js/tabbedcontent.js", HTTP_GET, []( AsyncWebServerRequest * request ) {
+    if ( ESPUI.basicAuth && !request->authenticate( ESPUI.basicAuthUsername, ESPUI.basicAuthPassword ) ) {
+      return request->requestAuthentication();
+    }
+
+    AsyncWebServerResponse* response =
+      request->beginResponse_P(
+        200, "application/javascript", JS_TABBEDCONTENT_GZIP, sizeof( JS_TABBEDCONTENT_GZIP ) );
     response->addHeader( "Content-Encoding", "gzip" );
     request->send( response );
   } );
