@@ -31,42 +31,102 @@
 
 #endif
 
-typedef struct Control {
-  unsigned int type;
-  unsigned int id;  // just mirroring the id here for practical reasons
-  const char *label;
-  void (*callback)(Control, int);
-  String value;
-  unsigned int color;
-} Control;
-
 // Message Types (and control types)
-#define UI_INITIAL_GUI 100
-#define UI_TITEL 0
 
-#define UI_LABEL 1
-#define UPDATE_LABEL 6
+enum ControlType : uint8_t {
+  Title = 0,
+  Button,
+  Pad,
+  Cpad,
+  Label,
+  Switcher,
+  Slider,
+  Number,
+  Text,
+  Graph,
+  GraphPoint,
 
-#define UI_BUTTON 2
+  UpdateOffset = 100,
+  UpdateLabel = 104,
+  UpdateSwitcher,
+  UpdateSlider,
+  UpdateNumber,
+  UpdateText,
+  ClearGraph,
 
-#define UI_SWITCHER 3
-#define UPDATE_SWITCHER 7
+  InitialGui = 200
+};
 
-#define UI_PAD 4
-#define UI_CPAD 5
+#define UI_INITIAL_GUI      ControlType::InitialGui
 
-#define UI_SLIDER 8
-#define UPDATE_SLIDER 9
+#define UI_TITLE            ControlType::Title
+#define UI_LABEL            ControlType::Label
+#define UI_BUTTON           ControlType::Button
+#define UI_SWITCHER         ControlType::Switcher
+#define UI_PAD              ControlType::Pad
+#define UI_CPAD             ControlType::Cpad
+#define UI_SLIDER           ControlType::Slider
+#define UI_NUMBER           ControlType::Number
+#define UI_TEXT_INPUT       ControlType::Text
+#define UI_GRAPH            ControlType::Graph
+#define UI_ADD_GRAPH_POINT  ControlType::GraphPoint
 
-#define UI_NUMBER 10
-#define UPDATE_NUMBER 11
+#define UPDATE_LABEL        ControlType::UpdateLabel
+#define UPDATE_SWITCHER     ControlType::UpdateSwitcher
+#define UPDATE_SLIDER       ControlType::UpdateSlider
+#define UPDATE_NUMBER       ControlType::UpdateNumber
+#define UPDATE_TEXT_INPUT   ControlType::UpdateText
+#define CLEAR_GRAPH         ControlType::ClearGraph
 
-#define UI_TEXT_INPUT 12
-#define UPDATE_TEXT_INPUT 13
+// Colors
+enum ControlColor : uint8_t {
+  Turquoise,
+  Emerald,
+  Peterriver,
+  Wetasphalt,
+  Sunflower,
+  Carrot,
+  Alizarin,
+  Dark,
+  None = 0xFF
+};
+#define COLOR_TURQUOISE     ControlColor::Turquoise
+#define COLOR_EMERALD       ControlColor::Emerald
+#define COLOR_PETERRIVER    ControlColor::Peterriver
+#define COLOR_WETASPHALT    ControlColor::Wetasphalt
+#define COLOR_SUNFLOWER     ControlColor::Sunflower
+#define COLOR_CARROT        ControlColor::Carrot
+#define COLOR_ALIZARIN      ControlColor::Alizarin
+#define COLOR_DARK          ControlColor::Dark
+#define COLOR_NONE          ControlColor::None
 
-#define UI_GRAPH 14
-#define CLEAR_GRAPH 15
-#define ADD_GRAPH_POINT 16
+class Control {
+  public:
+    ControlType type;
+    unsigned int id;  // just mirroring the id here for practical reasons
+    const char* label;
+    void ( *callback )( Control, int );
+    String value;
+    ControlColor color;
+    Control* next;
+
+    Control(
+      ControlType type, const char* label,
+      void ( *callback )( Control, int ),
+      String value, ControlColor color )
+      : type( type ), label( label ), callback( callback ), value( value ), color( color ), next( nullptr ) {
+      id = idCounter++;
+    }
+
+    Control( const Control& control )
+      : type( control.type ), id( control.id ), label( control.label ),
+        callback( control.callback ), value( control.value ),
+        color( control.color ), next( control.next ) {}
+
+  private:
+    static uint16_t idCounter;
+};
+
 
 // Values
 #define B_DOWN -1
@@ -90,86 +150,102 @@ typedef struct Control {
 #define N_VALUE 9
 #define T_VALUE 10
 
-// Colors
-#define COLOR_TURQUOISE 0
-#define COLOR_EMERALD 1
-#define COLOR_PETERRIVER 2
-#define COLOR_WETASPHALT 3
-#define COLOR_SUNFLOWER 4
-#define COLOR_CARROT 5
-#define COLOR_ALIZARIN 6
-#define COLOR_NONE 7
+enum Verbosity : uint8_t {
+      Quiet = 0,
+      Verbose,
+      VerboseJSON  
+};
 
 class ESPUIClass {
- public:
-  void begin(const char *_title);  // Setup servers and page in Memorymode
-  void begin(const char *_title, const char *username, const char *password);
+  public:
+    ESPUIClass( Verbosity verbosity = Verbosity::Quiet )
+      : verbosity( verbosity ) {}
 
-  void beginSPIFFS(const char *_title);  // Setup servers and page in SPIFFSmode
-  void beginSPIFFS(const char *_title, const char *username,
-                   const char *password);
+//     void begin( const char* _title, bool enableDebug=false ); // Setup servers and page in Memorymode
+    void begin( const char* _title, const char* username = nullptr, const char* password = nullptr );
 
-  void prepareFileSystem();  // Initially preps the filesystem and loads a lot
-                             // of stuff into SPIFFS
-  void list();
-  // Creating Elements
+//     void beginSPIFFS( const char* _title, bool enableDebug=false ); // Setup servers and page in SPIFFSmode
+    void beginSPIFFS( const char* _title, const char* username = nullptr, const char* password = nullptr );
 
-  int button(const char *label, void (*callBack)(Control, int), int color,
-             String value = "");  // Create Event Button
-  int switcher(const char *label, bool startState,
-               void (*callBack)(Control, int),
-               int color);  // Create Toggle Button
-  int pad(const char *label, bool centerButton, void (*callBack)(Control, int),
-          int color);  // Create Pad Control
-  int slider(const char *label, void (*callBack)(Control, int), int color,
-             String value);  // Create Slider Control
-  int number(const char *label, void (*callBack)(Control, int), int color,
-             int number, int min, int max);  // Create a Number Input Control
-  int text(const char *label, void (*callBack)(Control, int), int color,
-           String value = "");  // Create a Text Input Control
+    void prepareFileSystem();  // Initially preps the filesystem and loads a lot
+    // of stuff into SPIFFS
+    void list();
+    // Creating Elements
 
-  // Output only
-  int label(const char *label, int color, String value = "");  // Create Label
-  int graph(const char *label, int color);  // Create Graph display
+    int addControl( ControlType type, const char* label,
+                    void ( *callback )( Control, int ),
+                    String value, ControlColor color );
 
-  // Update Elements
-  void print(int id, String value);
-  void print(String label, String value);
+    int button( const char* label,
+                void ( *callback )( Control, int ), ControlColor color,
+                String value = "" ); // Create Event Button
+    int switcher( const char* label, bool startState,
+                  void ( *callback )( Control, int ),
+                  ControlColor color ); // Create Toggle Button
+    int pad( const char* label, bool centerButton,
+             void ( *callback )( Control, int ),
+             ControlColor color ); // Create Pad Control
+    int slider( const char* label,
+                void ( *callback )( Control, int ),
+                ControlColor color, String value ); // Create Slider Control
+    int number( const char* label,
+                void ( *callback )( Control, int ),
+                ControlColor color, int number, int min, int max ); // Create a Number Input Control
+    int text( const char* label,
+              void ( *callback )( Control, int ),
+              ControlColor color, String value = "" ); // Create a Text Input Control
 
-  void updateSwitcher(int id, bool nValue, int clientId = -1);
-  void updateSwitcher(String label, bool nValue, int clientId = -1);
+    // Output only
+    int label( const char* label, ControlColor color, String value = "" ); // Create Label
+    int graph( const char* label, ControlColor color ); // Create Graph display
 
-  void updateSlider(int id, int nValue, int clientId = -1);
-  void updateSlider(String label, int nValue, int clientId = -1);
+    // Update Elements
 
-  void updateNumber(int id, int nValue, int clientId = -1);
-  void updateNumber(String label, int nValue, int clientId = -1);
+    Control* getControl( int id );
+    Control* getControl( String label );
 
-  void updateText(int id, String nValue, int clientId = -1);
-  void updateText(String label, String nValue, int clientId = -1);
+    // Update Elements
+    void updateControl( int id, String value, int clientId = -1 );
+    void updateControl( String label, String value, int clientId = -1 );
+    void updateControl( Control* control, String value, int clientId = -1 );
 
-  void clearGraph(int id, int clientId = -1);
-  void clearGraph(String label, int clientId = -1);
+    void print( int id, String value );
+    void print( String label, String value );
 
-  void addGraphPoint(int id, int nValue, int clientId = -1);
-  void addGraphPoint(String label, int nValue, int clientId = -1);
+    void updateSwitcher( int id, bool nValue, int clientId = -1 );
+    void updateSwitcher( String label, bool nValue, int clientId = -1 );
 
-  void textThem(String text, int clientId);
+    void updateSlider( int id, int nValue, int clientId = -1 );
+    void updateSlider( String label, int nValue, int clientId = -1 );
 
-  // Variables ---
-  const char *ui_title = "ESPUI";  // Store UI Title and Header Name
-  int cIndex = 0;                  // Control index
-  Control *controls[25];
-  void jsonDom(AsyncWebSocketClient *client);
-  int getIdByLabel(String label);
-  bool labelExists(String label);
+    void updateNumber( int id, int nValue, int clientId = -1 );
+    void updateNumber( String label, int nValue, int clientId = -1 );
 
- private:
-  const char *basicAuthUsername;
-  const char *basicAuthPassword;
-  bool basicAuth = true;
-  AsyncWebServer *server;
-  AsyncWebSocket *ws;
+    void updateText( int id, String nValue, int clientId = -1 );
+    void updateText( String label, String nValue, int clientId = -1 );
+
+    void clearGraph( int id, int clientId = -1 );
+    void clearGraph( String label, int clientId = -1 );
+
+    void addGraphPoint( int id, int nValue, int clientId = -1 );
+    void addGraphPoint( String label, int nValue, int clientId = -1 );
+
+//     void textThem( String text, int clientId = -1 );
+
+    // Variables ---
+    const char* ui_title = "ESPUI";  // Store UI Title and Header Name
+    int cIndex = 0;                  // Control index
+    Control* controls = nullptr;
+    void jsonDom( AsyncWebSocketClient* client );
+
+    Verbosity verbosity;
+
+  private:
+    const char* basicAuthUsername = nullptr;
+    const char* basicAuthPassword = nullptr;
+    bool basicAuth = true;
+    AsyncWebServer* server;
+    AsyncWebSocket* ws;
 };
 
 extern ESPUIClass ESPUI;

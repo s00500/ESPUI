@@ -1,29 +1,28 @@
-const UI_INITIAL_GUI = 100;
+const UI_INITIAL_GUI = 200;
+
 const UI_TITEL = 0;
+const UI_BUTTON = 1;
+const UI_PAD = 2;
+const UI_CPAD = 3;
 
-const UI_LABEL = 1;
-const UPDATE_LABEL = 6;
+const UI_LABEL = 4;
+const UPDATE_LABEL = 104;
 
-const UI_BUTTON = 2;
+const UI_SWITCHER = 5;
+const UPDATE_SWITCHER = 105;
 
-const UI_SWITCHER = 3;
-const UPDATE_SWITCHER = 7;
+const UI_SLIDER = 6;
+const UPDATE_SLIDER = 106;
 
-const UI_PAD = 4;
-const UI_CPAD = 5;
+const UI_NUMBER = 7;
+const UPDATE_NUMBER = 107;
 
-const UI_SLIDER = 8;
-const UPDATE_SLIDER = 9;
+const UI_TEXT_INPUT = 8;
+const UPDATE_TEXT_INPUT = 108;
 
-const UI_NUMBER = 10;
-const UPDATE_NUMBER = 11;
-
-const UI_TEXT_INPUT = 12;
-const UPDATE_TEXT_INPUT = 13;
-
-const UI_GRAPH = 14;
-const CLEAR_GRAPH = 15;
-const ADD_GRAPH_POINT = 16;
+const UI_GRAPH = 9;
+const ADD_GRAPH_POINT = 10;
+const CLEAR_GRAPH = 109;
 
 const FOR = 0;
 const BACK = 1;
@@ -39,8 +38,8 @@ const C_WETASPHALT = 3;
 const C_SUNFLOWER = 4;
 const C_CARROT = 5;
 const C_ALIZARIN = 6;
-const C_NONE = 7;
-const C_DARK = 8;
+const C_DARK = 7;
+const C_NONE = 255;
 
 function colorClass(colorId) {
   colorId = Number(colorId);
