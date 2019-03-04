@@ -49,6 +49,8 @@ enum ControlType : uint8_t {
   Graph,
   GraphPoint,
   Tab,
+  Select,
+  Option,
 
   UpdateOffset = 100,
   UpdateLabel = 104,
@@ -58,6 +60,8 @@ enum ControlType : uint8_t {
   UpdateText,
   ClearGraph,
   UpdateTab,
+  UpdateSelection,
+  UpdateOption,
 
   InitialGui = 200
 };
@@ -157,6 +161,7 @@ class Control {
 #define SL_VALUE 8
 #define N_VALUE 9
 #define T_VALUE 10
+#define S_VALUE 11
 
 enum Verbosity : uint8_t {
   Quiet = 0,
@@ -234,6 +239,9 @@ class ESPUIClass {
 
     void updateText( uint16_t id, String nValue, int clientId = -1 );
     void updateText( String label, String nValue, int clientId = -1 );
+
+    void updateSelect( uint16_t id, String nValue, int clientId = -1 );
+    void updateSelect( String label, String nValue, int clientId = -1 );
 
     void clearGraph( uint16_t id, int clientId = -1 );
     void clearGraph( String label, int clientId = -1 );

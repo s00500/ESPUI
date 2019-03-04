@@ -27,6 +27,11 @@ const CLEAR_GRAPH = 109;
 const UI_TAB = 11;
 const UPDATE_TAB = 111;
 
+const UI_SELECT = 12;
+const UPDATE_SELECT = 112;
+const UI_OPTION = 13;
+const UPDATE_OPTION = 113;
+
 const FOR = 0;
 const BACK = 1;
 const LEFT = 2;
@@ -477,6 +482,44 @@ function start() {
                 e.preventDefault();
             });
         break;
+        
+      case UI_SELECT:
+        var element;
+        if(data.parentControl) {
+          element = $("#tab"+data.parentControl);
+        } else {
+          element = $("#row")
+        }
+        element.append(
+          "<div class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5 id='" +
+            data.id +
+            "'>" +
+            data.label +
+            "</h5><hr />" +
+            "<select style='color:black;' id='select" +
+            data.id +
+            "' onchange='selectchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
+        );
+        break;
+        
+      case UI_OPTION:
+        if(data.parentControl) {
+          var element = $("#select"+data.parentControl);
+          element.append(
+            "<option id='option" + data.id + "' value='" + data.value + "'>" + data.label + "</option>"
+          );
+        }
+        break;
+        
+      case UPDATE_SELECT:
+        $("#select" + data.id).val(data.value);
+        break;
 
       default:
         console.error("Unknown type or event");
@@ -496,6 +539,14 @@ function numberchange(number) {
 function textchange(number) {
   var val = $("#text" + number).val();
   websock.send("tvalue:" + val + ":" + number);
+  console.log("tvalue:" + val + ":" + number);
+  console.log(val);
+}
+
+function selectchange(number) {
+  var val = $("#select" + number).val();
+  websock.send("svalue:" + val + ":" + number);
+  console.log("svalue:" + val + ":" + number);
   console.log(val);
 }
 

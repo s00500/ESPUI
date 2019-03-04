@@ -370,6 +370,10 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
         String value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
         ESPUI.updateText( c->id, value, client->id() );
         c->callback( c, T_VALUE );
+      } else if ( msg.startsWith( "svalue:" ) ) {
+        String value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
+        ESPUI.updateSelect( c->id, value, client->id() );
+        c->callback( c, S_VALUE );
       } else {
         if ( ESPUI.verbosity ) {
           Serial.println( "Malformated message from the websocket" );
@@ -598,6 +602,14 @@ void ESPUIClass::updateText( uint16_t id, String text, int clientId ) {
 }
 
 void ESPUIClass::updateText( String label, String text, int clientId ) {
+  updateControl( label, text, clientId );
+}
+
+void ESPUIClass::updateSelect( uint16_t id, String text, int clientId ) {
+  updateControl( id, text, clientId );
+}
+
+void ESPUIClass::updateSelect( String label, String text, int clientId ) {
   updateControl( label, text, clientId );
 }
 

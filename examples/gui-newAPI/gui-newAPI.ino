@@ -118,7 +118,14 @@ void switchExample( Control* sender, int value ) {
   }
 
   Serial.print( " " );
-  Serial.println( sender.id );
+  Serial.println( sender->id );
+}
+
+void selectExample( Control* sender, int value ) {
+  Serial.print("Select: ID: ");
+  Serial.print(sender->id);
+  Serial.print(", Value: ");
+  Serial.println( sender->value );
 }
 
 void otherSwitchExample( Control* sender, int value ) {
@@ -186,6 +193,12 @@ void setup( void ) {
   Serial.println( WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP() );
 
   ESPUI.addControl( ControlType::Label, "Status:", "Stop", ControlColor::Turquoise );
+
+  uint16_t select1 = ESPUI.addControl( ControlType::Select, "Select:", "", ControlColor::Alizarin, Control::noParent, &selectExample );
+  ESPUI.addControl( ControlType::Option, "Option1", "Opt1", ControlColor::Alizarin, select1 );
+  ESPUI.addControl( ControlType::Option, "Option2", "Opt2", ControlColor::Alizarin, select1 );
+  ESPUI.addControl( ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1 );
+  
   ESPUI.addControl( ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, Control::noParent, &textCall );
   ESPUI.addControl( ControlType::Label, "Millis:", "0", ControlColor::Emerald, Control::noParent );
   ESPUI.addControl( ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, Control::noParent, &buttonCallback );
