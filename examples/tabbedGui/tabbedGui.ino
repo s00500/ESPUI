@@ -18,19 +18,23 @@ const char* ssid = "ESPUI";
 const char* password = "espui";
 const char* hostname = "EspuiTest";
 
-void numberCall( Control sender, int type ) {
-  Serial.println( sender.value );
+void numberCall( Control* sender, int type ) {
+  Serial.println( sender->value );
 }
 
-void textCall( Control sender, int type ) {
-  Serial.println( sender.value );
-}
+void textCall( Control* sender, int type ) {
+  Serial.print("Text: ID: ");
+  Serial.print(sender->id);
+  Serial.print(", Value: ");
+  Serial.println( sender->value );}
 
-void slider( Control sender, int type ) {
-  Serial.println( sender.value );
-}
+void slider( Control* sender, int type ) {
+  Serial.print("Slider: ID: ");
+  Serial.print(sender->id);
+  Serial.print(", Value: ");
+  Serial.println( sender->value );}
 
-void buttonCallback( Control sender, int type ) {
+void buttonCallback( Control* sender, int type ) {
   switch ( type ) {
     case B_DOWN:
       Serial.println( "Button DOWN" );
@@ -42,7 +46,7 @@ void buttonCallback( Control sender, int type ) {
   }
 }
 
-void buttonExample( Control sender, int type ) {
+void buttonExample( Control* sender, int type ) {
   switch ( type ) {
     case B_DOWN:
       Serial.println( "Status: Start" );
@@ -55,7 +59,7 @@ void buttonExample( Control sender, int type ) {
       break;
   }
 }
-void padExample( Control sender, int value ) {
+void padExample( Control* sender, int value ) {
   switch ( value ) {
     case P_LEFT_DOWN:
       Serial.print( "left down" );
@@ -99,10 +103,10 @@ void padExample( Control sender, int value ) {
   }
 
   Serial.print( " " );
-  Serial.println( sender.id );
+  Serial.println( sender->id );
 }
 
-void switchExample( Control sender, int value ) {
+void switchExample( Control* sender, int value ) {
   switch ( value ) {
     case S_ACTIVE:
       Serial.print( "Active:" );
@@ -117,7 +121,7 @@ void switchExample( Control sender, int value ) {
   Serial.println( sender.id );
 }
 
-void otherSwitchExample( Control sender, int value ) {
+void otherSwitchExample( Control* sender, int value ) {
   switch ( value ) {
     case S_ACTIVE:
       Serial.print( "Active:" );
@@ -129,7 +133,7 @@ void otherSwitchExample( Control sender, int value ) {
   }
 
   Serial.print( " " );
-  Serial.println( sender.id );
+  Serial.println( sender->id );
 }
 
 void setup( void ) {
@@ -180,23 +184,27 @@ void setup( void ) {
   Serial.println( WiFi.getMode() == WIFI_AP ? "Station" : "Client" );
   Serial.print( "IP address: " );
   Serial.println( WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP() );
-  
-  uint16_t tab1 = ESPUI.addControl( ControlType::Tab, "Settings 1", "Settings 1");
-  uint16_t tab2 = ESPUI.addControl( ControlType::Tab, "Settings 2", "Settings 2");
-  uint16_t tab3 = ESPUI.addControl( ControlType::Tab, "Settings 3", "Settings 3");
 
-  ESPUI.addControl( ControlType::Label, "Status:", "Stop",ControlColor::Turquoise, nullptr, tab1 );
-  ESPUI.addControl( ControlType::Label, "Millis:", "0", ControlColor::Emerald, nullptr, tab1 );
-  ESPUI.addControl( ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, &buttonCallback, tab1 );
-  ESPUI.addControl( ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, &buttonExample, tab1 );
-  ESPUI.addControl( ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, &padExample, tab2 );
-  ESPUI.addControl( ControlType::Pad, "Pad without center", "", ControlColor::Carrot, &padExample, tab3 );
-  ESPUI.addControl( ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, &switchExample, tab3 );
-  ESPUI.addControl( ControlType::Switcher, "Switch two", "", ControlColor::None, &otherSwitchExample, tab3 );
-  ESPUI.addControl( ControlType::Slider, "Slider one", "30", ControlColor::Alizarin, &slider, tab1 );
-  ESPUI.addControl( ControlType::Slider, "Slider two", "100", ControlColor::Alizarin, &slider, tab3 );
-  ESPUI.addControl( ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, &textCall, tab3 );
-  ESPUI.addControl( ControlType::Number, "Number:", "50", ControlColor::Alizarin, &numberCall, tab3 );
+  uint16_t tab1 = ESPUI.addControl( ControlType::Tab, "Settings 1", "Settings 1" );
+  uint16_t tab2 = ESPUI.addControl( ControlType::Tab, "Settings 2", "Settings 2" );
+  uint16_t tab3 = ESPUI.addControl( ControlType::Tab, "Settings 3", "Settings 3" );
+
+  // shown above all tabs
+  ESPUI.addControl( ControlType::Label, "Status:", "Stop", ControlColor::Turquoise );
+  
+  ESPUI.addControl( ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, tab1, &textCall );
+
+  // tabbed controls
+  ESPUI.addControl( ControlType::Label, "Millis:", "0", ControlColor::Emerald, tab1 );
+  ESPUI.addControl( ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, tab1, &buttonCallback );
+  ESPUI.addControl( ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, tab1, &buttonExample );
+  ESPUI.addControl( ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, tab2, &padExample );
+  ESPUI.addControl( ControlType::Pad, "Pad without center", "", ControlColor::Carrot, tab3, &padExample );
+  ESPUI.addControl( ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, tab3, &switchExample );
+  ESPUI.addControl( ControlType::Switcher, "Switch two", "", ControlColor::None, tab3, &otherSwitchExample );
+  ESPUI.addControl( ControlType::Slider, "Slider one", "30", ControlColor::Alizarin, tab1, &slider );
+  ESPUI.addControl( ControlType::Slider, "Slider two", "100", ControlColor::Alizarin, tab3, &slider );
+  ESPUI.addControl( ControlType::Number, "Number:", "50", ControlColor::Alizarin, tab3, &numberCall );
 
   /*
    * .begin loads and serves all files from PROGMEM directly.

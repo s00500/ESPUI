@@ -299,59 +299,81 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
       for ( size_t i = 0; i < len; i++ ) {
         msg += ( char )data[i];
       }
+      uint16_t id =  msg.substring( msg.lastIndexOf( ':' ) + 1 ).toInt();
 
-      Control* c = ESPUI.getControl( msg.substring( msg.lastIndexOf( ':' ) + 1 ).toInt() );
+      if ( ESPUI.verbosity >= Verbosity::VerboseJSON ) {
+        Serial.print("WS rec: ");
+        Serial.println( msg );
+        Serial.print( "WS recognised ID: " );
+        Serial.println( id );
+      }
 
-      if ( c != nullptr && c->callback != nullptr ) {
-        if ( msg.startsWith( "bdown:" ) ) {
-          c->callback( *c, B_DOWN );
-        } else if ( msg.startsWith( "bup:" ) ) {
-          c->callback( *c, B_UP );
-        } else if ( msg.startsWith( "pfdown:" ) ) {
-          c->callback( *c, P_FOR_DOWN );
-        } else if ( msg.startsWith( "pfup:" ) ) {
-          c->callback( *c, P_FOR_UP );
-        } else if ( msg.startsWith( "pldown:" ) ) {
-          c->callback( *c, P_LEFT_DOWN );
-        } else if ( msg.startsWith( "plup:" ) ) {
-          c->callback( *c, P_LEFT_UP );
-        } else if ( msg.startsWith( "prdown:" ) ) {
-          c->callback( *c, P_RIGHT_DOWN );
-        } else if ( msg.startsWith( "prup:" ) ) {
-          c->callback( *c, P_RIGHT_UP );
-        } else if ( msg.startsWith( "pbdown:" ) ) {
-          c->callback( *c, P_BACK_DOWN );
-        } else if ( msg.startsWith( "pbup:" ) ) {
-          c->callback( *c, P_BACK_UP );
-        } else if ( msg.startsWith( "pcdown:" ) ) {
-          c->callback( *c, P_CENTER_DOWN );
-        } else if ( msg.startsWith( "pcup:" ) ) {
-          c->callback( *c, P_CENTER_UP );
-        } else if ( msg.startsWith( "sactive:" ) ) {
-          ESPUI.updateSwitcher( c->id, true );
-          c->callback( *c, S_ACTIVE );
-        } else if ( msg.startsWith( "sinactive:" ) ) {
-          ESPUI.updateSwitcher( c->id, false );
-          c->callback( *c, S_INACTIVE );
-        } else if ( msg.startsWith( "slvalue:" ) ) {
-          int value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) ).toInt();
-          ESPUI.updateSlider( c->id, value, client->id() );
-          c->callback( *c, SL_VALUE );
-        } else if ( msg.startsWith( "nvalue:" ) ) {
-          int value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) ).toInt();
-          ESPUI.updateNumber( c->id, value, client->id() );
-          c->callback( *c, N_VALUE );
-        } else if ( msg.startsWith( "tvalue:" ) ) {
-          String value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
-          ESPUI.updateText( c->id, value, client->id() );
-          c->callback( *c, T_VALUE );
-        }
-      } else {
+      Control* c = ESPUI.getControl( id );
+
+      if ( c == nullptr ) {
         if ( ESPUI.verbosity ) {
-          Serial.println( "Maleformated id in websocket message" );
+          Serial.print( "No control found for ID " );
+          Serial.println( id );
         }
 
         return;
+      }
+
+      if ( c->callback == nullptr ) {
+        if ( ESPUI.verbosity ) {
+          Serial.print( "No callback found for ID " );
+          Serial.println( id );
+        }
+
+        return;
+      }
+
+      if ( msg.startsWith( "bdown:" ) ) {
+        c->callback( c, B_DOWN );
+      } else if ( msg.startsWith( "bup:" ) ) {
+        c->callback( c, B_UP );
+      } else if ( msg.startsWith( "pfdown:" ) ) {
+        c->callback( c, P_FOR_DOWN );
+      } else if ( msg.startsWith( "pfup:" ) ) {
+        c->callback( c, P_FOR_UP );
+      } else if ( msg.startsWith( "pldown:" ) ) {
+        c->callback( c, P_LEFT_DOWN );
+      } else if ( msg.startsWith( "plup:" ) ) {
+        c->callback( c, P_LEFT_UP );
+      } else if ( msg.startsWith( "prdown:" ) ) {
+        c->callback( c, P_RIGHT_DOWN );
+      } else if ( msg.startsWith( "prup:" ) ) {
+        c->callback( c, P_RIGHT_UP );
+      } else if ( msg.startsWith( "pbdown:" ) ) {
+        c->callback( c, P_BACK_DOWN );
+      } else if ( msg.startsWith( "pbup:" ) ) {
+        c->callback( c, P_BACK_UP );
+      } else if ( msg.startsWith( "pcdown:" ) ) {
+        c->callback( c, P_CENTER_DOWN );
+      } else if ( msg.startsWith( "pcup:" ) ) {
+        c->callback( c, P_CENTER_UP );
+      } else if ( msg.startsWith( "sactive:" ) ) {
+        ESPUI.updateSwitcher( c->id, true );
+        c->callback( c, S_ACTIVE );
+      } else if ( msg.startsWith( "sinactive:" ) ) {
+        ESPUI.updateSwitcher( c->id, false );
+        c->callback( c, S_INACTIVE );
+      } else if ( msg.startsWith( "slvalue:" ) ) {
+        int value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) ).toInt();
+        ESPUI.updateSlider( c->id, value, client->id() );
+        c->callback( c, SL_VALUE );
+      } else if ( msg.startsWith( "nvalue:" ) ) {
+        int value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) ).toInt();
+        ESPUI.updateNumber( c->id, value, client->id() );
+        c->callback( c, N_VALUE );
+      } else if ( msg.startsWith( "tvalue:" ) ) {
+        String value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
+        ESPUI.updateText( c->id, value, client->id() );
+        c->callback( c, T_VALUE );
+      } else {
+        if ( ESPUI.verbosity ) {
+          Serial.println( "Malformated message from the websocket" );
+        }
       }
     }
     break;
@@ -363,8 +385,8 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
 
 uint16_t ESPUIClass::addControl( ControlType type, const char* label,
                                  String value, ControlColor color,
-                                 void ( *callback )( Control, int ),
-                                 uint16_t parentControl
+                                 uint16_t parentControl,
+                                 void ( *callback )( Control*, int )
                                ) {
   if ( this->getControl( label ) != nullptr ) {
     if ( this->verbosity ) {
@@ -401,39 +423,39 @@ int ESPUIClass::graph( const char* label, ControlColor color ) {
 }
 
 // TODO: this still needs a range setting
-int ESPUIClass::slider( const char* label, void ( *callback )( Control, int ),
+int ESPUIClass::slider( const char* label, void ( *callback )( Control*, int ),
                         ControlColor color, String value ) {
-  return addControl( ControlType::Button, label, "", color, callback );
+  return addControl( ControlType::Button, label, "", color, Control::noParent, callback );
 }
 
-int ESPUIClass::button( const char* label, void ( *callback )( Control, int ),
+int ESPUIClass::button( const char* label, void ( *callback )( Control*, int ),
                         ControlColor color, String value ) {
-  return addControl( ControlType::Button, label, value, color, callback );
+  return addControl( ControlType::Button, label, value, color, Control::noParent, callback );
 }
 
 int ESPUIClass::switcher( const char* label, bool startState,
-                          void ( *callback )( Control, int ), ControlColor color ) {
-  return addControl( ControlType::Switcher, label, "", color, callback );
+                          void ( *callback )( Control*, int ), ControlColor color ) {
+  return addControl( ControlType::Switcher, label, "", color, Control::noParent, callback );
 }
 
 int ESPUIClass::pad( const char* label, bool center,
-                     void ( *callback )( Control, int ), ControlColor color ) {
+                     void ( *callback )( Control*, int ), ControlColor color ) {
   if ( center ) {
-    return addControl( ControlType::PadWithCenter, label, "", color, callback );
+    return addControl( ControlType::PadWithCenter, label, "", color, Control::noParent, callback );
   } else {
-    return addControl( ControlType::Pad, label, "", color, callback );
+    return addControl( ControlType::Pad, label, "", color, Control::noParent, callback );
   }
 }
 
 // TODO: min and max need to be saved, they also need to be sent to the frontend
-int ESPUIClass::number( const char* label, void ( *callback )( Control, int ),
+int ESPUIClass::number( const char* label, void ( *callback )( Control*, int ),
                         ControlColor color, int number, int min, int max ) {
-  return addControl( ControlType::Number, label, String( number ), color, callback );
+  return addControl( ControlType::Number, label, String( number ), color, Control::noParent, callback );
 }
 
-int ESPUIClass::text( const char* label, void ( *callback )( Control, int ),
+int ESPUIClass::text( const char* label, void ( *callback )( Control*, int ),
                       ControlColor color, String value ) {
-  return addControl( ControlType::Text, label, value, color, callback );
+  return addControl( ControlType::Text, label, value, color, Control::noParent, callback );
 }
 
 
@@ -556,11 +578,11 @@ void ESPUIClass::updateSlider( String label, int nValue, int clientId ) {
 }
 
 void ESPUIClass::updateSwitcher( uint16_t id, bool nValue, int clientId ) {
-  updateControl( id, String( int( nValue ? 1 : 0 ) ), clientId );
+  updateControl( id, String( nValue ? "1" : "0" ), clientId );
 }
 
 void ESPUIClass::updateSwitcher( String label, bool nValue, int clientId ) {
-  updateControl( label, String( int( nValue ? 1 : 0 ) ), clientId );
+  updateControl( label, String( nValue ? "1" : "0" ), clientId );
 }
 
 void ESPUIClass::updateNumber( uint16_t id, int number, int clientId ) {
@@ -610,7 +632,7 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
     item["value"] = String( control->value );
     item["color"] = ( int )control->color;
 
-    if ( control->parentControl != 0xffff ) {
+    if ( control->parentControl != Control::noParent ) {
       item["parentControl"] = String( control->parentControl );
     }
 

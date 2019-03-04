@@ -21,19 +21,26 @@ const char* hostname = "EspuiTest";
 long oldTime = 0;
 bool switchi = false;
 
-void numberCall( Control sender, int type ) {
-  Serial.println( sender.value );
+
+void numberCall( Control* sender, int type ) {
+  Serial.println( sender->value );
 }
 
-void textCall( Control sender, int type ) {
-  Serial.println( sender.value );
+void textCall( Control* sender, int type ) {
+  Serial.print( "Text: ID: " );
+  Serial.print( sender->id );
+  Serial.print( ", Value: " );
+  Serial.println( sender->value );
 }
 
-void slider( Control sender, int type ) {
-  Serial.println( sender.value );
+void slider( Control* sender, int type ) {
+  Serial.print( "Slider: ID: " );
+  Serial.print( sender->id );
+  Serial.print( ", Value: " );
+  Serial.println( sender->value );
 }
 
-void buttonCallback( Control sender, int type ) {
+void buttonCallback( Control* sender, int type ) {
   switch ( type ) {
     case B_DOWN:
       Serial.println( "Button DOWN" );
@@ -45,20 +52,20 @@ void buttonCallback( Control sender, int type ) {
   }
 }
 
-void buttonExample( Control sender, int type ) {
+void buttonExample( Control* sender, int type ) {
   switch ( type ) {
     case B_DOWN:
       Serial.println( "Status: Start" );
-      ESPUI.print( 0, "Status: Start" );
+      ESPUI.updateControl( "Status:", "Start" );
       break;
 
     case B_UP:
       Serial.println( "Status: Stop" );
-      ESPUI.print( 0, "Status: Stop" );
+      ESPUI.updateControl( "Status:", "Stop" );
       break;
   }
 }
-void padExample( Control sender, int value ) {
+void padExample( Control* sender, int value ) {
   switch ( value ) {
     case P_LEFT_DOWN:
       Serial.print( "left down" );
@@ -102,10 +109,10 @@ void padExample( Control sender, int value ) {
   }
 
   Serial.print( " " );
-  Serial.println( sender.id );
+  Serial.println( sender->id );
 }
 
-void switchExample( Control sender, int value ) {
+void switchExample( Control* sender, int value ) {
   switch ( value ) {
     case S_ACTIVE:
       Serial.print( "Active:" );
@@ -117,10 +124,10 @@ void switchExample( Control sender, int value ) {
   }
 
   Serial.print( " " );
-  Serial.println( sender.id );
+  Serial.println( sender->id );
 }
 
-void otherSwitchExample( Control sender, int value ) {
+void otherSwitchExample( Control* sender, int value ) {
   switch ( value ) {
     case S_ACTIVE:
       Serial.print( "Active:" );
@@ -132,7 +139,7 @@ void otherSwitchExample( Control sender, int value ) {
   }
 
   Serial.print( " " );
-  Serial.println( sender.id );
+  Serial.println( sender->id );
 }
 
 void setup( void ) {
@@ -186,7 +193,7 @@ void setup( void ) {
 
   ESPUI.label( "Status:", COLOR_TURQUOISE, "Stop" );
   ESPUI.label( "Millis:", COLOR_EMERALD, "0" );
-  ESPUI.button( "Push Button", &buttonCallback, COLOR_PETERRIVER );
+  ESPUI.button( "Push Button", &buttonCallback, COLOR_PETERRIVER, "Press" );
   ESPUI.button( "Other Button", &buttonExample, COLOR_WETASPHALT, "Press" );
   ESPUI.pad( "Pad with center", true, &padExample, COLOR_SUNFLOWER );
   ESPUI.pad( "Pad without center", false, &padExample, COLOR_CARROT );

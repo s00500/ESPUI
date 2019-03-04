@@ -110,17 +110,18 @@ class Control {
     ControlType type;
     uint16_t id;  // just mirroring the id here for practical reasons
     const char* label;
-    void ( *callback )( Control, int );
+    void ( *callback )( Control*, int );
     String value;
     ControlColor color;
     uint16_t parentControl;
-    
     Control* next;
+    
+    static constexpr uint16_t noParent = 0xffff;
 
     Control(
       ControlType type, const char* label,
-      void ( *callback )( Control, int ),
-      String value, ControlColor color, uint16_t parentControl = 0xffff )
+      void ( *callback )( Control*, int ),
+      String value, ControlColor color, uint16_t parentControl = Control::noParent )
       : type( type ), label( label ), callback( callback ), value( value ), color( color ), parentControl(parentControl), next( nullptr ) {
       id = idCounter++;
     }
@@ -181,25 +182,25 @@ class ESPUIClass {
 
     uint16_t addControl( ControlType type, const char* label,
                     String value = String( "" ), ControlColor color = ControlColor::Turquoise,
-                    void ( *callback )( Control, int ) = nullptr, uint16_t parentControl = 0xffff );
+                    uint16_t parentControl = Control::noParent, void ( *callback )( Control*, int ) = nullptr );
 
     int button( const char* label,
-                void ( *callback )( Control, int ), ControlColor color,
+                void ( *callback )( Control*, int ), ControlColor color,
                 String value = "" ); // Create Event Button
     int switcher( const char* label, bool startState,
-                  void ( *callback )( Control, int ),
+                  void ( *callback )( Control*, int ),
                   ControlColor color ); // Create Toggle Button
     int pad( const char* label, bool centerButton,
-             void ( *callback )( Control, int ),
+             void ( *callback )( Control*, int ),
              ControlColor color ); // Create Pad Control
     int slider( const char* label,
-                void ( *callback )( Control, int ),
+                void ( *callback )( Control*, int ),
                 ControlColor color, String value ); // Create Slider Control
     int number( const char* label,
-                void ( *callback )( Control, int ),
+                void ( *callback )( Control*, int ),
                 ControlColor color, int number, int min, int max ); // Create a Number Input Control
     int text( const char* label,
-              void ( *callback )( Control, int ),
+              void ( *callback )( Control*, int ),
               ControlColor color, String value = "" ); // Create a Text Input Control
 
     // Output only
