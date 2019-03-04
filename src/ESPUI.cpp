@@ -429,7 +429,7 @@ int ESPUIClass::graph( const char* label, ControlColor color ) {
 // TODO: this still needs a range setting
 int ESPUIClass::slider( const char* label, void ( *callback )( Control*, int ),
                         ControlColor color, String value ) {
-  return addControl( ControlType::Button, label, "", color, Control::noParent, callback );
+  return addControl( ControlType::Slider, label, "", color, Control::noParent, callback );
 }
 
 int ESPUIClass::button( const char* label, void ( *callback )( Control*, int ),
