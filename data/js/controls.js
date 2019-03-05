@@ -512,7 +512,7 @@ function start() {
         if(data.parentControl) {
           var element = $("#select"+data.parentControl);
           element.append(
-            "<option id='option" + data.id + "' value='" + data.value + "'>" + data.label + "</option>"
+            "<option id='option" + data.id + "' value='" + data.value + "' " + data.selected + ">" + data.label + "</option>"
           );
         }
         break;

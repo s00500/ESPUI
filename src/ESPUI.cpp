@@ -648,6 +648,15 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
       item["parentControl"] = String( control->parentControl );
     }
 
+    // special case for selects: to preselect an option, you have to add "selected" to <option>
+    if ( control->type == ControlType::Option ) {
+      if ( ESPUI.getControl( control->parentControl )->value == control->value ) {
+        item["selected"] = "selected";
+      } else {
+        item["selected"] = "";
+      }
+    }
+
     items.add( item );
 
     control = control->next;
