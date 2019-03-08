@@ -36,11 +36,11 @@
 enum ControlType : uint8_t {
   // fixed controls
   Title = 0,
-  Button,
+
+  // updatable controls
   Pad,
   PadWithCenter,
-  
-  // updatable controls
+  Button,
   Label,
   Switcher,
   Slider,
@@ -53,7 +53,10 @@ enum ControlType : uint8_t {
   Option,
 
   UpdateOffset = 100,
-  UpdateLabel = 104,
+  UpdatePad = 101,
+  UpdatePadWithCenter,
+  ButtonButton,
+  UpdateLabel,
   UpdateSwitcher,
   UpdateSlider,
   UpdateNumber,
@@ -119,21 +122,21 @@ class Control {
     ControlColor color;
     uint16_t parentControl;
     Control* next;
-    
+
     static constexpr uint16_t noParent = 0xffff;
 
     Control(
       ControlType type, const char* label,
       void ( *callback )( Control*, int ),
       String value, ControlColor color, uint16_t parentControl = Control::noParent )
-      : type( type ), label( label ), callback( callback ), value( value ), color( color ), parentControl(parentControl), next( nullptr ) {
+      : type( type ), label( label ), callback( callback ), value( value ), color( color ), parentControl( parentControl ), next( nullptr ) {
       id = idCounter++;
     }
 
     Control( const Control& control )
       : type( control.type ), id( control.id ), label( control.label ),
         callback( control.callback ), value( control.value ),
-        color( control.color ), parentControl(control.parentControl), next( control.next ) {}
+        color( control.color ), parentControl( control.parentControl ), next( control.next ) {}
 
   private:
     static uint16_t idCounter;
@@ -186,8 +189,8 @@ class ESPUIClass {
     // Creating Elements
 
     uint16_t addControl( ControlType type, const char* label,
-                    String value = String( "" ), ControlColor color = ControlColor::Turquoise,
-                    uint16_t parentControl = Control::noParent, void ( *callback )( Control*, int ) = nullptr );
+                         String value = String( "" ), ControlColor color = ControlColor::Turquoise,
+                         uint16_t parentControl = Control::noParent, void ( *callback )( Control*, int ) = nullptr );
 
     int button( const char* label,
                 void ( *callback )( Control*, int ), ControlColor color,
@@ -221,6 +224,9 @@ class ESPUIClass {
     void updateControl( uint16_t id, String value, int clientId = -1 );
     void updateControl( String label, String value, int clientId = -1 );
     void updateControl( Control* control, String value, int clientId = -1 );
+    void updateControl( uint16_t id, int clientId = -1 );
+    void updateControl( String label, int clientId = -1 );
+    void updateControl( Control* control, int clientId = -1 );
 
     void print( uint16_t id, String value );
     void print( String label, String value );

@@ -18,6 +18,8 @@ const char* ssid = "ESPUI";
 const char* password = "espui";
 const char* hostname = "EspuiTest";
 
+uint16_t button1;
+
 void numberCall( Control* sender, int type ) {
   Serial.println( sender->value );
 }
@@ -51,14 +53,21 @@ void buttonExample( Control* sender, int type ) {
     case B_DOWN:
       Serial.println( "Status: Start" );
       ESPUI.updateControl( "Status:", "Start" );
+    
+      ESPUI.getControl( button1 )->color = ControlColor::Carrot;
+      ESPUI.updateControl( button1 );
       break;
 
     case B_UP:
       Serial.println( "Status: Stop" );
       ESPUI.updateControl( "Status:", "Stop" );
+   
+      ESPUI.getControl( button1 )->color = ControlColor::Peterriver;
+      ESPUI.updateControl( button1 );
       break;
   }
 }
+
 void padExample( Control* sender, int value ) {
   switch ( value ) {
     case P_LEFT_DOWN:
@@ -200,8 +209,9 @@ void setup( void ) {
   ESPUI.addControl( ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1 );
   
   ESPUI.addControl( ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, Control::noParent, &textCall );
+
   ESPUI.addControl( ControlType::Label, "Millis:", "0", ControlColor::Emerald, Control::noParent );
-  ESPUI.addControl( ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, Control::noParent, &buttonCallback );
+  button1 = ESPUI.addControl( ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, Control::noParent, &buttonCallback );
   ESPUI.addControl( ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, Control::noParent, &buttonExample );
   ESPUI.addControl( ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, Control::noParent, &padExample );
   ESPUI.addControl( ControlType::Pad, "Pad without center", "", ControlColor::Carrot, Control::noParent, &padExample );

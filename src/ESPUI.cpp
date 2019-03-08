@@ -299,10 +299,11 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
       for ( size_t i = 0; i < len; i++ ) {
         msg += ( char )data[i];
       }
+
       uint16_t id =  msg.substring( msg.lastIndexOf( ':' ) + 1 ).toInt();
 
       if ( ESPUI.verbosity >= Verbosity::VerboseJSON ) {
-        Serial.print("WS rec: ");
+        Serial.print( "WS rec: " );
         Serial.println( msg );
         Serial.print( "WS recognised ID: " );
         Serial.println( id );
@@ -491,9 +492,8 @@ Control* ESPUIClass::getControl( String label ) {
   return nullptr;
 }
 
-void ESPUIClass::updateControl( Control* control, String value, int clientId ) {
+void ESPUIClass::updateControl( Control* control, int clientId ) {
   if ( control ) {
-    control->value = value;
     String json;
     StaticJsonBuffer<200> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
@@ -501,6 +501,7 @@ void ESPUIClass::updateControl( Control* control, String value, int clientId ) {
     root["type"] = ( int )control->type + ControlType::UpdateOffset;
     root["value"] = control->value;
     root["id"] = control->id;
+    root["color"] = ( int )control->color;
     root.printTo( json );
 
     if ( clientId > 0 ) {
@@ -532,6 +533,37 @@ void ESPUIClass::updateControl( Control* control, String value, int clientId ) {
     }
   }
 }
+
+void ESPUIClass::updateControl( uint16_t id, int clientId ) {
+  Control* control = getControl( id );
+
+  if ( control ) {
+    updateControl( control, clientId );
+  } else {
+    if ( this->verbosity ) {
+      Serial.println( String( "Error: There is no control with ID " ) + String( id ) );
+    }
+  }
+}
+void ESPUIClass::updateControl( String label, int clientId ) {
+  Control* control = getControl( label );
+
+  if ( control ) {
+    updateControl( control, clientId );
+  } else {
+    if ( this->verbosity ) {
+      Serial.println( String( "Error: There is no control with label " ) + label );
+    }
+  }
+}
+
+void ESPUIClass::updateControl( Control* control, String value, int clientId ) {
+  if ( control ) {
+    control->value = value;
+    updateControl( control, clientId );
+  }
+}
+
 void ESPUIClass::updateControl( uint16_t id, String value, int clientId ) {
   Control* control = getControl( id );
 
@@ -543,6 +575,7 @@ void ESPUIClass::updateControl( uint16_t id, String value, int clientId ) {
     }
   }
 }
+
 void ESPUIClass::updateControl( String label, String value, int clientId ) {
   Control* control = getControl( label );
 

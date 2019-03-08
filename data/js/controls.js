@@ -1,9 +1,16 @@
 const UI_INITIAL_GUI = 200;
+const UPDATE_OFFSET = 100;
 
 const UI_TITEL = 0;
-const UI_BUTTON = 1;
-const UI_PAD = 2;
-const UI_CPAD = 3;
+
+const UI_PAD = 1;
+const UPDATE_PAD = 101;
+
+const UI_CPAD = 2;
+const UPDATE_CPAD = 102;
+
+const UI_BUTTON = 3;
+const UPDATE_BUTTON = 103;
 
 const UI_LABEL = 4;
 const UPDATE_LABEL = 104;
@@ -32,8 +39,8 @@ const UPDATE_SELECT = 112;
 const UI_OPTION = 13;
 const UPDATE_OPTION = 113;
 
-const FOR = 0;
-const BACK = 1;
+const UP = 0;
+const DOWN = 1;
 const LEFT = 2;
 const RIGHT = 3;
 const CENTER = 4;
@@ -143,158 +150,92 @@ function start() {
           handleEvent(fauxEvent);
         });
         break;
+        
       case UI_TITEL:
         document.title = data.label;
         $("#mainHeader").html(data.label);
         break;
+        
       case UI_LABEL:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'><h5 id='" +
-            data.id +
-            "'>" +
-            data.label +
-            "</h5><hr /><span id='l" +
-            data.id +
-            "' class='label label-wrap'>" +
-            data.value +
-            "</span></div>"
+        parent.append(
+          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" +
+            "<h5>" + data.label + "</h5><hr/>" +
+            "<span id='l" + data.id + "' class='label label-wrap'>" + data.value + "</span>" +
+          "</div>"
         );
         break;
+        
       case UI_BUTTON:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='one columns card tcenter " +
-            colorClass(data.color) +
-            "'><h5>" +
-            data.label +
-            "</h5><hr/><button onmousedown='buttonclick(" +
-            data.id +
-            ", true)' onmouseup='buttonclick(" +
-            data.id +
-            ", false)' id='" +
-            data.id +
-            "'>" +
+        parent.append(
+          "<div id='" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<h5>" + data.label + "</h5><hr/>" +
+          "<button id='btn" + data.id + "' " +
+            "onmousedown='buttonclick(" + data.id + ", true)' "+
+            "onmouseup='buttonclick(" + data.id + ", false)'>" +
             data.value +
-            "</button></div>"
+          "</button></div>"
         );
-        $("#" + data.id).on({
+        $("#btn" + data.id).on({
           touchstart: function(e) {
             e.preventDefault();
             buttonclick(data.id, true);
-          }
-        });
-        $("#" + data.id).on({
+          },
           touchend: function(e) {
             e.preventDefault();
             buttonclick(data.id, false);
           }
         });
         break;
+        
       case UI_SWITCHER:
-        var label = "<label id='sl" + data.id + "' class='switch checked'>";
-        var input =
-          "<div class='in'><input type='checkbox' id='s" +
-          data.id +
-          "' onClick='switcher(" +
-          data.id +
-          ",null)' checked></div>";
-        if (data.value == "0") {
-          label = "<label id='sl" + data.id + "' class='switch'>";
-          input =
-            "<div class='in'><input type='checkbox' id='s" +
-            data.id +
-            "' onClick='switcher(" +
-            data.id +
-            ",null)' ></div>";
-        }
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div id='" +
-            data.id +
-            "' class='one columns card tcenter " +
-            colorClass(data.color) +
-            "'><h5>" +
-            data.label +
-            "</h5><hr/>" +
-            label +
-            input +
+        parent.append(
+          "<div id='" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
+            "<h5>" + data.label + "</h5><hr/>" +
+            "<label id='sl" + data.id + "' class='switch " + ((data.value == "1")?"checked":"") + "'>"  +
+              "<div class='in'><input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' " + ((data.value == "1")?"checked":"") + "/></div>" +
             "</label>" +
-            "</div>"
+          "</div>"
         );
+        switcher(data.id, data.value);
         break;
+        
       case UI_CPAD:
-        center =
-          "<a class='confirm' onmousedown='padclick(CENTER, " +
-          data.id +
-          ", true)' onmouseup='padclick(CENTER, " +
-          data.id +
-          ", false)' href='#' id='pc" +
-          data.id +
-          "'>OK</a>";
-      //NO BREAK
       case UI_PAD:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'><h5>" +
-            data.label +
-            "</h5><hr/>" +
+        parent.append(
+          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<h5>" + data.label + "</h5><hr/>" +
             "<nav class='control'>" +
             "<ul>" +
-            "<li><a onmousedown='padclick(FOR, " +
-            data.id +
-            ", true)' onmouseup='padclick(FOR, " +
-            data.id +
-            ", false)' href='#' id='pf" +
-            data.id +
-            "'>▲</a></li>" +
-            "<li><a onmousedown='padclick(RIGHT, " +
-            data.id +
-            ", true)' onmouseup='padclick(RIGHT, " +
-            data.id +
-            ", false)' href='#' id='pr" +
-            data.id +
-            "'>▲</a></li>" +
-            "<li><a onmousedown='padclick(LEFT, " +
-            data.id +
-            ", true)' onmouseup='padclick(LEFT, " +
-            data.id +
-            ", false)' href='#' id='pl" +
-            data.id +
-            "'>▲</a></li>" +
-            "<li><a onmousedown='padclick(BACK, " +
-            data.id +
-            ", true)' onmouseup='padclick(BACK, " +
-            data.id +
-            ", false)' href='#' id='pb" +
-            data.id +
-            "'>▲</a></li>" +
+              "<li><a onmousedown='padclick(UP, "    + data.id + ", true)' onmouseup='padclick(UP, "    + data.id + ", false)' id='pf" + data.id + "'>▲</a></li>" +
+              "<li><a onmousedown='padclick(RIGHT, " + data.id + ", true)' onmouseup='padclick(RIGHT, " + data.id + ", false)' id='pr" + data.id + "'>▲</a></li>" +
+              "<li><a onmousedown='padclick(LEFT, "  + data.id + ", true)' onmouseup='padclick(LEFT, "  + data.id + ", false)' id='pl" + data.id + "'>▲</a></li>" +
+              "<li><a onmousedown='padclick(DOWN, "  + data.id + ", true)' onmouseup='padclick(DOWN, "  + data.id + ", false)' id='pb" + data.id + "'>▲</a></li>" +
             "</ul>" +
-            center +
+            ((data.type==UI_CPAD)?"<a class='confirm' onmousedown='padclick(CENTER," + data.id + ", true)' onmouseup='padclick(CENTER, " + data.id + ", false)' id='pc" + data.id + "'>OK</a>":"") +
             "</nav>" +
             "</div>"
         );
@@ -302,11 +243,11 @@ function start() {
         $("#pf" + data.id).on({
           touchstart: function(e) {
             e.preventDefault();
-            padclick(FOR, data.id, true);
+            padclick(UP, data.id, true);
           },
           touchend: function(e) {
             e.preventDefault();
-            padclick(FOR, data.id, false);
+            padclick(UP, data.id, false);
           }
         });
         $("#pl" + data.id).on({
@@ -332,11 +273,11 @@ function start() {
         $("#pb" + data.id).on({
           touchstart: function(e) {
             e.preventDefault();
-            padclick(BACK, data.id, true);
+            padclick(DOWN, data.id, true);
           },
           touchend: function(e) {
             e.preventDefault();
-            padclick(BACK, data.id, false);
+            padclick(DOWN, data.id, false);
           }
         });
         $("#pc" + data.id).on({
@@ -351,115 +292,53 @@ function start() {
         });
 
         break;
-      case UPDATE_LABEL:
-        $("#l" + data.id).html(data.value);
-        break;
-      case UPDATE_SWITCHER:
-        if (data.value == "0") switcher(data.id, 0);
-        else switcher(data.id, 1);
-        break;
+        
       case UI_SLIDER:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='two columns card tcenter card-slider " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5 id='" +
-            data.id +
-            "'>" +
-            data.label +
-            "</h5><hr />" +
-            "<div id='sl" +
-            data.id +
-            "' class='rkmd-slider slider-discrete slider-" +
-            colorClass(data.color) +
-            "'>" +
-            "<input type='range' min='0' max='100' value='" +
-            data.value +
-            "'>" +
+        parent.append(
+          "<div id='" + data.id + "' class='two columns card tcenter card-slider " + colorClass(data.color) + "'>" + 
+            "<h5>" + data.label + "</h5><hr/>" +
+            "<div id='sl" + data.id + "' class='rkmd-slider slider-discrete slider-" + colorClass(data.color) + "'>" +
+              "<input type='range' min='0' max='100' value='" + data.value + "'>" +
             "</div>" +
-            "</div>"
+          "</div>" + 
+          "<script>rkmd_rangeSlider('#sl" + data.id + "');</script>"
         );
-        var element;
-        if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
-        } else {
-          element = $("#row")
-        }
-        element.append(
-          "<script>" + "rkmd_rangeSlider('#sl" + data.id + "');" + "</script>"
-        );
-        break;
-
-      case UPDATE_SLIDER:
-        slider_move($("#sl" + data.id), data.value, "100", false);
         break;
 
       case UI_NUMBER:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5 id='" +
-            data.id +
-            "'>" +
-            data.label +
-            "</h5><hr />" +
-            "<input style='color:black;' id='num" +
-            data.id +
-            "' type='number' value='" +
-            data.value +
-            "' onchange='numberchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
+        parent.append(
+          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+            "<h5>" + data.label + "</h5><hr/>" +
+            "<input style='color:black;' id='num" + data.id + "' type='number' value='" + data.value + "' onchange='numberchange(" + data.id + ")' />" +
+          "</div>"
         );
-        break;
-
-      case UPDATE_NUMBER:
-        $("#num" + data.id).val(data.value);
         break;
 
       case UI_TEXT_INPUT:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5 id='" +
-            data.id +
-            "'>" +
-            data.label +
-            "</h5><hr />" +
-            "<input style='color:black;' id='text" +
-            data.id +
-            "' value='" +
-            data.value +
-            "' onchange='textchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
+        parent.append(
+          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+            "<h5>" + data.label + "</h5><hr/>" +
+            "<input style='color:black;' id='text" + data.id + "' value='" + data.value + "' onchange='textchange(" + data.id + ")' />" +
+          "</div>"
         );
-        break;
-
-      case UPDATE_TEXT_INPUT:
-        $("#text" + data.id).val(data.value);
         break;
         
       case UI_TAB:
@@ -484,70 +363,91 @@ function start() {
         break;
         
       case UI_SELECT:
-        var element;
+        var parent;
         if(data.parentControl) {
-          element = $("#tab"+data.parentControl);
+          parent = $("#tab"+data.parentControl);
         } else {
-          element = $("#row")
+          parent = $("#row")
         }
-        element.append(
-          "<div class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5 id='" +
-            data.id +
-            "'>" +
-            data.label +
-            "</h5><hr />" +
-            "<select style='color:black;' id='select" +
-            data.id +
-            "' onchange='selectchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
+        parent.append(
+          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+            "<h5>" + data.label + "</h5><hr/>" +
+            "<select style='color:black;' id='select" + data.id + "' onchange='selectchange(" + data.id + ")' />" +
+          "</div>"
         );
         break;
         
       case UI_OPTION:
         if(data.parentControl) {
-          var element = $("#select"+data.parentControl);
-          element.append(
+          var parent = $("#select"+data.parentControl);
+          parent.append(
             "<option id='option" + data.id + "' value='" + data.value + "' " + data.selected + ">" + data.label + "</option>"
           );
         }
         break;
         
+      case UPDATE_LABEL:
+        $("#l" + data.id).html(data.value);
+        break;
+        
+      case UPDATE_SWITCHER:
+        switcher(data.id, (data.value == "0")?0:1);
+        break;
+
+      case UPDATE_SLIDER:
+        slider_move($("#sl" + data.id), data.value, "100", false);
+        break;
+
+      case UPDATE_NUMBER:
+        $("#num" + data.id).val(data.value);
+        break;
+
+      case UPDATE_TEXT_INPUT:
+        $("#text" + data.id).val(data.value);
+        break;
+        
       case UPDATE_SELECT:
         $("#select" + data.id).val(data.value);
+        break;
+        
+      case UPDATE_BUTTON:
+      case UPDATE_PAD:
+      case UPDATE_CPAD:
         break;
 
       default:
         console.error("Unknown type or event");
         break;
     }
+    
+    if(data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
+      var element = $('#' + data.id);
+      if(data.type == UPDATE_SLIDER) {
+        element.removeClass("slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin");
+        element.addClass("slider-" + colorClass(data.color));
+      } else {
+        element.removeClass("turquoise emerald peterriver wetasphalt sunflower carrot alizarin");
+        element.addClass(colorClass(data.color));
+      }
+    }
   };
-
+  
   websock.onmessage = handleEvent;
 }
 
 function numberchange(number) {
   var val = $("#num" + number).val();
   websock.send("nvalue:" + val + ":" + number);
-  console.log(val);
 }
 
 function textchange(number) {
   var val = $("#text" + number).val();
   websock.send("tvalue:" + val + ":" + number);
-  console.log("tvalue:" + val + ":" + number);
-  console.log(val);
 }
 
 function selectchange(number) {
   var val = $("#select" + number).val();
   websock.send("svalue:" + val + ":" + number);
-  console.log("svalue:" + val + ":" + number);
-  console.log(val);
 }
 
 function buttonclick(number, isdown) {
@@ -561,11 +461,11 @@ function padclick(type, number, isdown) {
       if (isdown) websock.send("pcdown:" + number);
       else websock.send("pcup:" + number);
       break;
-    case FOR:
+    case UP:
       if (isdown) websock.send("pfdown:" + number);
       else websock.send("pfup:" + number);
       break;
-    case BACK:
+    case DOWN:
       if (isdown) websock.send("pbdown:" + number);
       else websock.send("pbup:" + number);
       break;
