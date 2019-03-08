@@ -892,21 +892,21 @@ input[id^="num"] {
   font-size: 115%;
 }
 
-body div > ul {
+body div > ul.navigation {
   margin: 0;
   padding: 0;
   border-bottom: 3px solid #666;
   overflow: hidden;
 }
-ul li {
+ ul.navigation li {
   list-style: none;
   float: left;
   margin-right: 4px;
 }
-ul li.controls {
+ ul.navigation li.controls {
   float: right;
 }
-ul li a {
+ ul.navigation li a {
   font-weight: bold;
   display: inline-block;
   padding: 6px 12px;
@@ -920,7 +920,7 @@ ul li a {
   -pie-background: linear-gradient(#eee,#e4e4e4);
 }
 
-ul li.active a {
+ ul.navigation li.active a {
   pointer-events: none;
   color: white;
   background: #666;
@@ -929,6 +929,7 @@ ul li.active a {
   background: linear-gradient(#888,#666);
   -pie-background: linear-gradient(#888,#666);
 }
+
 div.tabscontent > div {
   padding: 0 15px;
 }
