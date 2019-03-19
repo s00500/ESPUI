@@ -51,6 +51,9 @@ enum ControlType : uint8_t {
   Tab,
   Select,
   Option,
+  Min,
+  Max,
+  Step,
 
   UpdateOffset = 100,
   UpdatePad = 101,
@@ -65,6 +68,9 @@ enum ControlType : uint8_t {
   UpdateTab,
   UpdateSelection,
   UpdateOption,
+  UpdateMin,
+  UpdateMax,
+  UpdateStep,
 
   InitialGui = 200
 };
@@ -131,6 +137,8 @@ class Control {
       String value, ControlColor color, uint16_t parentControl = Control::noParent )
       : type( type ), label( label ), callback( callback ), value( value ), color( color ), parentControl( parentControl ), next( nullptr ) {
       id = idCounter++;
+//       Serial.print( "Control id: " );
+//       Serial.println( id );
     }
 
     Control( const Control& control )
@@ -218,42 +226,30 @@ class ESPUIClass {
     // Update Elements
 
     Control* getControl( uint16_t id );
-    Control* getControl( String label );
 
     // Update Elements
     void updateControl( uint16_t id, String value, int clientId = -1 );
-    void updateControl( String label, String value, int clientId = -1 );
     void updateControl( Control* control, String value, int clientId = -1 );
     void updateControl( uint16_t id, int clientId = -1 );
-    void updateControl( String label, int clientId = -1 );
     void updateControl( Control* control, int clientId = -1 );
 
     void print( uint16_t id, String value );
-    void print( String label, String value );
 
     void updateLabel( uint16_t id, String value );
-    void updateLabel( String label, String value );
 
     void updateSwitcher( uint16_t id, bool nValue, int clientId = -1 );
-    void updateSwitcher( String label, bool nValue, int clientId = -1 );
 
     void updateSlider( uint16_t id, int nValue, int clientId = -1 );
-    void updateSlider( String label, int nValue, int clientId = -1 );
 
     void updateNumber( uint16_t id, int nValue, int clientId = -1 );
-    void updateNumber( String label, int nValue, int clientId = -1 );
 
     void updateText( uint16_t id, String nValue, int clientId = -1 );
-    void updateText( String label, String nValue, int clientId = -1 );
 
     void updateSelect( uint16_t id, String nValue, int clientId = -1 );
-    void updateSelect( String label, String nValue, int clientId = -1 );
 
     void clearGraph( uint16_t id, int clientId = -1 );
-    void clearGraph( String label, int clientId = -1 );
 
     void addGraphPoint( uint16_t id, int nValue, int clientId = -1 );
-    void addGraphPoint( String label, int nValue, int clientId = -1 );
 
 //     void textThem( String text, int clientId = -1 );
 

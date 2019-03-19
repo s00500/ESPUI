@@ -360,20 +360,17 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
         ESPUI.updateSwitcher( c->id, false );
         c->callback( c, S_INACTIVE );
       } else if ( msg.startsWith( "slvalue:" ) ) {
-        int value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) ).toInt();
-        ESPUI.updateSlider( c->id, value, client->id() );
+        c->value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
+        ESPUI.updateControl( c );
         c->callback( c, SL_VALUE );
       } else if ( msg.startsWith( "nvalue:" ) ) {
-        int value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) ).toInt();
-        ESPUI.updateNumber( c->id, value, client->id() );
+        c->value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
         c->callback( c, N_VALUE );
       } else if ( msg.startsWith( "tvalue:" ) ) {
-        String value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
-        ESPUI.updateText( c->id, value, client->id() );
+        c->value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
         c->callback( c, T_VALUE );
       } else if ( msg.startsWith( "svalue:" ) ) {
-        String value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
-        ESPUI.updateSelect( c->id, value, client->id() );
+        c->value = msg.substring( msg.indexOf( ':' ) + 1, msg.lastIndexOf( ':' ) );
         c->callback( c, S_VALUE );
       } else {
         if ( ESPUI.verbosity ) {
@@ -393,15 +390,6 @@ uint16_t ESPUIClass::addControl( ControlType type, const char* label,
                                  uint16_t parentControl,
                                  void ( *callback )( Control*, int )
                                ) {
-  if ( this->getControl( label ) != nullptr ) {
-    if ( this->verbosity ) {
-      Serial.println( "UI ERROR: Element " + String( label ) +
-                      " exists, skipping creating element!" );
-    }
-
-    return -1;
-  }
-
   Control* control = new Control( type, label, callback, value, color, parentControl );
 
   if ( this->controls == nullptr ) {
@@ -478,24 +466,10 @@ Control* ESPUIClass::getControl( uint16_t id ) {
   return nullptr;
 }
 
-Control* ESPUIClass::getControl( String label ) {
-  Control* control = this->controls;
-
-  while ( control != nullptr ) {
-    if ( String( control->label ) == label ) {
-      return control;
-    }
-
-    control = control->next;
-  }
-
-  return nullptr;
-}
-
 void ESPUIClass::updateControl( Control* control, int clientId ) {
   if ( control ) {
     String json;
-    StaticJsonBuffer<200> jsonBuffer;
+    DynamicJsonBuffer jsonBuffer( 2000 );
     JsonObject& root = jsonBuffer.createObject();
 
     root["type"] = ( int )control->type + ControlType::UpdateOffset;
@@ -545,17 +519,6 @@ void ESPUIClass::updateControl( uint16_t id, int clientId ) {
     }
   }
 }
-void ESPUIClass::updateControl( String label, int clientId ) {
-  Control* control = getControl( label );
-
-  if ( control ) {
-    updateControl( control, clientId );
-  } else {
-    if ( this->verbosity ) {
-      Serial.println( String( "Error: There is no control with label " ) + label );
-    }
-  }
-}
 
 void ESPUIClass::updateControl( Control* control, String value, int clientId ) {
   if ( control ) {
@@ -576,74 +539,32 @@ void ESPUIClass::updateControl( uint16_t id, String value, int clientId ) {
   }
 }
 
-void ESPUIClass::updateControl( String label, String value, int clientId ) {
-  Control* control = getControl( label );
-
-  if ( control ) {
-    updateControl( control, value, clientId );
-  } else {
-    if ( this->verbosity ) {
-      Serial.println( String( "Error: There is no control with label " ) + label );
-    }
-  }
-}
-
-
-
 void ESPUIClass::print( uint16_t id, String value ) {
   updateControl( id, value );
-}
-
-void ESPUIClass::print( String label, String value ) {
-  updateControl( label, value );
 }
 
 void ESPUIClass::updateLabel( uint16_t id, String value ) {
   updateControl( id, value );
 }
 
-void ESPUIClass::updateLabel( String label, String value ) {
-  updateControl( label, value );
-}
-
 void ESPUIClass::updateSlider( uint16_t id, int nValue, int clientId ) {
   updateControl( id, String( nValue ), clientId );
-}
-
-void ESPUIClass::updateSlider( String label, int nValue, int clientId ) {
-  updateControl( label, String( nValue ), clientId );
 }
 
 void ESPUIClass::updateSwitcher( uint16_t id, bool nValue, int clientId ) {
   updateControl( id, String( nValue ? "1" : "0" ), clientId );
 }
 
-void ESPUIClass::updateSwitcher( String label, bool nValue, int clientId ) {
-  updateControl( label, String( nValue ? "1" : "0" ), clientId );
-}
-
 void ESPUIClass::updateNumber( uint16_t id, int number, int clientId ) {
   updateControl( id, String( number ), clientId );
-}
-
-void ESPUIClass::updateNumber( String label, int number, int clientId ) {
-  updateControl( label, String( number ), clientId );
 }
 
 void ESPUIClass::updateText( uint16_t id, String text, int clientId ) {
   updateControl( id, text, clientId );
 }
 
-void ESPUIClass::updateText( String label, String text, int clientId ) {
-  updateControl( label, text, clientId );
-}
-
 void ESPUIClass::updateSelect( uint16_t id, String text, int clientId ) {
   updateControl( id, text, clientId );
-}
-
-void ESPUIClass::updateSelect( String label, String text, int clientId ) {
-  updateControl( label, text, clientId );
 }
 
 /*
@@ -654,7 +575,7 @@ sent as one blob at the beginning. Therefore a new type is used as well
 */
 void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
   String json;
-  DynamicJsonBuffer jsonBuffer( 2000 );
+  DynamicJsonBuffer jsonBuffer( 8000 );
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = ( int )UI_INITIAL_GUI;
   JsonArray& items = jsonBuffer.createArray();

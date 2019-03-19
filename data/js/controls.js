@@ -36,8 +36,15 @@ const UPDATE_TAB = 111;
 
 const UI_SELECT = 12;
 const UPDATE_SELECT = 112;
+
 const UI_OPTION = 13;
 const UPDATE_OPTION = 113;
+const UI_MIN = 14;
+const UPDATE_MIN = 114;
+const UI_MAX = 15;
+const UPDATE_MAX = 115;
+const UI_STEP = 16;
+const UPDATE_STEP = 116;
 
 const UP = 0;
 const DOWN = 1;
@@ -164,7 +171,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" +
+          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" +
             "<h5>" + data.label + "</h5><hr/>" +
             "<span id='l" + data.id + "' class='label label-wrap'>" + data.value + "</span>" +
           "</div>"
@@ -179,7 +186,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
           "<h5>" + data.label + "</h5><hr/>" +
           "<button id='btn" + data.id + "' " +
             "onmousedown='buttonclick(" + data.id + ", true)' "+
@@ -207,7 +214,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
             "<h5>" + data.label + "</h5><hr/>" +
             "<label id='sl" + data.id + "' class='switch " + ((data.value == "1")?"checked":"") + "'>"  +
               "<div class='in'><input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' " + ((data.value == "1")?"checked":"") + "/></div>" +
@@ -226,7 +233,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
           "<h5>" + data.label + "</h5><hr/>" +
             "<nav class='control'>" +
             "<ul>" +
@@ -293,22 +300,24 @@ function start() {
 
         break;
         
+        //https://codepen.io/seanstopnik/pen/CeLqA
       case UI_SLIDER:
         var parent;
         if(data.parentControl) {
           parent = $("#tab"+data.parentControl);
         } else {
           parent = $("#row")
-        }
+        }      
         parent.append(
-          "<div id='" + data.id + "' class='two columns card tcenter card-slider " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='two columns card tcenter card-slider " + colorClass(data.color) + "'>" + 
             "<h5>" + data.label + "</h5><hr/>" +
-            "<div id='sl" + data.id + "' class='rkmd-slider slider-discrete slider-" + colorClass(data.color) + "'>" +
-              "<input type='range' min='0' max='100' value='" + data.value + "'>" +
+            "<div class='range-slider'>" +
+              "<input id='sl" + data.id + "' type='range' min='0' max='100' value='" + data.value + "' class='range-slider__range'>" +
+              "<span class='range-slider__value'>" + data.value + "</span>" +
             "</div>" +
-          "</div>" + 
-          "<script>rkmd_rangeSlider('#sl" + data.id + "');</script>"
+          "</div>"
         );
+        rangeSlider();
         break;
 
       case UI_NUMBER:
@@ -319,7 +328,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
             "<h5>" + data.label + "</h5><hr/>" +
             "<input style='color:black;' id='num" + data.id + "' type='number' value='" + data.value + "' onchange='numberchange(" + data.id + ")' />" +
           "</div>"
@@ -334,7 +343,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
             "<h5>" + data.label + "</h5><hr/>" +
             "<input style='color:black;' id='text" + data.id + "' value='" + data.value + "' onchange='textchange(" + data.id + ")' />" +
           "</div>"
@@ -370,7 +379,7 @@ function start() {
           parent = $("#row")
         }
         parent.append(
-          "<div id='" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
+          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
             "<h5>" + data.label + "</h5><hr/>" +
             "<select style='color:black;' id='select" + data.id + "' onchange='selectchange(" + data.id + ")' />" +
           "</div>"
@@ -383,6 +392,36 @@ function start() {
           parent.append(
             "<option id='option" + data.id + "' value='" + data.value + "' " + data.selected + ">" + data.label + "</option>"
           );
+        }
+        break;
+        
+      case UI_MIN:
+        if(data.parentControl) {
+          var parent = $("#id"+data.parentControl+" input");
+          if(parent.size()){
+            console.log("MIN" + data.value);
+            parent.attr("min", data.value);
+          }
+        }
+        break;
+        
+      case UI_MAX:
+        if(data.parentControl) {
+          var parent = $("#id"+data.parentControl+" input");
+          if(parent.size()){
+            console.log("MAX" + data.value);
+            parent.attr("max", data.value);
+          }
+        }
+        break;
+        
+      case UI_STEP:
+        if(data.parentControl) {
+          var parent = $("#id"+data.parentControl+" input");
+          if(parent.size()){
+            console.log("STEP" + data.value);
+            parent.attr("step", data.value);
+          }
         }
         break;
         
@@ -421,18 +460,24 @@ function start() {
     }
     
     if(data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
-      var element = $('#' + data.id);
-      if(data.type == UPDATE_SLIDER) {
-        element.removeClass("slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin");
-        element.addClass("slider-" + colorClass(data.color));
-      } else {
+      var element = $('#id' + data.id);
+//       if(data.type == UPDATE_SLIDER) {
+//         element.removeClass("slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin");
+//         element.addClass("slider-" + colorClass(data.color));
+//       } else {
         element.removeClass("turquoise emerald peterriver wetasphalt sunflower carrot alizarin");
         element.addClass(colorClass(data.color));
-      }
+//       }
     }
   };
   
   websock.onmessage = handleEvent;
+}
+
+function sliderchange(number) {
+  var val = $("#sl" + number).val();
+  console.log("slvalue:" + val + ":" + number);
+  websock.send("slvalue:" + val + ":" + number);
 }
 
 function numberchange(number) {
@@ -497,3 +542,26 @@ function switcher(number, state) {
     $("#sl" + number).prop("checked", false);
   }
 }
+
+var rangeSlider = function(){
+  var slider = $('.range-slider'),
+      range = $('.range-slider__range'),
+      value = $('.range-slider__value');
+    
+  slider.each(function(){
+
+    value.each(function(){
+      var value = $(this).prev().attr('value');
+      $(this).html(value);
+    });
+
+    range.on({
+      'input': function(){
+        $(this).next().html(this.value);
+      },
+      'change': function(){
+        sliderchange($(this).attr('id').replace( /^\D+/g, ''));
+      }
+    });
+  });
+};
