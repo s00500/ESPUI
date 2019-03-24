@@ -27,7 +27,7 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
 - Tabs by @eringerli ISSUE #45 ✅
   - remove black line without tabs ✅
 - API changes by @eringerli
-  - less updateCotrol functions
+  - less updateControl functions ✅
   - proper wrappers for all create/update actions
 - OptionList by @eringerli
 - Better return values
@@ -44,6 +44,14 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
   - OptionList
   - Tab usage
   - Verbosity setting
+
+## Changelog for functions:
+
+- split pad into pad and padWithCenter
+- Cleaned order or parameters on switch
+- cleaned order of parameters on pad
+- Changes all numbers to actually be numbers (slider value, number value, min
+  and max)
 
 ## Dependencies
 

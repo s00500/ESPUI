@@ -174,23 +174,26 @@ public:
                       uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
 
   // create Elements
-  int button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");            // Create Event Button
-  int switcher(const char *label, bool startState, void (*callback)(Control *, int), ControlColor color);            // Create Toggle Button
-  int pad(const char *label, bool centerButton, void (*callback)(Control *, int), ControlColor color);               // Create Pad Control
-  int slider(const char *label, void (*callback)(Control *, int), ControlColor color, String value);                 // Create Slider Control
-  int number(const char *label, void (*callback)(Control *, int), ControlColor color, int number, int min, int max); // Create a Number Input Control
-  int text(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");              // Create a Text Input Control
+  uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");         // Create Event Button
+  uint16_t switcher(const char *label, void (*callback)(Control *, int), ControlColor color, bool startState = false); // Create Toggle Button
+  uint16_t pad(const char *label, void (*callback)(Control *, int), ControlColor color);                               // Create Pad Control
+  uint16_t padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color); // Create Pad Control with Centerbutton
+
+  uint16_t slider(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min = 0,
+                  int max = 100); // Create Slider Control
+  uint16_t number(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min = 0,
+                  int max = 100);                                                                            // Create a Number Input Control
+  uint16_t text(const char *label, void (*callback)(Control *, int), ControlColor color, String value = ""); // Create a Text Input Control
 
   // Output only
-  int label(const char *label, ControlColor color, String value = ""); // Create Label
-  int graph(const char *label, ControlColor color);                    // Create Graph display
+  uint16_t label(const char *label, ControlColor color, String value = ""); // Create Label
+  uint16_t graph(const char *label, ControlColor color);                    // Create Graph display
 
   // Update Elements
 
   Control *getControl(uint16_t id);
 
   // Update Elements
-  void updateControlValue(uint16_t id, String value, int clientId = -1);
   void updateControlValue(uint16_t id, String value, int clientId = -1);
   void updateControlValue(Control *control, String value, int clientId = -1);
 

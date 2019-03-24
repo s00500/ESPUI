@@ -407,35 +407,41 @@ uint16_t ESPUIClass::addControl(ControlType type, const char *label, String valu
   return control->id;
 }
 
-int ESPUIClass::label(const char *label, ControlColor color, String value) { return addControl(ControlType::Label, label, value, color); }
+uint16_t ESPUIClass::label(const char *label, ControlColor color, String value) { return addControl(ControlType::Label, label, value, color); }
 
-int ESPUIClass::graph(const char *label, ControlColor color) { return addControl(ControlType::Graph, label, "", color); }
+uint16_t ESPUIClass::graph(const char *label, ControlColor color) { return addControl(ControlType::Graph, label, "", color); }
 
-int ESPUIClass::slider(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
-  return addControl(ControlType::Slider, label, "", color, Control::noParent, callback);
+uint16_t ESPUIClass::slider(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min, int max) {
+  uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback);
+  addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
+  addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
+
+  return sliderId;
 }
 
-int ESPUIClass::button(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
+uint16_t ESPUIClass::button(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
   return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
 }
 
-int ESPUIClass::switcher(const char *label, bool startState, void (*callback)(Control *, int), ControlColor color) {
-  return addControl(ControlType::Switcher, label, "", color, Control::noParent, callback);
+uint16_t ESPUIClass::switcher(const char *label, void (*callback)(Control *, int), ControlColor color, bool startState) {
+  return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
 }
 
-int ESPUIClass::pad(const char *label, bool center, void (*callback)(Control *, int), ControlColor color) {
-  if (center) {
-    return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
-  } else {
-    return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
-  }
+uint16_t ESPUIClass::pad(const char *label, void (*callback)(Control *, int), ControlColor color) {
+  return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
+}
+uint16_t ESPUIClass::padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color) {
+  return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
 }
 
-int ESPUIClass::number(const char *label, void (*callback)(Control *, int), ControlColor color, int number, int min, int max) {
-  return addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
+uint16_t ESPUIClass::number(const char *label, void (*callback)(Control *, int), ControlColor color, int number, int min, int max) {
+  uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
+  addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
+  addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+  return numberId;
 }
 
-int ESPUIClass::text(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
+uint16_t ESPUIClass::text(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
   return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
 }
 
@@ -522,7 +528,7 @@ void ESPUIClass::updateControlValue(uint16_t id, String value, int clientId) {
   Control *control = getControl(id);
 
   if (control) {
-    updateControl(control, value, clientId);
+    updateControlValue(control, value, clientId);
   } else {
     if (this->verbosity) {
       Serial.println(String("Error: There is no control with ID ") + String(id));
