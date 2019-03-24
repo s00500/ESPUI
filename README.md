@@ -20,8 +20,18 @@ mainly to be used with the ESP32 Processor.
 
 # Important notes
 
-Currently ESPUI only supports ArduinoJSON 5.x, please keep that in mind! Version
-6 support is work in progress
+THIS IS THE 2.0.0 development branch
+
+**Roadmap for 2.0.0:**
+
+- ArduinoJSON 6.10.0 Support
+- Tabs by engerlingi ISSUE #45
+- OptionList by engerlingi
+- Better returnvalues
+- Min Max on slider
+- Accelerometer Widget
+- Cleanup Example
+- New Documentation
 
 ## Dependencies
 
