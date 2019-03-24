@@ -44,6 +44,7 @@ THIS IS THE 2.0.0 development branch
   - Slider
   - OptionList
   - Tab usage
+  - Verbosity setting
 
 ## Dependencies
 
