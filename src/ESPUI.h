@@ -163,7 +163,7 @@ enum Verbosity : uint8_t { Quiet = 0, Verbose, VerboseJSON };
 class ESPUIClass {
 public:
   ESPUIClass() { verbosity = Verbosity::Quiet; }
-  ´ void setVerbosity(Verbosity verbosity);
+  void setVerbosity(Verbosity verbosity);
   void begin(const char *_title, const char *username = nullptr, const char *password = nullptr);       // Setup server and page in Memorymode
   void beginSPIFFS(const char *_title, const char *username = nullptr, const char *password = nullptr); // Setup server and page in SPIFFSmode
 
@@ -173,6 +173,7 @@ public:
   uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise,
                       uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
 
+  // create Elements
   int button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");            // Create Event Button
   int switcher(const char *label, bool startState, void (*callback)(Control *, int), ControlColor color);            // Create Toggle Button
   int pad(const char *label, bool centerButton, void (*callback)(Control *, int), ControlColor color);               // Create Pad Control
@@ -189,8 +190,9 @@ public:
   Control *getControl(uint16_t id);
 
   // Update Elements
-  void updateControl(uint16_t id, String value, int clientId = -1);
-  void updateControl(Control *control, String value, int clientId = -1);
+  void updateControlValue(uint16_t id, String value, int clientId = -1);
+  void updateControlValue(uint16_t id, String value, int clientId = -1);
+  void updateControlValue(Control *control, String value, int clientId = -1);
 
   void updateControl(uint16_t id, int clientId = -1);
   void updateControl(Control *control, int clientId = -1);

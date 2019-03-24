@@ -30,7 +30,7 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
   - less updateCotrol functions
   - proper wrappers for all create/update actions
 - OptionList by @eringerli
-- Better returnvalues
+- Better return values
 - Min Max on slider
 - Accelerometer Widget
 - Cleanup Example

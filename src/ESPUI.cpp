@@ -353,23 +353,28 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     } else if (msg.startsWith("pcup:")) {
       c->callback(c, P_CENTER_UP);
     } else if (msg.startsWith("sactive:")) {
-      ESPUI.updateSwitcher(c->id, true);
+      c->value = "1";
+      ESPUI.updateControl(c, client->id());
       c->callback(c, S_ACTIVE);
     } else if (msg.startsWith("sinactive:")) {
-      ESPUI.updateSwitcher(c->id, false);
+      c->value = "0";
+      ESPUI.updateControl(c, client->id());
       c->callback(c, S_INACTIVE);
     } else if (msg.startsWith("slvalue:")) {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
-      ESPUI.updateControl(c);
+      ESPUI.updateControl(c, client->id());
       c->callback(c, SL_VALUE);
     } else if (msg.startsWith("nvalue:")) {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
       c->callback(c, N_VALUE);
     } else if (msg.startsWith("tvalue:")) {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
       c->callback(c, T_VALUE);
     } else if (msg.startsWith("svalue:")) {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
       c->callback(c, S_VALUE);
     } else {
       if (ESPUI.verbosity) {
@@ -463,32 +468,32 @@ void ESPUIClass::updateControl(Control *control, int clientId) {
   root["color"] = (int)control->color;
   serializeJson(document, json);
 
-  if (clientId > 0) {
-    // This is a hacky workaround because ESPAsyncWebServer does not have a
-    // function like this and it's clients array is private
-    int tryId = 0;
+  if (this->verbosity >= Verbosity::VerboseJSON) {
+    Serial.println(json);
+  }
 
-    for (int count = 0; count < this->ws->count();) {
-      if (this->ws->hasClient(tryId)) {
-        if (clientId != tryId) {
-          this->ws->client(tryId)->text(json);
+  if (clientId < 0) {
+    this->ws->textAll(json);
+    return;
+  }
+  // This is a hacky workaround because ESPAsyncWebServer does not have a
+  // function like this and it's clients array is private
+  int tryId = 0;
 
-          if (this->verbosity >= Verbosity::VerboseJSON) {
-            Serial.println(json);
-          }
+  for (int count = 0; count < this->ws->count();) {
+    if (this->ws->hasClient(tryId)) {
+      if (clientId != tryId) {
+        this->ws->client(tryId)->text(json);
+
+        if (this->verbosity >= Verbosity::VerboseJSON) {
+          Serial.println(json);
         }
-
-        count++;
       }
 
-      tryId++;
-    }
-  } else {
-    if (this->verbosity >= Verbosity::VerboseJSON) {
-      Serial.println(json);
+      count++;
     }
 
-    this->ws->textAll(json);
+    tryId++;
   }
 }
 
@@ -504,7 +509,7 @@ void ESPUIClass::updateControl(uint16_t id, int clientId) {
   }
 }
 
-void ESPUIClass::updateControl(Control *control, String value, int clientId) {
+void ESPUIClass::updateControlValue(Control *control, String value, int clientId) {
   if (!control) {
     return;
   }
@@ -513,7 +518,7 @@ void ESPUIClass::updateControl(Control *control, String value, int clientId) {
   updateControl(control, clientId);
 }
 
-void ESPUIClass::updateControl(uint16_t id, String value, int clientId) {
+void ESPUIClass::updateControlValue(uint16_t id, String value, int clientId) {
   Control *control = getControl(id);
 
   if (control) {
@@ -525,19 +530,19 @@ void ESPUIClass::updateControl(uint16_t id, String value, int clientId) {
   }
 }
 
-void ESPUIClass::print(uint16_t id, String value) { updateControl(id, value); }
+void ESPUIClass::print(uint16_t id, String value) { updateControlValue(id, value); }
 
-void ESPUIClass::updateLabel(uint16_t id, String value) { updateControl(id, value); }
+void ESPUIClass::updateLabel(uint16_t id, String value) { updateControlValue(id, value); }
 
-void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId) { updateControl(id, String(nValue), clientId); }
+void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId) { updateControlValue(id, String(nValue), clientId); }
 
-void ESPUIClass::updateSwitcher(uint16_t id, bool nValue, int clientId) { updateControl(id, String(nValue ? "1" : "0"), clientId); }
+void ESPUIClass::updateSwitcher(uint16_t id, bool nValue, int clientId) { updateControlValue(id, String(nValue ? "1" : "0"), clientId); }
 
-void ESPUIClass::updateNumber(uint16_t id, int number, int clientId) { updateControl(id, String(number), clientId); }
+void ESPUIClass::updateNumber(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
 
-void ESPUIClass::updateText(uint16_t id, String text, int clientId) { updateControl(id, text, clientId); }
+void ESPUIClass::updateText(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
 
-void ESPUIClass::updateSelect(uint16_t id, String text, int clientId) { updateControl(id, text, clientId); }
+void ESPUIClass::updateSelect(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
 
 /*
 Convert & Transfer Arduino elements to JSON elements
