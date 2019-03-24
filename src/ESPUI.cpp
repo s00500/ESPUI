@@ -838,3 +838,7 @@ void ESPUIClass::begin(const char* _title, const char* username,
     Serial.println("UI Initialized");
   }
 }
+
+void ESPUIClass::setVerbosity(Verbosity v) { this->verbosity = v; }
+
+ESPUIClass ESPUI;

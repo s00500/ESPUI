@@ -24,14 +24,26 @@ THIS IS THE 2.0.0 development branch
 
 **Roadmap for 2.0.0:**
 
-- ArduinoJSON 6.10.0 Support
+- ArduinoJSON 6.10.0 Support ✅
 - Tabs by engerlingi ISSUE #45
+  - remove black line without tabs
+- API changes by engerlingi
+  - less updateCotrol functions
+  - proper wrappers for all create/update actions
 - OptionList by engerlingi
 - Better returnvalues
 - Min Max on slider
 - Accelerometer Widget
 - Cleanup Example
 - New Documentation
+  - Numberfield
+  - Textfield
+  - Data directory
+  - Graph Usage
+  - Accelerometer
+  - Slider
+  - OptionList
+  - Tab usage
 
 ## Dependencies
 
