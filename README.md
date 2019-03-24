@@ -25,8 +25,8 @@ THIS IS THE 2.0.0 development branch
 **Roadmap for 2.0.0:**
 
 - ArduinoJSON 6.10.0 Support ✅
-- Tabs by @eringerli ISSUE #45
-  - remove black line without tabs
+- Tabs by @eringerli ISSUE #45 ✅
+  - remove black line without tabs ✅
 - API changes by @eringerli
   - less updateCotrol functions
   - proper wrappers for all create/update actions
