@@ -1,6 +1,7 @@
 # ESPUI
 
-![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
+![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png) //
+TODO: Update Logo
 
 ESPUI is a simple library to make a web user interface for your projects using
 the **ESP8266** or the **ESP32** It uses web sockets and lets you create,
@@ -14,13 +15,11 @@ So if you either don't know how or just don't want to waste time: this is your
 simple solution user interface without the need of internet connectivity or any
 additional servers.
 
-I completely rewrote the EasyUI Library created by ayushsharma82
-[Here](https://github.com/ayushsharma82/) Now it uses ESPAsyncWebserver and is
-mainly to be used with the ESP32 Processor.
+The Library runs fine on any kind of ESP8266 and ESP32 (NodeMCU Boards, usw)
 
 # Important notes
 
-THIS IS THE 2.0.0 development branch
+THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
 
 **Roadmap for 2.0.0:**
 
@@ -35,10 +34,10 @@ THIS IS THE 2.0.0 development branch
 - Min Max on slider
 - Accelerometer Widget
 - Cleanup Example
-- New Documentation
-  - Numberfield
-  - Textfield
-  - Data directory
+- Cleanup and extend Documentation
+  - Number field ✅
+  - Text field ✅
+  - Data directory ✅
   - Graph Usage
   - Accelerometer
   - Slider
@@ -51,10 +50,8 @@ THIS IS THE 2.0.0 development branch
 This library is dependent on the following libraries to function properly.
 
 - [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
-- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) **(VERSIONS 5.x only
-  currently)**
-
-**Plus for ESP8266**
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Last tested with
+  version 6.10.0) **Plus for ESP8266**
 
 - [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
 
@@ -92,16 +89,16 @@ Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
 
 ## Getting started
 
-ESPUI serves several files to the browser to build up its webinterface. This can
-be achieved in 2 ways: _PROGMEM_ or _SPIFFS_
+ESPUI serves several files to the browser to build up its web interface. This
+can be achieved in 2 ways: _PROGMEM_ or _SPIFFS_
 
 _When `ESPUI.begin()` is called the default is serving files from Memory and
 ESPUI should work out of the box!_
 
-But if this causes your program to _use too much memory_ you can burn the files
-into the SPIFFS filesystem on the ESP. There are now two ways to do this: you
-can either use the ESP file upload tool or you use the library function
-`ESPUI.prepareFileSystem()`
+**OPTIONAL:** But if this causes your program to _use too much memory_ you can
+burn the files into the SPIFFS filesystem on the ESP. There are now two ways to
+do this: you can either use the ESP file upload tool or you use the library
+function `ESPUI.prepareFileSystem()`
 
 #### Simple filesystem preparation (_recommended_)
 
@@ -111,19 +108,8 @@ will create all needed files. Congratulations, you are done, from now on you
 just need to to this again when there is a library update, or when you want to
 use another chip :-) Now you can upload your normal sketch, when you do not call
 the `ESPUI.prepareFileSystem()` function the compiler will strip out all the
-unnecessary that is already saved in the chip's filesystem and you have more
-programm memory to work with.
-
-#### Manual way (mainly for development)
-
-To do this download and install me-no-devs wonderful
-[ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin)
-or for ESP8266
-[ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin)
-
-Then open the **gui** example sketch and select "Upload Sketch Data" from the
-Tools menu for your processor. Now you are set to go and use any code you want
-to with this library
+unnecessary strings that are already saved in the chip's filesystem and you have
+more program memory to work with.
 
 ## User interface Elements
 
@@ -235,6 +221,28 @@ realtime data, are touch compatible and can be used to for example control a
 Servo. The current value is shown while the slider is dragged in a little bubble
 over the handle.
 
+#### Number Input
+
+TODO: Add image
+
+The numberinput can be used to directly input numbers to your program. You can
+enter a Value into it and when you are done with your change it is sent to the
+ESP.
+
+#### Text Input
+
+TODO: Add image
+
+The textinput works very similar like the number input but with a string. You
+can enter a String into it and when you are done with your change it is sent to
+the ESP.
+
+#### Using Tabs
+
+TODO: Add image
+
+// TODO: add Text for tabs
+
 #### Initialisation of the UI
 
 After all the elements are configured you can use `ESPUI.begin(“Some Title”);`
@@ -244,11 +252,24 @@ example). The web interface can then be used from multiple devices at once and
 also shows an connection status in the top bar. The library is designed to be
 easy to use and can still be extended with a lot of more functionality.
 
+#### Log output
+
+ESPUI has several different log levels. You can set them using the
+`ESPUI.setVerbosity(Verbosity::VerboseJSON)` function.
+
+Loglevels are:
+
+- Verbosity::Quiet (default)
+- Verbosity::Verbose
+- Verbosity::VerboseJSON
+
+// TODO: Add some more notes here
+
 # Notes for Development
 
-If you want to work on the HTML/CSS/JS files, do make changes in the
-`examples/gui/data` directory. When you need to transfer that code to the ESP,
-run `tools/prepare_static_ui_sources.py -a` (this script needs python3 with the
+If you want to work on the HTML/CSS/JS files, do make changes in the `data`
+directory. When you need to transfer that code to the ESP, run
+`tools/prepare_static_ui_sources.py -a` (this script needs python3 with the
 modules htmlmin, jsmin and csscompressor). This will generate a) minified files
 next to the original files to be uploaded with the ESP32 sketch data uploader
 mentioned above and b) the C header files in `src` that contain the minified and
@@ -271,3 +292,5 @@ commits.
 
 Liked this Library? You can **support** me by sending me a :coffee:
 [Coffee](https://paypal.me/lukasbachschwell/3).
+
+Otherwise I really welcome **Pull Requests**.
