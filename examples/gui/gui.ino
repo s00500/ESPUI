@@ -16,7 +16,10 @@ const char *password = "espui";
 const char *hostname = "EspuiTest";
 
 long oldTime = 0;
+
 bool testSwitchState = false;
+int statusLabelId;
+int graphId;
 int millisLabelId;
 int testSwitchId;
 
@@ -34,6 +37,21 @@ void slider(Control *sender, int type) {
   Serial.print(sender->id);
   Serial.print(", Value: ");
   Serial.println(sender->value);
+  // Like all Control Values in ESPUI slider values are Strings. To use them as int simply do this:
+  int sliderValueWithOffset = sender->value.toInt() + 100;
+  Serial.print("SliderValue with offset");
+  Serial.println(sliderValueWithOffset);
+}
+
+void accelCall(Control *sender, int type) {
+  Serial.print("Accel: ID: ");
+  Serial.print(sender->id);
+  Serial.print(", Value: ");
+  Serial.println(sender->value);
+  // Like all Control Values in ESPUI accel values are Strings. To use them as int simply do this:
+  int sliderValueWithOffset = sender->value.toInt() + 100;
+  Serial.print("Accel with offset");
+  Serial.println(sliderValueWithOffset);
 }
 
 void buttonCallback(Control *sender, int type) {
@@ -52,12 +70,12 @@ void buttonExample(Control *sender, int type) {
   switch (type) {
   case B_DOWN:
     Serial.println("Status: Start");
-    // ESPUI.updateControl( "Status:", "Start" );
+    ESPUI.print(statusLabelId, "Start");
     break;
 
   case B_UP:
     Serial.println("Status: Stop");
-    // ESPUI.updateControl( "Status:", "Stop" );
+    ESPUI.print(statusLabelId, "Stop");
     break;
   }
 }
@@ -188,7 +206,7 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
-  ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
+  statusLabelId = ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
   millisLabelId = ESPUI.label("Millis:", COLOR_EMERALD, "0");
   ESPUI.button("Push Button", &buttonCallback, COLOR_PETERRIVER, "Press");
   ESPUI.button("Other Button", &buttonExample, COLOR_WETASPHALT, "Press");
@@ -200,6 +218,11 @@ void setup(void) {
   ESPUI.slider("Slider two", &slider, COLOR_NONE, 100);
   ESPUI.text("Text Test:", &textCall, COLOR_ALIZARIN, "a Text Field");
   ESPUI.number("Numbertest", &numberCall, COLOR_ALIZARIN, 5, 0, 10);
+
+  graphId = ESPUI.graph("Graph Test", COLOR_WETASPHALT);
+  ESPUI.gauge("Gauge Test", COLOR_WETASPHALT, 58, 0, 100); // Gauge has
+
+  ESPUI.accelerometer("Accel Test", &accelCall, COLOR_WETASPHALT);
 
   /*
    * .begin loads and serves all files from PROGMEM directly.
@@ -222,8 +245,12 @@ void loop(void) {
 
   if (millis() - oldTime > 5000) {
     ESPUI.print(millisLabelId, String(millis()));
+
+    ESPUI.addGraphPoint(graphId, random(1, 50));
+
     testSwitchState = !testSwitchState;
     ESPUI.updateSwitcher(testSwitchId, testSwitchState);
+
     oldTime = millis();
   }
 }

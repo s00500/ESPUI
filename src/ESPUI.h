@@ -54,6 +54,8 @@ enum ControlType : uint8_t {
   Min,
   Max,
   Step,
+  Gauge,
+  Accel,
 
   UpdateOffset = 100,
   UpdatePad = 101,
@@ -71,6 +73,8 @@ enum ControlType : uint8_t {
   UpdateMin,
   UpdateMax,
   UpdateStep,
+  UpdateGauge,
+  UpdateAccel,
 
   InitialGui = 200
 };
@@ -188,6 +192,11 @@ public:
   // Output only
   uint16_t label(const char *label, ControlColor color, String value = ""); // Create Label
   uint16_t graph(const char *label, ControlColor color);                    // Create Graph display
+  uint16_t gauge(const char *label, ControlColor color, int value, int min = 0,
+                 int max = 100); // Create Gauge display
+
+  // Input only
+  uint16_t accelerometer(const char *label, void (*callback)(Control *, int), ControlColor color);
 
   // Update Elements
 
@@ -207,6 +216,8 @@ public:
   void updateNumber(uint16_t id, int nValue, int clientId = -1);
   void updateText(uint16_t id, String nValue, int clientId = -1);
   void updateSelect(uint16_t id, String nValue, int clientId = -1);
+  void updateGauge(uint16_t id, int number, int clientId);
+
   void clearGraph(uint16_t id, int clientId = -1);
   void addGraphPoint(uint16_t id, int nValue, int clientId = -1);
 

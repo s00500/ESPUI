@@ -26,14 +26,16 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
 - ArduinoJSON 6.10.0 Support ✅
 - Tabs by @eringerli ISSUE #45 ✅
   - remove black line without tabs ✅
-- API changes by @eringerli
+- API changes by @eringerli ✅
   - less updateControl functions ✅
-  - proper wrappers for all create/update actions
+  - proper wrappers for all create/update actions ✅
 - OptionList by @eringerli
-- Better return values
-- Min Max on slider
+- Min Max on slider by @eringerli ✅
+- Public Access to ESPAsyncServer
 - Accelerometer Widget
-- Cleanup Example
+- Graph Widget
+-
+- Cleanup Example, DNS and autojoin
 - Cleanup and extend Documentation
   - Number field ✅
   - Text field ✅
@@ -44,6 +46,12 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
   - OptionList
   - Tab usage
   - Verbosity setting
+
+## OLD Roadmap :
+
+- Datagraph output -> _WIP_
+- Number min and max value
+- proper return value (as int and not as string) for slider
 
 ## Changelog for functions:
 
@@ -143,21 +151,6 @@ Checkout the example for the usage
 - COLOR_ALIZARIN
 - COLOR_NONE
 
-## Roadmap :
-
-- ~~Setup SPIFFS using values in program memory~~
-- ~~ESP8266 support~~
-- ~~PlattformIO Integration~~
-- ~~Multiline Labels~~
-- ~~GZip Files and serve from memory~~
-- Datagraph output -> _WIP_
-- ~~Number input ~~
-- ~~Text input ~~
-- Dokumentation for Text and number widget
-- Number min and max value
-- proper return value (as int and not as string) for slider
-- Maybe a slider range setting, meanwhile please use _map()_
-
 ## Documentation
 
 The heart of ESPUI is
@@ -227,7 +220,8 @@ the normal `<br>` tag in the string you print to the label
 The Slider can be used to slide through a value from 1 to 100. Slides provide
 realtime data, are touch compatible and can be used to for example control a
 Servo. The current value is shown while the slider is dragged in a little bubble
-over the handle.
+over the handle. In the Callback the slider does not return an int but a String.
+Use the .toInt
 
 #### Number Input
 

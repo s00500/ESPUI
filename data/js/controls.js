@@ -46,6 +46,11 @@ const UPDATE_MAX = 115;
 const UI_STEP = 16;
 const UPDATE_STEP = 116;
 
+const UI_GAUGE = 17;
+const UPTDATE_GAUGE = 117;
+const UI_ACCEL = 18;
+const UPTDATE_ACCEL = 117;
+
 const UP = 0;
 const DOWN = 1;
 const LEFT = 2;
@@ -157,42 +162,64 @@ function start() {
           handleEvent(fauxEvent);
         });
         break;
-        
+
       case UI_TITEL:
         document.title = data.label;
         $("#mainHeader").html(data.label);
         break;
-        
+
       case UI_LABEL:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" +
-            "<h5>" + data.label + "</h5><hr/>" +
-            "<span id='l" + data.id + "' class='label label-wrap'>" + data.value + "</span>" +
-          "</div>"
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<span id='l" +
+            data.id +
+            "' class='label label-wrap'>" +
+            data.value +
+            "</span>" +
+            "</div>"
         );
         break;
-        
+
       case UI_BUTTON:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
-          "<h5>" + data.label + "</h5><hr/>" +
-          "<button id='btn" + data.id + "' " +
-            "onmousedown='buttonclick(" + data.id + ", true)' "+
-            "onmouseup='buttonclick(" + data.id + ", false)'>" +
+          "<div id='id" +
+            data.id +
+            "' class='one columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<button id='btn" +
+            data.id +
+            "' " +
+            "onmousedown='buttonclick(" +
+            data.id +
+            ", true)' " +
+            "onmouseup='buttonclick(" +
+            data.id +
+            ", false)'>" +
             data.value +
-          "</button></div>"
+            "</button></div>"
         );
         $("#btn" + data.id).on({
           touchstart: function(e) {
@@ -205,44 +232,98 @@ function start() {
           }
         });
         break;
-        
+
       case UI_SWITCHER:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='one columns card tcenter " + colorClass(data.color) + "'>" + 
-            "<h5>" + data.label + "</h5><hr/>" +
-            "<label id='sl" + data.id + "' class='switch " + ((data.value == "1")?"checked":"") + "'>"  +
-              "<div class='in'><input type='checkbox' id='s" + data.id + "' onClick='switcher(" + data.id + ",null)' " + ((data.value == "1")?"checked":"") + "/></div>" +
+          "<div id='id" +
+            data.id +
+            "' class='one columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<label id='sl" +
+            data.id +
+            "' class='switch " +
+            (data.value == "1" ? "checked" : "") +
+            "'>" +
+            "<div class='in'><input type='checkbox' id='s" +
+            data.id +
+            "' onClick='switcher(" +
+            data.id +
+            ",null)' " +
+            (data.value == "1" ? "checked" : "") +
+            "/></div>" +
             "</label>" +
-          "</div>"
+            "</div>"
         );
         switcher(data.id, data.value);
         break;
-        
+
       case UI_CPAD:
       case UI_PAD:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
-          "<h5>" + data.label + "</h5><hr/>" +
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
             "<nav class='control'>" +
             "<ul>" +
-              "<li><a onmousedown='padclick(UP, "    + data.id + ", true)' onmouseup='padclick(UP, "    + data.id + ", false)' id='pf" + data.id + "'>▲</a></li>" +
-              "<li><a onmousedown='padclick(RIGHT, " + data.id + ", true)' onmouseup='padclick(RIGHT, " + data.id + ", false)' id='pr" + data.id + "'>▲</a></li>" +
-              "<li><a onmousedown='padclick(LEFT, "  + data.id + ", true)' onmouseup='padclick(LEFT, "  + data.id + ", false)' id='pl" + data.id + "'>▲</a></li>" +
-              "<li><a onmousedown='padclick(DOWN, "  + data.id + ", true)' onmouseup='padclick(DOWN, "  + data.id + ", false)' id='pb" + data.id + "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(UP, " +
+            data.id +
+            ", true)' onmouseup='padclick(UP, " +
+            data.id +
+            ", false)' id='pf" +
+            data.id +
+            "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(RIGHT, " +
+            data.id +
+            ", true)' onmouseup='padclick(RIGHT, " +
+            data.id +
+            ", false)' id='pr" +
+            data.id +
+            "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(LEFT, " +
+            data.id +
+            ", true)' onmouseup='padclick(LEFT, " +
+            data.id +
+            ", false)' id='pl" +
+            data.id +
+            "'>▲</a></li>" +
+            "<li><a onmousedown='padclick(DOWN, " +
+            data.id +
+            ", true)' onmouseup='padclick(DOWN, " +
+            data.id +
+            ", false)' id='pb" +
+            data.id +
+            "'>▲</a></li>" +
             "</ul>" +
-            ((data.type==UI_CPAD)?"<a class='confirm' onmousedown='padclick(CENTER," + data.id + ", true)' onmouseup='padclick(CENTER, " + data.id + ", false)' id='pc" + data.id + "'>OK</a>":"") +
+            (data.type == UI_CPAD
+              ? "<a class='confirm' onmousedown='padclick(CENTER," +
+                data.id +
+                ", true)' onmouseup='padclick(CENTER, " +
+                data.id +
+                ", false)' id='pc" +
+                data.id +
+                "'>OK</a>"
+              : "") +
             "</nav>" +
             "</div>"
         );
@@ -299,138 +380,274 @@ function start() {
         });
 
         break;
-        
-        //https://codepen.io/seanstopnik/pen/CeLqA
+
+      //https://codepen.io/seanstopnik/pen/CeLqA
       case UI_SLIDER:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
-        }      
+          parent = $("#row");
+        }
         parent.append(
-          "<div id='id" + data.id + "' class='two columns card tcenter card-slider " + colorClass(data.color) + "'>" + 
-            "<h5>" + data.label + "</h5><hr/>" +
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter card-slider " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
             "<div class='range-slider'>" +
-              "<input id='sl" + data.id + "' type='range' min='0' max='100' value='" + data.value + "' class='range-slider__range'>" +
-              "<span class='range-slider__value'>" + data.value + "</span>" +
+            "<input id='sl" +
+            data.id +
+            "' type='range' min='0' max='100' value='" +
+            data.value +
+            "' class='range-slider__range'>" +
+            "<span class='range-slider__value'>" +
+            data.value +
+            "</span>" +
             "</div>" +
-          "</div>"
+            "</div>"
         );
         rangeSlider();
         break;
 
       case UI_NUMBER:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
-            "<h5>" + data.label + "</h5><hr/>" +
-            "<input style='color:black;' id='num" + data.id + "' type='number' value='" + data.value + "' onchange='numberchange(" + data.id + ")' />" +
-          "</div>"
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<input style='color:black;' id='num" +
+            data.id +
+            "' type='number' value='" +
+            data.value +
+            "' onchange='numberchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
         );
         break;
 
       case UI_TEXT_INPUT:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
-            "<h5>" + data.label + "</h5><hr/>" +
-            "<input style='color:black;' id='text" + data.id + "' value='" + data.value + "' onchange='textchange(" + data.id + ")' />" +
-          "</div>"
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<input style='color:black;' id='text" +
+            data.id +
+            "' value='" +
+            data.value +
+            "' onchange='textchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
         );
         break;
-        
+
       case UI_TAB:
         $("#tabsnav").append(
           "<li><a href='#tab" + data.id + "'>" + data.value + "</a></li>"
         );
-        $("#tabscontent").append(
-          "<div id='tab" + data.id + "'></div>"
-        );
-        
-        tabs = $('.tabscontent').tabbedContent({loop: true}).data('api');
-            // switch to tab...
-            $('a').filter(function() {
-                return $(this).attr('href') === '#click-to-switch';
-            }).on('click', function(e) {
-                var tab = prompt('Tab to switch to (number or id)?');
-                if (!tabs.switchTab(tab)) {
-                    alert('That tab does not exist :\\');
-                }
-                e.preventDefault();
-            });
+        $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
+
+        tabs = $(".tabscontent")
+          .tabbedContent({ loop: true })
+          .data("api");
+        // switch to tab...
+        $("a")
+          .filter(function() {
+            return $(this).attr("href") === "#click-to-switch";
+          })
+          .on("click", function(e) {
+            var tab = prompt("Tab to switch to (number or id)?");
+            if (!tabs.switchTab(tab)) {
+              alert("That tab does not exist :\\");
+            }
+            e.preventDefault();
+          });
         break;
-        
+
       case UI_SELECT:
         var parent;
-        if(data.parentControl) {
-          parent = $("#tab"+data.parentControl);
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
         } else {
-          parent = $("#row")
+          parent = $("#row");
         }
         parent.append(
-          "<div id='id" + data.id + "' class='two columns card tcenter " + colorClass(data.color) + "'>" + 
-            "<h5>" + data.label + "</h5><hr/>" +
-            "<select style='color:black;' id='select" + data.id + "' onchange='selectchange(" + data.id + ")' />" +
-          "</div>"
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "<select style='color:black;' id='select" +
+            data.id +
+            "' onchange='selectchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
         );
         break;
-        
+
       case UI_OPTION:
-        if(data.parentControl) {
-          var parent = $("#select"+data.parentControl);
+        if (data.parentControl) {
+          var parent = $("#select" + data.parentControl);
           parent.append(
-            "<option id='option" + data.id + "' value='" + data.value + "' " + data.selected + ">" + data.label + "</option>"
+            "<option id='option" +
+              data.id +
+              "' value='" +
+              data.value +
+              "' " +
+              data.selected +
+              ">" +
+              data.label +
+              "</option>"
           );
         }
         break;
-        
+
       case UI_MIN:
-        if(data.parentControl) {
-          var parent = $("#id"+data.parentControl+" input");
-          if(parent.size()){
+        if (data.parentControl) {
+          var parent = $("#id" + data.parentControl + " input");
+          if (parent.size()) {
             console.log("MIN" + data.value);
             parent.attr("min", data.value);
           }
         }
         break;
-        
+
       case UI_MAX:
-        if(data.parentControl) {
-          var parent = $("#id"+data.parentControl+" input");
-          if(parent.size()){
+        if (data.parentControl) {
+          var parent = $("#id" + data.parentControl + " input");
+          if (parent.size()) {
             console.log("MAX" + data.value);
             parent.attr("max", data.value);
           }
         }
         break;
-        
+
       case UI_STEP:
-        if(data.parentControl) {
-          var parent = $("#id"+data.parentControl+" input");
-          if(parent.size()){
+        if (data.parentControl) {
+          var parent = $("#id" + data.parentControl + " input");
+          if (parent.size()) {
             console.log("STEP" + data.value);
             parent.attr("step", data.value);
           }
         }
         break;
-        
+      case UI_GRAPH:
+        var parent;
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
+        } else {
+          parent = $("#row");
+        }
+        parent.append(
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "WILL BE A GRAPH <input style='color:black;' id='graph" +
+            data.id +
+            "' type='number' value='" +
+            data.value +
+            "' onchange='numberchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
+        );
+        break;
+
+      case UI_GAUGE:
+        var parent;
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
+        } else {
+          parent = $("#row");
+        }
+        parent.append(
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "WILL BE A GAUGE <input style='color:black;' id='gauge" +
+            data.id +
+            "' type='number' value='" +
+            data.value +
+            "' onchange='numberchange(" +
+            data.id +
+            ")' />" +
+            "</div>"
+        );
+        break;
+
+      case UI_ACCEL:
+        var parent;
+        if (data.parentControl) {
+          parent = $("#tab" + data.parentControl);
+        } else {
+          parent = $("#row");
+        }
+        parent.append(
+          "<div id='id" +
+            data.id +
+            "' class='two columns card tcenter " +
+            colorClass(data.color) +
+            "'>" +
+            "<h5>" +
+            data.label +
+            "</h5><hr/>" +
+            "WILL BE A ACCEL<div class='accelerometer' id='accel" +
+            data.id +
+            "' ><div class='ball" +
+            data.id +
+            "'></div><pre class='accelerometeroutput" +
+            data.id +
+            "'></pre>" +
+            "</div>"
+        );
+        break;
+
       case UPDATE_LABEL:
         $("#l" + data.id).html(data.value);
         break;
-        
+
       case UPDATE_SWITCHER:
-        switcher(data.id, (data.value == "0")?0:1);
+        switcher(data.id, data.value == "0" ? 0 : 1);
         break;
 
       case UPDATE_SLIDER:
@@ -444,33 +661,41 @@ function start() {
       case UPDATE_TEXT_INPUT:
         $("#text" + data.id).val(data.value);
         break;
-        
+
       case UPDATE_SELECT:
         $("#select" + data.id).val(data.value);
         break;
-        
+
       case UPDATE_BUTTON:
       case UPDATE_PAD:
       case UPDATE_CPAD:
+        break;
+      case UPDATE_GAUGE:
+        $("#gauge" + data.id).val(data.value);
+        break;
+      case UPDATE_ACCEL:
         break;
 
       default:
         console.error("Unknown type or event");
         break;
     }
-    
-    if(data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
-      var element = $('#id' + data.id);
-//       if(data.type == UPDATE_SLIDER) {
-//         element.removeClass("slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin");
-//         element.addClass("slider-" + colorClass(data.color));
-//       } else {
-        element.removeClass("turquoise emerald peterriver wetasphalt sunflower carrot alizarin");
-        element.addClass(colorClass(data.color));
-//       }
+
+    if (data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
+      var element = $("#id" + data.id);
+      // FIXME: Test sliderupdate
+      //       if(data.type == UPDATE_SLIDER) {
+      //         element.removeClass("slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin");
+      //         element.addClass("slider-" + colorClass(data.color));
+      //       } else {
+      element.removeClass(
+        "turquoise emerald peterriver wetasphalt sunflower carrot alizarin"
+      );
+      element.addClass(colorClass(data.color));
+      //       }
     }
   };
-  
+
   websock.onmessage = handleEvent;
 }
 
@@ -543,24 +768,31 @@ function switcher(number, state) {
   }
 }
 
-var rangeSlider = function(){
-  var slider = $('.range-slider'),
-      range = $('.range-slider__range'),
-      value = $('.range-slider__value');
-    
-  slider.each(function(){
+var rangeSlider = function() {
+  var slider = $(".range-slider"),
+    range = $(".range-slider__range"),
+    value = $(".range-slider__value");
 
-    value.each(function(){
-      var value = $(this).prev().attr('value');
+  slider.each(function() {
+    value.each(function() {
+      var value = $(this)
+        .prev()
+        .attr("value");
       $(this).html(value);
     });
 
     range.on({
-      'input': function(){
-        $(this).next().html(this.value);
+      input: function() {
+        $(this)
+          .next()
+          .html(this.value);
       },
-      'change': function(){
-        sliderchange($(this).attr('id').replace( /^\D+/g, ''));
+      change: function() {
+        sliderchange(
+          $(this)
+            .attr("id")
+            .replace(/^\D+/g, "")
+        );
       }
     });
   });

@@ -244,7 +244,7 @@ void loop(void) {
   static bool testSwitchState = false;
 
   if (millis() - oldTime > 5000) {
-    ESPUI.updateControl("Millis:", String(millis()));
+    ESPUI.updateControlValue(millisLabelId, String(millis()));
     testSwitchState = !testSwitchState;
     ESPUI.updateControlValue("Switch one", testSwitchState ? "1" : "0");
     oldTime = millis();

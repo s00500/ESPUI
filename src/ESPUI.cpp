@@ -441,6 +441,17 @@ uint16_t ESPUIClass::number(const char *label, void (*callback)(Control *, int),
   return numberId;
 }
 
+uint16_t ESPUIClass::gauge(const char *label, ControlColor color, int number, int min, int max) {
+  uint16_t numberId = addControl(ControlType::Gauge, label, String(number), color, Control::noParent);
+  addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
+  addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+  return numberId;
+}
+
+uint16_t ESPUIClass::accelerometer(const char *label, void (*callback)(Control *, int), ControlColor color) {
+  return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
+}
+
 uint16_t ESPUIClass::text(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
   return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
 }
@@ -506,13 +517,14 @@ void ESPUIClass::updateControl(Control *control, int clientId) {
 void ESPUIClass::updateControl(uint16_t id, int clientId) {
   Control *control = getControl(id);
 
-  if (control) {
-    updateControl(control, clientId);
-  } else {
+  if (!control) {
     if (this->verbosity) {
       Serial.println(String("Error: There is no control with ID ") + String(id));
     }
+    return;
   }
+
+  updateControl(control, clientId);
 }
 
 void ESPUIClass::updateControlValue(Control *control, String value, int clientId) {
@@ -527,13 +539,14 @@ void ESPUIClass::updateControlValue(Control *control, String value, int clientId
 void ESPUIClass::updateControlValue(uint16_t id, String value, int clientId) {
   Control *control = getControl(id);
 
-  if (control) {
-    updateControlValue(control, value, clientId);
-  } else {
+  if (!control) {
     if (this->verbosity) {
       Serial.println(String("Error: There is no control with ID ") + String(id));
     }
+    return;
   }
+
+  updateControlValue(control, value, clientId);
 }
 
 void ESPUIClass::print(uint16_t id, String value) { updateControlValue(id, value); }
@@ -550,6 +563,10 @@ void ESPUIClass::updateText(uint16_t id, String text, int clientId) { updateCont
 
 void ESPUIClass::updateSelect(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
 
+void ESPUIClass::updateGauge(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
+
+void ESPUIClass::clearGraph(uint16_t id, int clientId) {}
+void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId) {}
 /*
 Convert & Transfer Arduino elements to JSON elements
 Initially this function used to send the control element data individually.
