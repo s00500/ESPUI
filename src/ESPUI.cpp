@@ -468,7 +468,6 @@ Control* ESPUIClass::getControl( uint16_t id ) {
 
 void ESPUIClass::updateControl( Control* control, int clientId ) {
   if ( control ) {
-    String json;
     DynamicJsonBuffer jsonBuffer( 2000 );
     JsonObject& root = jsonBuffer.createObject();
 
@@ -476,34 +475,40 @@ void ESPUIClass::updateControl( Control* control, int clientId ) {
     root["value"] = control->value;
     root["id"] = control->id;
     root["color"] = ( int )control->color;
-    root.printTo( json );
+    size_t len = root.measureLength();
 
-    if ( clientId > 0 ) {
-      // This is a hacky workaround because ESPAsyncWebServer does not have a function
-      // like this and it's clients array is private
-      int tryId = 0;
+    AsyncWebSocketMessageBuffer* buffer = this->ws->makeBuffer( len ); //  creates a buffer (len + 1) for you.
 
-      for ( int count = 0; count < this->ws->count(); ) {
-        if ( this->ws->hasClient( tryId ) ) {
-          if ( clientId != tryId ) {
-            this->ws->client( tryId )->text( json );
+    if ( buffer ) {
+      root.printTo( ( char* )buffer->get(), len + 1 );
 
-            if ( this->verbosity >= Verbosity::VerboseJSON ) {
-              Serial.println( json );
+      if ( clientId > 0 ) {
+        // This is a hacky workaround because ESPAsyncWebServer does not have a function
+        // like this and it's clients array is private
+        int tryId = 0;
+
+        for ( int count = 0; count < this->ws->count(); ) {
+          if ( this->ws->hasClient( tryId ) ) {
+            if ( clientId != tryId ) {
+              this->ws->client( tryId )->text( buffer );
+
+//               if ( this->verbosity >= Verbosity::VerboseJSON ) {
+//                 Serial.println( json );
+//               }
             }
+
+            count++;
           }
 
-          count++;
+          tryId++;
         }
+      } else {
+//         if ( this->verbosity >= Verbosity::VerboseJSON ) {
+//           Serial.println( json );
+//         }
 
-        tryId++;
+        this->ws->textAll( buffer );
       }
-    } else {
-      if ( this->verbosity >= Verbosity::VerboseJSON ) {
-        Serial.println( json );
-      }
-
-      this->ws->textAll( json );
     }
   }
 }
@@ -574,8 +579,8 @@ Due to a change in the ESPAsyncWebserver library this had top be changed to be
 sent as one blob at the beginning. Therefore a new type is used as well
 */
 void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
-  String json;
-  DynamicJsonBuffer jsonBuffer( 8000 );
+//   String json;
+  DynamicJsonBuffer jsonBuffer( 4000 );
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = ( int )UI_INITIAL_GUI;
   JsonArray& items = jsonBuffer.createArray();
@@ -618,13 +623,23 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
 
   // Send as one big bunch
   root["controls"] = items;
-  root.printTo( json );
 
-  if ( this->verbosity >= Verbosity::VerboseJSON ) {
-    Serial.println( json );
+  size_t len = root.measureLength();
+
+  AsyncWebSocketMessageBuffer* buffer = this->ws->makeBuffer( len ); //  creates a buffer (len + 1) for you.
+
+  if ( buffer ) {
+    root.printTo( ( char* )buffer->get(), len + 1 );
+    client->text( buffer );
   }
 
-  client->text( json );
+//   root.printTo( json );
+//
+//   if ( this->verbosity >= Verbosity::VerboseJSON ) {
+//     Serial.println( json );
+//   }
+//
+//   client->text( json );
 }
 
 void ESPUIClass::beginSPIFFS( const char* _title, const char* username, const char* password ) {
