@@ -295,6 +295,7 @@ void onWsEvent( AsyncWebSocket* server, AsyncWebSocketClient* client,
 
     case WS_EVT_DATA: {
       String msg = "";
+      msg.reserve( len + 1 );
 
       for ( size_t i = 0; i < len; i++ ) {
         msg += ( char )data[i];
@@ -466,9 +467,46 @@ Control* ESPUIClass::getControl( uint16_t id ) {
   return nullptr;
 }
 
+void ESPUIClass::addGraphPoint( Control* control, int line, int nValue, int clientId ) {
+  if ( control ) {
+    Serial.println( "addGraphPoint" );
+    DynamicJsonBuffer jsonBuffer( 256 );
+    JsonObject& root = jsonBuffer.createObject();
+
+    root["type"] = ( int )ControlType::GraphPoint;
+    root["value"] = nValue;
+    root["id"] = control->id;
+    root["line"] = line;
+    size_t len = root.measureLength();
+
+    AsyncWebSocketMessageBuffer* buffer = this->ws->makeBuffer( len ); //  creates a buffer (len + 1) for you.
+
+    if ( buffer ) {
+      root.printTo( ( char* )buffer->get(), len + 1 );
+
+      this->ws->textAll( buffer );
+    }
+  }
+}
+
+void ESPUIClass::addGraphPoint( uint16_t id, int line, int nValue, int clientId ) {
+  Control* control = getControl( id );
+
+  if ( control ) {
+    addGraphPoint( control, line, nValue, clientId );
+  } else {
+    if ( this->verbosity ) {
+      Serial.print( "Error: There is no control with ID " );
+      Serial.println( String( id ) );
+    }
+  }
+}
+
 void ESPUIClass::updateControl( Control* control, int clientId ) {
   if ( control ) {
-    DynamicJsonBuffer jsonBuffer( 2000 );
+    constexpr size_t sizeOfBuffer = 200;
+
+    StaticJsonBuffer<sizeOfBuffer> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
 
     root["type"] = ( int )control->type + ControlType::UpdateOffset;
@@ -477,38 +515,43 @@ void ESPUIClass::updateControl( Control* control, int clientId ) {
     root["color"] = ( int )control->color;
     size_t len = root.measureLength();
 
-    AsyncWebSocketMessageBuffer* buffer = this->ws->makeBuffer( len ); //  creates a buffer (len + 1) for you.
+    char buffer[sizeOfBuffer];
 
-    if ( buffer ) {
-      root.printTo( ( char* )buffer->get(), len + 1 );
+    if ( len >= sizeof( buffer ) ) {
+      len = sizeof( buffer ) - 1;
+    }
 
-      if ( clientId > 0 ) {
-        // This is a hacky workaround because ESPAsyncWebServer does not have a function
-        // like this and it's clients array is private
-        int tryId = 0;
 
-        for ( int count = 0; count < this->ws->count(); ) {
-          if ( this->ws->hasClient( tryId ) ) {
-            if ( clientId != tryId ) {
-              this->ws->client( tryId )->text( buffer );
+//     AsyncWebSocketMessageBuffer* buffer = this->ws->makeBuffer( len ); //  creates a buffer (len + 1) for you.
 
-//               if ( this->verbosity >= Verbosity::VerboseJSON ) {
-//                 Serial.println( json );
-//               }
+    root.printTo( ( char* )buffer/*r->get()*/, len + 1 );
+
+    if ( clientId > 0 ) {
+      // This is a hacky workaround because ESPAsyncWebServer does not have a function
+      // like this and it's clients array is private
+      int tryId = 0;
+
+      for ( int count = 0; count < this->ws->count(); ) {
+        if ( this->ws->hasClient( tryId ) ) {
+          if ( clientId != tryId ) {
+            this->ws->client( tryId )->text( buffer );
+
+            if ( this->verbosity >= Verbosity::VerboseJSON ) {
+              Serial.println( buffer );
             }
-
-            count++;
           }
 
-          tryId++;
+          count++;
         }
-      } else {
-//         if ( this->verbosity >= Verbosity::VerboseJSON ) {
-//           Serial.println( json );
-//         }
 
-        this->ws->textAll( buffer );
+        tryId++;
       }
+    } else {
+        if ( this->verbosity >= Verbosity::VerboseJSON ) {
+          Serial.println( buffer );
+        }
+
+      this->ws->textAll( buffer );
     }
   }
 }
@@ -632,14 +675,6 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
     root.printTo( ( char* )buffer->get(), len + 1 );
     client->text( buffer );
   }
-
-//   root.printTo( json );
-//
-//   if ( this->verbosity >= Verbosity::VerboseJSON ) {
-//     Serial.println( json );
-//   }
-//
-//   client->text( json );
 }
 
 void ESPUIClass::beginSPIFFS( const char* _title, const char* username, const char* password ) {
