@@ -247,9 +247,8 @@ class ESPUIClass {
 
     void updateSelect( uint16_t id, String nValue, int clientId = -1 );
 
-    void clearGraph( uint16_t id, int clientId = -1 );
-
-    void addGraphPoint( uint16_t id, int nValue, int clientId = -1 );
+    void addGraphPoint( Control* control, int line, int nValue, int clientId = -1 );
+    void addGraphPoint( uint16_t id, int line, int nValue, int clientId = -1 );
 
 //     void textThem( String text, int clientId = -1 );
 
