@@ -633,7 +633,7 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
   {
     JsonObject& item = jsonBuffer.createObject();
     item["type"] = ( int )UI_TITLE;
-    item["label"] = String( ui_title );
+    item["label"] = ui_title;
     items.add( item );
   }
 
@@ -642,7 +642,7 @@ void ESPUIClass::jsonDom( AsyncWebSocketClient* client ) {
 
     item["id"] = String( control->id );
     item["type"] = ( int )control->type;
-    item["label"] = String( control->label );
+    item["label"] = control->label;
     item["value"] = String( control->value );
     item["color"] = ( int )control->color;
 
