@@ -1014,3 +1014,47 @@ input::-moz-focus-inner,
 input::-moz-focus-outer {
   border: 0;
 }
+
+/* Styles for Graph widget */
+
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.y-axis path,
+.x-axis path {
+  stroke: gray;
+  stroke-width: 1;
+  fill: none;
+}
+
+.series {
+  stroke: steelblue;
+  stroke-width: 3;
+  fill: none;
+}
+
+.data-points circle {
+  stroke: steelblue;
+  stroke-width: 2;
+  fill: white;
+}
+
+.data-points text {
+  display: none;
+}
+
+.data-points circle:hover {
+  fill: steelblue;
+  stroke-width: 6;
+}
+
+.data-points circle:hover + text {
+  display: inline-block;
+}
+
+text {
+  text-anchor: end;
+}

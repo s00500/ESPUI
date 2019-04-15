@@ -6,6 +6,7 @@
 #include "dataStyleCSS.h"
 
 #include "dataControlsJS.h"
+#include "dataGraphJS.h"
 #include "dataSliderJS.h"
 #include "dataTabbedcontentJS.h"
 #include "dataZeptoJS.h"
@@ -219,6 +220,7 @@ void ESPUIClass::prepareFileSystem() {
   deleteFile("/js/zepto.min.js");
   deleteFile("/js/controls.js");
   deleteFile("/js/slider.js");
+  deleteFile("/js/graph.js");
   deleteFile("/js/tabbedcontent.js");
 
   if (this->verbosity) {
@@ -234,7 +236,8 @@ void ESPUIClass::prepareFileSystem() {
   writeFile("/js/zepto.min.js", JS_ZEPTO);
   writeFile("/js/controls.js", JS_CONTROLS);
   writeFile("/js/slider.js", JS_SLIDER);
-  ;
+  writeFile("/js/graph.js", JS_GRAPH);
+
   writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
 
   if (this->verbosity) {
@@ -745,6 +748,16 @@ void ESPUIClass::begin(const char *_title, const char *username, const char *pas
     }
 
     AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->on("/js/graph.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
+      return request->requestAuthentication();
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_GRAPH_GZIP, sizeof(JS_GRAPH_GZIP));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
