@@ -570,7 +570,50 @@ void ESPUIClass::updateSelect(uint16_t id, String text, int clientId) { updateCo
 void ESPUIClass::updateGauge(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
 
 void ESPUIClass::clearGraph(uint16_t id, int clientId) {}
-void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId) {}
+
+void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId) {
+  Control *control = getControl(id);
+  if (!control) {
+    return;
+  }
+
+  String json;
+  DynamicJsonDocument document(2000);
+  JsonObject root = document.to<JsonObject>();
+
+  root["type"] = (int)ControlType::GraphPoint;
+  root["value"] = nValue;
+  root["id"] = control->id;
+  serializeJson(document, json);
+
+  if (this->verbosity >= Verbosity::VerboseJSON) {
+    Serial.println(json);
+  }
+
+  if (clientId < 0) {
+    this->ws->textAll(json);
+    return;
+  }
+  // This is a hacky workaround because ESPAsyncWebServer does not have a
+  // function like this and it's clients array is private
+  int tryId = 0;
+
+  for (int count = 0; count < this->ws->count();) {
+    if (this->ws->hasClient(tryId)) {
+      if (clientId != tryId) {
+        this->ws->client(tryId)->text(json);
+
+        if (this->verbosity >= Verbosity::VerboseJSON) {
+          Serial.println(json);
+        }
+      }
+
+      count++;
+    }
+
+    tryId++;
+  }
+}
 /*
 Convert & Transfer Arduino elements to JSON elements
 Initially this function used to send the control element data individually.

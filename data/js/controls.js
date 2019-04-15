@@ -68,6 +68,8 @@ const C_ALIZARIN = 6;
 const C_DARK = 7;
 const C_NONE = 255;
 
+var graphData = new Array();
+
 function colorClass(colorId) {
   colorId = Number(colorId);
   switch (colorId) {
@@ -155,7 +157,7 @@ function start() {
     var center = "";
     switch (data.type) {
       case UI_INITIAL_GUI:
-        data.controls.forEach(element => {
+        data.controls.forEach((element) => {
           var fauxEvent = {
             data: JSON.stringify(element)
           };
@@ -577,17 +579,27 @@ function start() {
             "<h5>" +
             data.label +
             "</h5><hr/>" +
-            "WILL BE A GRAPH <input style='color:black;' id='graph" +
+            "<figure id='graph" +
             data.id +
-            "' type='number' value='" +
-            data.value +
-            "' onchange='numberchange(" +
-            data.id +
-            ")' />" +
+            "'>" +
+            "<figcaption>" +
+            data.label +
+            "</figcaption>" +
+            "</figure>" +
             "</div>"
         );
+        graphData[data.id] = [];
+        renderGraphSvg(graphData[data.id], "graph" + data.id);
         break;
-
+      case ADD_GRAPH_POINT:
+        var ts = Math.round(new Date().getTime() / 1000);
+        graphData[data.id].push({ x: ts, y: data.value });
+        renderGraphSvg(graphData[data.id], "graph" + data.id);
+        break;
+      case CLEAR_GRAPH:
+        graphData[data.id] = [];
+        renderGraphSvg(graphData[data.id], "graph" + data.id);
+        break;
       case UI_GAUGE:
         var parent;
         if (data.parentControl) {
