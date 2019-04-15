@@ -583,14 +583,14 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
 
   JsonObject titleItem = items.createNestedObject();
   titleItem["type"] = (int)UI_TITLE;
-  titleItem["label"] = String(ui_title);
+  titleItem["label"] = ui_title;
 
   while (control != nullptr) {
     JsonObject item = items.createNestedObject();
 
     item["id"] = String(control->id);
     item["type"] = (int)control->type;
-    item["label"] = String(control->label);
+    item["label"] = control->label;
     item["value"] = String(control->value);
     item["color"] = (int)control->color;
 
