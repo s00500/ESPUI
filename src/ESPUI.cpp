@@ -294,6 +294,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 
   case WS_EVT_DATA: {
     String msg = "";
+    msg.reserve(len + 1);
 
     for (size_t i = 0; i < len; i++) {
       msg += (char)data[i];
@@ -575,7 +576,7 @@ sent as one blob at the beginning. Therefore a new type is used as well
 */
 void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
   String json;
-  DynamicJsonDocument document(8000);
+  DynamicJsonDocument document(4000);
   document["type"] = (int)UI_INITIAL_GUI;
   JsonArray items = document.createNestedArray("controls");
 
