@@ -43,17 +43,6 @@ void slider(Control *sender, int type) {
   Serial.println(sliderValueWithOffset);
 }
 
-void accelCall(Control *sender, int type) {
-  Serial.print("Accel: ID: ");
-  Serial.print(sender->id);
-  Serial.print(", Value: ");
-  Serial.println(sender->value);
-  // Like all Control Values in ESPUI accel values are Strings. To use them as int simply do this:
-  int sliderValueWithOffset = sender->value.toInt() + 100;
-  Serial.print("Accel with offset");
-  Serial.println(sliderValueWithOffset);
-}
-
 void buttonCallback(Control *sender, int type) {
   switch (type) {
   case B_DOWN:
@@ -221,8 +210,6 @@ void setup(void) {
 
   graphId = ESPUI.graph("Graph Test", COLOR_WETASPHALT);
   ESPUI.gauge("Gauge Test", COLOR_WETASPHALT, 58, 0, 100); // Gauge has
-
-  ESPUI.accelerometer("Accel Test", &accelCall, COLOR_WETASPHALT);
 
   /*
    * .begin loads and serves all files from PROGMEM directly.
