@@ -214,7 +214,7 @@ function renderGraphSvg(dataArray, renderId) {
   while (figure.hasChildNodes()) {
     figure.removeChild(figure.lastChild);
   }
-  console.log(dataArray);
+  //console.log(dataArray);
   var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 640 440");
   svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
