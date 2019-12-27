@@ -35,26 +35,20 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
 - Graph Widget ✅
 
 * Cleanup Example, DNS and autojoin
+* Persist save graph in local storage
+* data upload new info to doc? (copy to folder?)
 * Cleanup and extend Documentation
   - Number field ✅
   - Text field ✅
   - Data directory ✅
   - Graph Usage
+  - Number min and max value to docs
   - Slider
   - OptionList
   - Tab usage
   - Verbosity setting
 
-To check:
-data upload new info to doc?
-
-## OLD Roadmap :
-
-- Datagraph output -> _WIP_
-- Number min and max value
-- proper return value (as int and not as string) for slider
-
-## Changelog for functions:
+## Changelog for 2.0 functions:
 
 - split pad into pad and padWithCenter
 - Cleaned order or parameters on switch
@@ -70,38 +64,40 @@ This library is dependent on the following libraries to function properly.
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Last tested with
   version 6.10.0) **Plus for ESP8266**
 
-- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
-
-**Additionally necessary for ESP32**
-
-- [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
+- (_For ESP8266_) [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
+- (_For ESP32_) [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
 
 ## How to Install
 
 Make sure all the dependencies are installed, then install like so:
+
+#### Using PlattformIO (_recommended_)
+
+Just include this library as a dependency on lib_deps like so:
+
+```
+lib_deps = ESPUI
+```
 
 #### Directly Through Arduino IDE (_recommended_)
 
 You can find this Library in the Arduino IDE library manager Go to Sketch >
 Include Library > Library Manager > Search for "ESPUI" > Install
 
-#### Manual Install
+#### Manual Install Arduino IDE
 
-For Windows: Download the
+_For Windows:_ Download the
 [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the
 .zip in Documents>Arduino>Libraries>{Place "ESPUI" folder Here}
 
-For Linux: Download the
+_For Linux:_ Download the
 [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the
 .zip in Sketchbook/Libraries/{Place "ESPUI" folder Here}
 
-For macOs: Download the
+_For macOs:_ Download the
 [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the
 .zip in ~/Documents/Arduino/libraries/{Place "ESPUI" folder Here}
 
-#### Manually through IDE
-
-Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip),
 Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
 
 ## Getting started
