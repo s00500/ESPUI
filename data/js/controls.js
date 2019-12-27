@@ -70,6 +70,8 @@ const C_NONE = 255;
 
 var graphData = new Array();
 
+var hasAccel = false;
+
 function colorClass(colorId) {
   colorId = Number(colorId);
   switch (colorId) {
@@ -103,6 +105,57 @@ function colorClass(colorId) {
 
 var websock;
 var websockConnected = false;
+
+function requestOrientationPermission() {
+  /*
+  // Currently this fails, since it needs secure context on IOS safari
+  if (typeof DeviceMotionEvent.requestPermission === "function") {
+    DeviceOrientationEvent.requestPermission()
+      .then(response => {
+        if (response == "granted") {
+          window.addEventListener("deviceorientation", handleOrientation);
+        }
+      })
+      .catch(console.error);
+  } else {
+    // Non IOS 13
+    window.addEventListener("deviceorientation", handleOrientation);
+  }
+  */
+}
+/*
+function handleOrientation(event) {
+  var x = event.beta; // In degree in the range [-180,180]
+  var y = event.gamma; // In degree in the range [-90,90]
+
+  var output = document.querySelector(".output");
+  output.innerHTML = "beta : " + x + "\n";
+  output.innerHTML += "gamma: " + y + "\n";
+
+  // Because we don't want to have the device upside down
+  // We constrain the x value to the range [-90,90]
+  if (x > 90) {
+    x = 90;
+  }
+  if (x < -90) {
+    x = -90;
+  }
+
+  // To make computation easier we shift the range of
+  // x and y to [0,180]
+  x += 90;
+  y += 90;
+
+  // 10 is half the size of the ball
+  // It center the positioning point to the center of the ball
+  var ball = document.querySelector(".ball");
+  var garden = document.querySelector(".garden");
+  var maxX = garden.clientWidth - ball.clientWidth;
+  var maxY = garden.clientHeight - ball.clientHeight;
+  ball.style.top = (maxY * y) / 180 - 10 + "px";
+  ball.style.left = (maxX * x) / 180 - 10 + "px";
+}
+*/
 
 function restart() {
   $(document)
@@ -157,7 +210,7 @@ function start() {
     var center = "";
     switch (data.type) {
       case UI_INITIAL_GUI:
-        data.controls.forEach((element) => {
+        data.controls.forEach(element => {
           var fauxEvent = {
             data: JSON.stringify(element)
           };
@@ -628,12 +681,14 @@ function start() {
         break;
 
       case UI_ACCEL:
+        if (hasAccel) break;
         var parent;
         if (data.parentControl) {
           parent = $("#tab" + data.parentControl);
         } else {
           parent = $("#row");
         }
+        hasAccel = true;
         parent.append(
           "<div id='id" +
             data.id +
@@ -643,7 +698,7 @@ function start() {
             "<h5>" +
             data.label +
             "</h5><hr/>" +
-            "WILL BE A ACCEL<div class='accelerometer' id='accel" +
+            "ACCEL // Not implemented fully!<div class='accelerometer' id='accel" +
             data.id +
             "' ><div class='ball" +
             data.id +
@@ -652,6 +707,8 @@ function start() {
             "'></pre>" +
             "</div>"
         );
+
+        requestOrientationPermission();
         break;
 
       case UPDATE_LABEL:

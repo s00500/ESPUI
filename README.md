@@ -29,23 +29,24 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
 - API changes by @eringerli ✅
   - less updateControl functions ✅
   - proper wrappers for all create/update actions ✅
-- OptionList by @eringerli
 - Min Max on slider by @eringerli ✅
-- Public Access to ESPAsyncServer
-- Accelerometer Widget
-- Graph Widget
--
-- Cleanup Example, DNS and autojoin
-- Cleanup and extend Documentation
+- OptionList by @eringerli ✅
+- Public Access to ESPAsyncServer ✅
+- Graph Widget ✅
+
+* Cleanup Example, DNS and autojoin
+* Cleanup and extend Documentation
   - Number field ✅
   - Text field ✅
   - Data directory ✅
   - Graph Usage
-  - Accelerometer
   - Slider
   - OptionList
   - Tab usage
   - Verbosity setting
+
+To check:
+data upload new info to doc?
 
 ## OLD Roadmap :
 
