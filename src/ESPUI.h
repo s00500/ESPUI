@@ -228,12 +228,13 @@ public:
 
   Verbosity verbosity;
 
+  AsyncWebServer *server;
+  AsyncWebSocket *ws;
+
 private:
   const char *basicAuthUsername = nullptr;
   const char *basicAuthPassword = nullptr;
   bool basicAuth = true;
-  AsyncWebServer *server;
-  AsyncWebSocket *ws;
 };
 
 extern ESPUIClass ESPUI;
