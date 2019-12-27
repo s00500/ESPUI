@@ -1,4 +1,4 @@
-# ESPUI
+# ESPUI 2.0
 
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png) //
 TODO: Update Logo

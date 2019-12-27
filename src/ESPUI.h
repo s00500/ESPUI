@@ -166,7 +166,11 @@ enum Verbosity : uint8_t { Quiet = 0, Verbose, VerboseJSON };
 
 class ESPUIClass {
 public:
-  ESPUIClass() { verbosity = Verbosity::Quiet; }
+  ESPUIClass() {
+    verbosity = Verbosity::Quiet;
+    jsonUpdateDocumentSize = 2000;
+    jsonInitialDocumentSize = 8000;
+  }
   void setVerbosity(Verbosity verbosity);
   void begin(const char *_title, const char *username = nullptr, const char *password = nullptr);       // Setup server and page in Memorymode
   void beginSPIFFS(const char *_title, const char *username = nullptr, const char *password = nullptr); // Setup server and page in SPIFFSmode

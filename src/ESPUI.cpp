@@ -480,7 +480,7 @@ void ESPUIClass::updateControl(Control *control, int clientId) {
   }
 
   String json;
-  DynamicJsonDocument document(2000);
+  DynamicJsonDocument document(jsonUpdateDocumentSize);
   JsonObject root = document.to<JsonObject>();
 
   root["type"] = (int)control->type + ControlType::UpdateOffset;
@@ -578,7 +578,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId) {
   }
 
   String json;
-  DynamicJsonDocument document(2000);
+  DynamicJsonDocument document(jsonUpdateDocumentSize);
   JsonObject root = document.to<JsonObject>();
 
   root["type"] = (int)ControlType::GraphPoint;
@@ -622,7 +622,7 @@ sent as one blob at the beginning. Therefore a new type is used as well
 */
 void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
   String json;
-  DynamicJsonDocument document(4000);
+  DynamicJsonDocument document(jsonInitialDocumentSize);
   document["type"] = (int)UI_INITIAL_GUI;
   JsonArray items = document.createNestedArray("controls");
 
