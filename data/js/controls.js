@@ -157,6 +157,19 @@ function handleOrientation(event) {
 }
 */
 
+function saveGraphData() {
+  localStorage.setItem("espuigraphs", JSON.stringify(graphData));
+}
+
+function restoreGraphData(id) {
+  var savedData = localStorage.getItem("espuigraphs", graphData);
+  if (savedData != null) {
+    savedData = JSON.parse(savedData);
+    return savedData[id];
+  }
+  return [];
+}
+
 function restart() {
   $(document)
     .add("*")
@@ -641,16 +654,18 @@ function start() {
             "</figure>" +
             "</div>"
         );
-        graphData[data.id] = [];
+        graphData[data.id] = restoreGraphData(data.id);
         renderGraphSvg(graphData[data.id], "graph" + data.id);
         break;
       case ADD_GRAPH_POINT:
         var ts = Math.round(new Date().getTime() / 1000);
         graphData[data.id].push({ x: ts, y: data.value });
+        saveGraphData();
         renderGraphSvg(graphData[data.id], "graph" + data.id);
         break;
       case CLEAR_GRAPH:
         graphData[data.id] = [];
+        saveGraphData();
         renderGraphSvg(graphData[data.id], "graph" + data.id);
         break;
       case UI_GAUGE:

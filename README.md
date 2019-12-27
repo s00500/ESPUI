@@ -34,8 +34,9 @@ THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
 - Public Access to ESPAsyncServer ✅
 - Graph Widget ✅
 
+* Persist save graph in local storage #10
+* Switch slider behaviour ?
 * Cleanup Example, DNS and autojoin
-* Persist save graph in local storage
 * data upload new info to doc? (copy to folder?)
 * Cleanup and extend Documentation
   - Number field ✅
