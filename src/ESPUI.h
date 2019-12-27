@@ -171,6 +171,9 @@ public:
     jsonUpdateDocumentSize = 2000;
     jsonInitialDocumentSize = 8000;
   }
+  unsigned int jsonUpdateDocumentSize;
+  unsigned int jsonInitialDocumentSize;
+
   void setVerbosity(Verbosity verbosity);
   void begin(const char *_title, const char *username = nullptr, const char *password = nullptr);       // Setup server and page in Memorymode
   void beginSPIFFS(const char *_title, const char *username = nullptr, const char *password = nullptr); // Setup server and page in SPIFFSmode
