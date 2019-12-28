@@ -15,7 +15,10 @@ const char *ssid = "ESPUI";
 const char *password = "espui";
 const char *hostname = "espui";
 
+uint16_t status;
 uint16_t button1;
+uint16_t millisLabelId;
+uint16_t switchOne;
 
 void numberCall( Control* sender, int type ) {
   Serial.println( sender->value );
@@ -51,7 +54,7 @@ void buttonExample(Control *sender, int type) {
   switch (type) {
   case B_DOWN:
     Serial.println("Status: Start");
-    ESPUI.updateControl("Status:", "Start");
+    ESPUI.updateControlValue(status, "Start");
 
     ESPUI.getControl(button1)->color = ControlColor::Carrot;
     ESPUI.updateControl(button1);
@@ -59,7 +62,7 @@ void buttonExample(Control *sender, int type) {
 
   case B_UP:
     Serial.println("Status: Stop");
-    ESPUI.updateControl("Status:", "Stop");
+    ESPUI.updateControlValue(status, "Stop");
 
     ESPUI.getControl(button1)->color = ControlColor::Peterriver;
     ESPUI.updateControl(button1);
@@ -201,7 +204,7 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
-  ESPUI.addControl(ControlType::Label, "Status:", "Stop", ControlColor::Turquoise);
+  status = ESPUI.addControl(ControlType::Label, "Status:", "Stop", ControlColor::Turquoise);
 
   uint16_t select1 = ESPUI.addControl(ControlType::Select, "Select:", "", ControlColor::Alizarin, Control::noParent, &selectExample);
 
@@ -211,12 +214,12 @@ void setup(void) {
 
   ESPUI.addControl(ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, Control::noParent, &textCall);
 
-  ESPUI.addControl(ControlType::Label, "Millis:", "0", ControlColor::Emerald, Control::noParent);
+  millisLabelId = ESPUI.addControl(ControlType::Label, "Millis:", "0", ControlColor::Emerald, Control::noParent);
   button1 = ESPUI.addControl(ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, Control::noParent, &buttonCallback);
   ESPUI.addControl(ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, Control::noParent, &buttonExample);
   ESPUI.addControl(ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, Control::noParent, &padExample);
   ESPUI.addControl(ControlType::Pad, "Pad without center", "", ControlColor::Carrot, Control::noParent, &padExample);
-  ESPUI.addControl(ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, Control::noParent, &switchExample);
+  switchOne = ESPUI.addControl(ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, Control::noParent, &switchExample);
   ESPUI.addControl(ControlType::Switcher, "Switch two", "", ControlColor::None, Control::noParent, &otherSwitchExample);
   ESPUI.addControl(ControlType::Slider, "Slider one", "30", ControlColor::Alizarin, Control::noParent, &slider);
   ESPUI.addControl(ControlType::Slider, "Slider two", "100", ControlColor::Alizarin, Control::noParent, &slider);
@@ -252,7 +255,7 @@ void loop(void) {
   if (millis() - oldTime > 5000) {
     ESPUI.updateControlValue(millisLabelId, String(millis()));
     testSwitchState = !testSwitchState;
-    ESPUI.updateControlValue("Switch one", testSwitchState ? "1" : "0");
+    ESPUI.updateControlValue(switchOne, testSwitchState ? "1" : "0");
 
     oldTime = millis();
   }

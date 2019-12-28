@@ -16,6 +16,9 @@ const char* password = "espui";
 const char* hostname = "espui";
 
 uint16_t button1;
+uint16_t switchOne;
+uint16_t status;
+uint16_t millisLabelId;
 
 void numberCall( Control* sender, int type ) {
   Serial.println( sender->value );
@@ -49,7 +52,7 @@ void buttonExample( Control* sender, int type ) {
   switch ( type ) {
     case B_DOWN:
       Serial.println( "Status: Start" );
-      ESPUI.updateControl( "Status:", "Start" );
+      ESPUI.updateControlValue( status, "Start" );
     
       ESPUI.getControl( button1 )->color = ControlColor::Carrot;
       ESPUI.updateControl( button1 );
@@ -57,7 +60,7 @@ void buttonExample( Control* sender, int type ) {
 
     case B_UP:
       Serial.println( "Status: Stop" );
-      ESPUI.updateControl( "Status:", "Stop" );
+      ESPUI.updateControlValue( status, "Stop" );
    
       ESPUI.getControl( button1 )->color = ControlColor::Peterriver;
       ESPUI.updateControl( button1 );
@@ -203,7 +206,7 @@ void setup( void ) {
   uint16_t tab3 = ESPUI.addControl( ControlType::Tab, "Settings 3", "Settings 3" );
 
   // shown above all tabs
-  ESPUI.addControl( ControlType::Label, "Status:", "Stop", ControlColor::Turquoise );
+  status = ESPUI.addControl( ControlType::Label, "Status:", "Stop", ControlColor::Turquoise );
 
   uint16_t select1 = ESPUI.addControl( ControlType::Select, "Select:", "", ControlColor::Alizarin, tab1, &selectExample );
   ESPUI.addControl( ControlType::Option, "Option1", "Opt1", ControlColor::Alizarin, select1 );
@@ -218,7 +221,7 @@ void setup( void ) {
   ESPUI.addControl( ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, tab1, &buttonExample );
   ESPUI.addControl( ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, tab2, &padExample );
   ESPUI.addControl( ControlType::Pad, "Pad without center", "", ControlColor::Carrot, tab3, &padExample );
-  ESPUI.addControl( ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, tab3, &switchExample );
+  switchOne = ESPUI.addControl( ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, tab3, &switchExample );
   ESPUI.addControl( ControlType::Switcher, "Switch two", "", ControlColor::None, tab3, &otherSwitchExample );
   ESPUI.addControl( ControlType::Slider, "Slider one", "30", ControlColor::Alizarin, tab1, &slider );
   ESPUI.addControl( ControlType::Slider, "Slider two", "100", ControlColor::Alizarin, tab3, &slider );
@@ -252,10 +255,10 @@ void loop( void ) {
   static bool switchi = false;
 
   if ( millis() - oldTime > 5000 ) {
-    ESPUI.updateControl( "Millis:", String( millis() ) );
+    ESPUI.updateControlValue( millisLabelId, String( millis() ) );
     switchi = !switchi;
-    ESPUI.updateControl( "Switch one", switchi ? "1" : "0" );
-    
+    ESPUI.updateControlValue( switchOne, switchi ? "1" : "0" );
+
     oldTime = millis();
   }
 }
