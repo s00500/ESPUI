@@ -767,16 +767,17 @@ function start() {
 
     if (data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
       var element = $("#id" + data.id);
-      // FIXME: Test sliderupdate
-      //       if(data.type == UPDATE_SLIDER) {
-      //         element.removeClass("slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin");
-      //         element.addClass("slider-" + colorClass(data.color));
-      //       } else {
-      element.removeClass(
-        "turquoise emerald peterriver wetasphalt sunflower carrot alizarin"
-      );
-      element.addClass(colorClass(data.color));
-      //       }
+      if (data.type == UPDATE_SLIDER) {
+        element.removeClass(
+          "slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin"
+        );
+        element.addClass("slider-" + colorClass(data.color));
+      } else {
+        element.removeClass(
+          "turquoise emerald peterriver wetasphalt sunflower carrot alizarin"
+        );
+        element.addClass(colorClass(data.color));
+      }
     }
   };
 
@@ -785,7 +786,6 @@ function start() {
 
 function sliderchange(number) {
   var val = $("#sl" + number).val();
-  console.log("slvalue:" + val + ":" + number);
   websock.send("slvalue:" + val + ":" + number);
 }
 
