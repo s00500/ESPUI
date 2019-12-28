@@ -11,16 +11,15 @@ DNSServer dnsServer;
 #include <ESP8266WiFi.h>
 #endif
 
-// true for verbose, false for quiet
-ESPUIClass ESPUI(Verbosity::VerboseJSON);
-
 const char *ssid = "ESPUI";
 const char *password = "espui";
-const char *hostname = "EspuiTest";
+const char *hostname = "espui";
 
 uint16_t button1;
 
-void numberCall(Control *sender, int type) { Serial.println(sender->value); }
+void numberCall( Control* sender, int type ) {
+  Serial.println( sender->value );
+}
 
 void textCall(Control *sender, int type) {
   Serial.print("Text: ID: ");
@@ -153,6 +152,7 @@ void otherSwitchExample(Control *sender, int value) {
 }
 
 void setup(void) {
+  ESPUI.setVerbosity(Verbosity::VerboseJSON);
   Serial.begin(115200);
 
 #if defined(ESP32)
@@ -166,9 +166,9 @@ void setup(void) {
   Serial.print("\n\nTry to connect to existing network");
 
   {
-    uint8_t timeout = 5;
+    uint8_t timeout = 10;
 
-    // Wait for connection, 2.5s timeout
+    // Wait for connection, 5s timeout
     do {
       delay(500);
       Serial.print(".");
@@ -227,14 +227,20 @@ void setup(void) {
    * If you want to serve the files from SPIFFS use ESPUI.beginSPIFFS
    * (.prepareFileSystem has to be run in an empty sketch before)
    */
-  ESPUI.begin("ESPUI Control");
+
+  // Enable this option if you want sliders to be continuous (update during move) and not discrete (update on stop)
+  // ESPUI.sliderContinuous = true;
+
   /*
    * Optionally you can use HTTP BasicAuth. Keep in mind that this is NOT a
    * SECURE way of limiting access.
    * Anyone who is able to sniff traffic will be able to intercept your password
-   * since it is transmitted in cleartext. Just add a username and password,
-   * for example begin("ESPUI Control", "username", "password")
+   * since it is transmitted in cleartext. Just add a string as username and
+   * password, for example begin("ESPUI Control", "username", "password")
    */
+
+
+  ESPUI.begin("ESPUI Control");
 }
 
 void loop(void) {
@@ -247,6 +253,7 @@ void loop(void) {
     ESPUI.updateControlValue(millisLabelId, String(millis()));
     testSwitchState = !testSwitchState;
     ESPUI.updateControlValue("Switch one", testSwitchState ? "1" : "0");
+
     oldTime = millis();
   }
 }

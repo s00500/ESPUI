@@ -16,9 +16,6 @@ const char *password = "espui";
 
 const char *hostname = "espui";
 
-long oldTime = 0;
-
-bool testSwitchState = false;
 int statusLabelId;
 int graphId;
 int millisLabelId;
@@ -217,6 +214,9 @@ void setup(void) {
    * If you want to serve the files from SPIFFS use ESPUI.beginSPIFFS
    * (.prepareFileSystem has to be run in an empty sketch before)
    */
+ 
+  // Enable this option if you want sliders to be continuous (update during move) and not discrete (update on stop)
+  // ESPUI.sliderContinuous = true;
 
   /*
    * Optionally you can use HTTP BasicAuth. Keep in mind that this is NOT a
@@ -226,14 +226,15 @@ void setup(void) {
    * password, for example begin("ESPUI Control", "username", "password")
    */
 
-  // Enable this option if you want sliders to be continuous (update during move) and not discrete (update on stop)
-  // ESPUI.sliderContinuous = true;
 
   ESPUI.begin("ESPUI Control");
 }
 
 void loop(void) {
   dnsServer.processNextRequest();
+
+  static long oldTime = 0;
+  static bool testSwitchState = false;
 
   if (millis() - oldTime > 5000) {
     ESPUI.print(millisLabelId, String(millis()));
@@ -242,7 +243,7 @@ void loop(void) {
 
     testSwitchState = !testSwitchState;
     ESPUI.updateSwitcher(testSwitchId, testSwitchState);
-
+    
     oldTime = millis();
   }
 }
