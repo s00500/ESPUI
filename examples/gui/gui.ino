@@ -14,7 +14,7 @@ DNSServer dnsServer;
 const char *ssid = "ESPUI";
 const char *password = "espui";
 
-const char *hostname = "EspuiTest";
+const char *hostname = "espui";
 
 long oldTime = 0;
 
@@ -196,21 +196,21 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
-  statusLabelId = ESPUI.label("Status:", COLOR_TURQUOISE, "Stop");
-  millisLabelId = ESPUI.label("Millis:", COLOR_EMERALD, "0");
-  ESPUI.button("Push Button", &buttonCallback, COLOR_PETERRIVER, "Press");
-  ESPUI.button("Other Button", &buttonExample, COLOR_WETASPHALT, "Press");
-  ESPUI.padWithCenter("Pad with center", &padExample, COLOR_SUNFLOWER);
-  ESPUI.pad("Pad without center", &padExample, COLOR_CARROT);
-  testSwitchId = ESPUI.switcher("Switch one", &switchExample, COLOR_ALIZARIN, false);
-  ESPUI.switcher("Switch two", &otherSwitchExample, COLOR_NONE, true);
-  ESPUI.slider("Slider one", &slider, COLOR_ALIZARIN, 30);
-  ESPUI.slider("Slider two", &slider, COLOR_NONE, 100);
-  ESPUI.text("Text Test:", &textCall, COLOR_ALIZARIN, "a Text Field");
-  ESPUI.number("Numbertest", &numberCall, COLOR_ALIZARIN, 5, 0, 10);
+  statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
+  millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
+  ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
+  ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
+  ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
+  ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
+  testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
+  ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
+  ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30);
+  ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
+  ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
+  ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
 
-  graphId = ESPUI.graph("Graph Test", COLOR_WETASPHALT);
-  ESPUI.gauge("Gauge Test", COLOR_WETASPHALT, 58, 0, 100); // Gauge has
+  graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
+  ESPUI.gauge("Gauge Test", ControlColor::Wetasphalt, 58, 0, 100); // Gauge has
 
   /*
    * .begin loads and serves all files from PROGMEM directly.
@@ -225,6 +225,10 @@ void setup(void) {
    * since it is transmitted in cleartext. Just add a string as username and
    * password, for example begin("ESPUI Control", "username", "password")
    */
+
+  // Enable this option if you want sliders to be continuous (update during move) and not discrete (update on stop)
+  // ESPUI.sliderContinuous = true;
+
   ESPUI.begin("ESPUI Control");
 }
 
