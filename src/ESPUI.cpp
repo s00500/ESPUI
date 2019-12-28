@@ -624,6 +624,7 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
   String json;
   DynamicJsonDocument document(jsonInitialDocumentSize);
   document["type"] = (int)UI_INITIAL_GUI;
+  document["sliderContinuous"] = sliderContinuous;
   JsonArray items = document.createNestedArray("controls");
 
   Control *control = this->controls;

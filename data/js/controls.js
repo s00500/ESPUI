@@ -69,8 +69,8 @@ const C_DARK = 7;
 const C_NONE = 255;
 
 var graphData = new Array();
-
 var hasAccel = false;
+var sliderContinuous = false;
 
 function colorClass(colorId) {
   colorId = Number(colorId);
@@ -223,6 +223,9 @@ function start() {
     var center = "";
     switch (data.type) {
       case UI_INITIAL_GUI:
+        if (data.sliderContinuous) {
+          sliderContinuous = data.sliderContinuous;
+        }
         data.controls.forEach(element => {
           var fauxEvent = {
             data: JSON.stringify(element)
@@ -478,7 +481,7 @@ function start() {
             "</div>" +
             "</div>"
         );
-        rangeSlider();
+        rangeSlider(!sliderContinuous);
         break;
 
       case UI_NUMBER:
@@ -604,7 +607,6 @@ function start() {
         if (data.parentControl) {
           var parent = $("#id" + data.parentControl + " input");
           if (parent.size()) {
-            console.log("MIN" + data.value);
             parent.attr("min", data.value);
           }
         }
@@ -614,7 +616,6 @@ function start() {
         if (data.parentControl) {
           var parent = $("#id" + data.parentControl + " input");
           if (parent.size()) {
-            console.log("MAX" + data.value);
             parent.attr("max", data.value);
           }
         }
@@ -624,7 +625,6 @@ function start() {
         if (data.parentControl) {
           var parent = $("#id" + data.parentControl + " input");
           if (parent.size()) {
-            console.log("STEP" + data.value);
             parent.attr("step", data.value);
           }
         }
@@ -852,7 +852,7 @@ function switcher(number, state) {
   }
 }
 
-var rangeSlider = function() {
+var rangeSlider = function(isDiscrete) {
   var slider = $(".range-slider"),
     range = $(".range-slider__range"),
     value = $(".range-slider__value");
@@ -865,19 +865,31 @@ var rangeSlider = function() {
       $(this).html(value);
     });
 
-    range.on({
-      input: function() {
-        $(this)
-          .next()
-          .html(this.value);
-      },
-      change: function() {
-        sliderchange(
+    if (!isDiscrete) {
+      range.on({
+        input: function() {
+          sliderchange(
+            $(this)
+              .attr("id")
+              .replace(/^\D+/g, "")
+          );
+        }
+      });
+    } else {
+      range.on({
+        input: function() {
           $(this)
-            .attr("id")
-            .replace(/^\D+/g, "")
-        );
-      }
-    });
+            .next()
+            .html(this.value);
+        },
+        change: function() {
+          sliderchange(
+            $(this)
+              .attr("id")
+              .replace(/^\D+/g, "")
+          );
+        }
+      });
+    }
   });
 };

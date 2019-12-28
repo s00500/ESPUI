@@ -170,9 +170,11 @@ public:
     verbosity = Verbosity::Quiet;
     jsonUpdateDocumentSize = 2000;
     jsonInitialDocumentSize = 8000;
+    sliderContinuous = false;
   }
   unsigned int jsonUpdateDocumentSize;
   unsigned int jsonInitialDocumentSize;
+  bool sliderContinuous;
 
   void setVerbosity(Verbosity verbosity);
   void begin(const char *_title, const char *username = nullptr, const char *password = nullptr);       // Setup server and page in Memorymode

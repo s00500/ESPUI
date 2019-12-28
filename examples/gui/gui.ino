@@ -13,6 +13,7 @@ DNSServer dnsServer;
 
 const char *ssid = "ESPUI";
 const char *password = "espui";
+
 const char *hostname = "EspuiTest";
 
 long oldTime = 0;
@@ -160,9 +161,9 @@ void setup(void) {
   Serial.print("\n\nTry to connect to existing network");
 
   {
-    uint8_t timeout = 5;
+    uint8_t timeout = 10;
 
-    // Wait for connection, 2.5s timeout
+    // Wait for connection, 5s timeout
     do {
       delay(500);
       Serial.print(".");
