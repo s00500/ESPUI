@@ -1,3 +1,19 @@
+* Cleanup and extend Documentation
+  - Number field ✅
+  - Text field ✅
+  - Data directory ✅
+  - Verbosity setting ✅
+  - Graph Usage
+  - Number min and max value to docs
+  - Slider
+  - OptionList
+  - Tab usage
+  - prepare filesystem things ?
+  - Generic creation and updates
+  - additionsl parameters sliderContinuous     
+  - jsonUpdateDocumentSize = 2000;
+    jsonInitialDocumentSize = 8000;
+
 # ESPUI 2.0
 
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png) //
@@ -15,47 +31,25 @@ So if you either don't know how or just don't want to waste time: this is your
 simple solution user interface without the need of internet connectivity or any
 additional servers.
 
-The Library runs fine on any kind of ESP8266 and ESP32 (NodeMCU Boards, usw)
+The Library runs fine on any kind of **ESP8266** and **ESP32** (NodeMCU Boards, usw)
 
-# Important notes
+## Changelog for 2.0:
 
-THIS IS THE 2.0.0 DEVELOPMENT BRANCH, NOT GUARANTIED TO WORK
-
-**Roadmap for 2.0.0:**
-
-- ArduinoJSON 6.10.0 Support ✅
-- Tabs by @eringerli ISSUE #45 ✅
-  - remove black line without tabs ✅
-- API changes by @eringerli ✅
-  - less updateControl functions ✅
-  - proper wrappers for all create/update actions ✅
-- Min Max on slider by @eringerli ✅
-- OptionList by @eringerli ✅
-- Public Access to ESPAsyncServer ✅
-- Graph Widget ✅
-
-* Persist save graph in local storage #10
-* Switch slider behaviour ?
-* Cleanup Example, DNS and autojoin
-* data upload new info to doc? (copy to folder?)
-* Cleanup and extend Documentation
-  - Number field ✅
-  - Text field ✅
-  - Data directory ✅
-  - Graph Usage
-  - Number min and max value to docs
-  - Slider
-  - OptionList
-  - Tab usage
-  - Verbosity setting
-
-## Changelog for 2.0 functions:
-
+- ArduinoJSON 6.10.0 Support
 - split pad into pad and padWithCenter
-- Cleaned order or parameters on switch
-- cleaned order of parameters on pad
-- Changes all numbers to actually be numbers (slider value, number value, min
-  and max)
+- Cleaned Order or parameters on switch
+- cleaned Order of parameters on pad
+- Changes all numbers to actually be numbers (slider value, number value, min and max)
+
+### Added features
+
+- Tabs by @eringerli ISSUE #45
+- Generic API by @eringerli
+- Min Max on slider by @eringerli
+- OptionList by @eringerli
+- Public Access to ESPAsyncServer
+- Graph Widget (Persist save graph in local storage #10)
+
 
 ## Dependencies
 
@@ -63,7 +57,7 @@ This library is dependent on the following libraries to function properly.
 
 - [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Last tested with
-  version 6.10.0) **Plus for ESP8266**
+  version 6.10.0)
 
 - (_For ESP8266_) [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
 - (_For ESP32_) [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
@@ -127,27 +121,30 @@ more program memory to work with.
 
 ## User interface Elements
 
-- Label (updateable)
+- Label
 - Button
-- Switch (updateable)
+- Switch
 - Control pad
 - Control pad with center button
 - Slider
-- Text Input (updateable)
-- Numberinput (updateable)
+- Text Input
+- Numberinput
 
-Checkout the example for the usage
+Checkout the example for the usage or see the detailed info below
 
 ## Available colors:
 
-- COLOR_TURQUOISE
-- COLOR_EMERALD
-- COLOR_PETERRIVER
-- COLOR_WETASPHALT
-- COLOR_SUNFLOWER
-- COLOR_CARROT
-- COLOR_ALIZARIN
-- COLOR_NONE
+- Turquoise
+- Emerald
+- Peterriver
+- Wetasphalt
+- Sunflower
+- Carrot
+- Alizarin
+- Dark
+- None
+
+(Use like `ControlColor::Sunflower`)
 
 ## Documentation
 
@@ -155,17 +152,15 @@ The heart of ESPUI is
 [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's
 frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like
 lightweight [zepto.js](https://zeptojs.com/) for Handling Click Events Etc. The
-communication between the _ESP32_ and the client browser works using web
+communication between the _ESP_ and the client browser works using web
 sockets. ESPUI does not need network access and can be used in standalone access
-point mode. All assets are loaded from the internal SPIFFS filesystem of the
-ESP32.
+point mode, all resources are loaded directly from the ESPs memory.
 
 This section will explain in detail how the Library is to be used from the
-Arduino code side. As of now the Facilino blocks are not implemented. In the
-arduino setup() routine the interface can be customised by adding UI Elements.
+Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements.
 This is done by calling the corresponding library methods on the Library object
-ESPUI. Eg: `ESPUI.button(“button”, &myCallback);` creates a button in the
-interface that calls the “myCallback” function when changed. All buttons and
+`ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the
+interface that calls the `myCallback(Control *sender, int value)` function when changed. All buttons and
 items call their callback whenever there is a state change from them. This means
 the button will call the callback when it is pressed and also again when it is
 released. To separate different events an integer number with the event name is
@@ -177,8 +172,12 @@ of the UI library:
 
 ![Buttons](https://github.com/s00500/ESPUI/blob/master/docs/ui_button.png)
 
-Buttons have a name and a callback value. They have one event for press and one
-for release.
+Buttons have a name and a callback value. They have one event for press (`B_DOWN`) and one
+for release (`B_UP`).
+
+* B_DOWN
+* B_UP
+
 
 #### Switch
 
@@ -186,9 +185,12 @@ for release.
 
 Switches sync their state on all connected devices. This means when you change
 their value they change visibly on all tablets or computers that currently
-display the interface. They also have two types of events: one for turning on
-and one for turning off.
+display the interface. They also have two types of events: one when turning on (`S_ACTIVE`)
+and one when turning off (`S_INACTIVE`).
 
+* S_ACTIVE
+* S_INACTIVE
+  
 #### Buttonpad
 
 ![control pads](https://github.com/s00500/ESPUI/blob/master/docs/ui_controlpad.png)
@@ -198,13 +200,25 @@ useful for con-trolling all kinds of movements of vehicles or also of course our
 walking robots. They use a single callback per pad and have 8 or 10 different
 event types to differentiate the button actions.
 
+* P_LEFT_DOWN 
+* P_LEFT_UP
+* P_RIGHT_DOWN 
+* P_RIGHT_UP
+* P_FOR_DOWN 
+* P_FOR_UP
+* P_BACK_DOWN 
+* P_BACK_UP
+* P_CENTER_DOWN 
+* P_CENTER_UP
+
+
 #### Labels
 
 ![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_labels.png)
 
 Labels are a nice tool to get information from the robot to the user interface.
 This can be done to show states, values of sensors and configuration parameters.
-To send data from the code use `ESP.print(labelId, “Text”);` . Labels get a name
+To send data from the code use `ESP.print(labelId, "Text");` . Labels get a name
 on creation and a initial value. The name is not changeable once the UI
 initialised.
 
@@ -237,6 +251,12 @@ The textinput works very similar like the number input but with a string. You
 can enter a String into it and when you are done with your change it is sent to
 the ESP.
 
+#### Graph
+
+TODO: Add image
+
+// TODO: add docs
+
 #### Using Tabs
 
 TODO: Add image
@@ -245,12 +265,11 @@ TODO: Add image
 
 #### Initialisation of the UI
 
-After all the elements are configured you can use `ESPUI.begin(“Some Title”);`
-to start the UI interface. (Or `ESPUI.beginSPIFFS(“Some Title”);` respectively)
+After all the elements are configured you can use `ESPUI.begin("Some Title");`
+to start the UI interface. (Or `ESPUI.beginSPIFFS("Some Title");` respectively)
 Make sure you setup a working network connection or AccesPoint **before** (See
-example). The web interface can then be used from multiple devices at once and
-also shows an connection status in the top bar. The library is designed to be
-easy to use and can still be extended with a lot of more functionality.
+gui.ino example). The web interface can then be used from multiple devices at once and
+also shows an connection status in the top bar.
 
 #### Log output
 
@@ -259,26 +278,22 @@ ESPUI has several different log levels. You can set them using the
 
 Loglevels are:
 
-- Verbosity::Quiet (default)
-- Verbosity::Verbose
-- Verbosity::VerboseJSON
+- `Verbosity::Quiet` (default)
+- `Verbosity::Verbose`
+- `Verbosity::VerboseJSON`
 
-// TODO: Add some more notes here
+VerboseJSON outputs the most debug information.
 
 # Notes for Development
 
-If you want to work on the HTML/CSS/JS files, do make changes in the `data`
+If you want to work on the HTML/CSS/JS files, do make changes in the *data*
 directory. When you need to transfer that code to the ESP, run
-`tools/prepare_static_ui_sources.py -a` (this script needs python3 with the
-modules htmlmin, jsmin and csscompressor). This will generate a) minified files
-next to the original files to be uploaded with the ESP32 sketch data uploader
-mentioned above and b) the C header files in `src` that contain the minified and
-gzipped HTML/CSS/JS data (which are used by the **prepareFileSystem** example
-sketch or when they are served from PROGMEM; see above in the section "Getting
-started"). Alternatively, you can duplicate the `examples/gui` directory and
-work on the copy. Then specify the `--source` and `--target` arguments to the
+`tools/prepare_static_ui_sources.py -a` (this script needs **python3** with the
+modules **htmlmin**, **jsmin** and **csscompressor**). This will generate a) minified files
+next to the original files and b) the C header files in `src` that contain the minified and
+gzipped HTML/CSS/JS data. Alternatively, you can specify the `--source` and `--target` arguments to the
 `prepare_static_ui_sources.py` script (run the script without arguments for
-help).
+help) if you want to use different locations.
 
 If you don't have a python environment, you need to minify and gzip the
 HTML/CSS/JS files manually. I wrote a little useful jsfiddle for this,
@@ -286,7 +301,7 @@ HTML/CSS/JS files manually. I wrote a little useful jsfiddle for this,
 
 If you change something in HTML/CSS/JS and want to create a pull request, please
 do include the minified versions and corresponding C header files in your
-commits.
+commits. (Do **NOT** commit all the minified versions for the non changed files)
 
 # Contribute
 
