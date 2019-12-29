@@ -3,20 +3,16 @@
   - Text field ✅
   - Data directory ✅
   - Verbosity setting ✅
+  - Tab usage ✅
+  - OptionList ✅
+  -
   - Graph Usage
   - Number min and max value to docs
-  - Slider
-  - OptionList ✅
-  - Tab usage ✅
   - Generic creation and updates
-  - additionsl parameters sliderContinuous
-  - jsonUpdateDocumentSize = 2000;
-    jsonInitialDocumentSize = 8000;
 
 # ESPUI (v2.X)
 
-![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png) //
-TODO: Update Logo
+![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
 
 ESPUI is a simple library to make a web user interface for your projects using
 the **ESP8266** or the **ESP32** It uses web sockets and lets you create,
@@ -240,7 +236,14 @@ The Slider can be used to slide through a value from 1 to 100. Slides provide
 realtime data, are touch compatible and can be used to for example control a
 Servo. The current value is shown while the slider is dragged in a little bubble
 over the handle. In the Callback the slider does not return an int but a String.
-Use the .toInt
+Use the .toInt function to convert the value, see the **gui** example to check how it works.
+
+A slider usually only sends a new value when it is released to save the esps from being spammed with values. This behaviour can be cahnged globally using a property of the ESPUI object before `begin()`:
+
+```
+  ESPUI.sliderContinuous = true;
+  ESPUI.begin("ESPUI Control");
+```
 
 #### Number Input
 
@@ -316,6 +319,16 @@ Loglevels are:
 
 VerboseJSON outputs the most debug information.
 
+### Advanced properties
+
+If you have many different widgets it might be necessary to adjust the JSON Buffers used internally in ESPUI before .begin() :
+
+```
+ ESPUI.jsonUpdateDocumentSize = 2000; // This is the default, and this value is not affected by the amount of widgets
+ ESPUI.jsonInitialDocumentSize = 8000; // This is the default, adjust when you have too many widgets or options
+ ESPUI.begin("ESPUI Control");
+```
+
 # Notes for Development
 
 If you want to work on the HTML/CSS/JS files, do make changes in the _data_
@@ -338,6 +351,6 @@ commits. (Do **NOT** commit all the minified versions for the non changed files)
 # Contribute
 
 Liked this Library? You can **support** me by sending me a :coffee:
-[Coffee](https://paypal.me/lukasbachschwell/3).
+[Coffee](https://paypal.me/lukasbachschwell/5).
 
 Otherwise I really welcome **Pull Requests**.
