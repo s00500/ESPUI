@@ -207,7 +207,6 @@ void setup(void) {
   ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
 
   graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
-  ESPUI.gauge("Gauge Test", ControlColor::Wetasphalt, 58, 0, 100); // Gauge has
 
   /*
    * .begin loads and serves all files from PROGMEM directly.

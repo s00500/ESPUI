@@ -1,4 +1,4 @@
-* Cleanup and extend Documentation
+- Cleanup and extend Documentation
   - Number field ✅
   - Text field ✅
   - Data directory ✅
@@ -6,15 +6,14 @@
   - Graph Usage
   - Number min and max value to docs
   - Slider
-  - OptionList
-  - Tab usage
-  - prepare filesystem things ?
+  - OptionList ✅
+  - Tab usage ✅
   - Generic creation and updates
-  - additionsl parameters sliderContinuous     
+  - additionsl parameters sliderContinuous
   - jsonUpdateDocumentSize = 2000;
     jsonInitialDocumentSize = 8000;
 
-# ESPUI 2.0
+# ESPUI (v2.X)
 
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png) //
 TODO: Update Logo
@@ -43,13 +42,18 @@ The Library runs fine on any kind of **ESP8266** and **ESP32** (NodeMCU Boards, 
 
 ### Added features
 
-- Tabs by @eringerli ISSUE #45
+- Tabs by @eringerli #45
 - Generic API by @eringerli
 - Min Max on slider by @eringerli
 - OptionList by @eringerli
 - Public Access to ESPAsyncServer
 - Graph Widget (Persist save graph in local storage #10)
 
+## Further Roadmap
+
+- Slider css issues
+- implement Gauge
+- File upload ?
 
 ## Dependencies
 
@@ -71,7 +75,10 @@ Make sure all the dependencies are installed, then install like so:
 Just include this library as a dependency on lib_deps like so:
 
 ```
-lib_deps = ESPUI
+lib_deps =
+    ESPUI
+    ESPAsyncWebserver
+    ESPAsyncTCP # or AsyncTCP on ESP32
 ```
 
 #### Directly Through Arduino IDE (_recommended_)
@@ -129,6 +136,8 @@ more program memory to work with.
 - Slider
 - Text Input
 - Numberinput
+- Graph
+- Option select
 
 Checkout the example for the usage or see the detailed info below
 
@@ -175,9 +184,8 @@ of the UI library:
 Buttons have a name and a callback value. They have one event for press (`B_DOWN`) and one
 for release (`B_UP`).
 
-* B_DOWN
-* B_UP
-
+- B_DOWN
+- B_UP
 
 #### Switch
 
@@ -188,9 +196,9 @@ their value they change visibly on all tablets or computers that currently
 display the interface. They also have two types of events: one when turning on (`S_ACTIVE`)
 and one when turning off (`S_INACTIVE`).
 
-* S_ACTIVE
-* S_INACTIVE
-  
+- S_ACTIVE
+- S_INACTIVE
+
 #### Buttonpad
 
 ![control pads](https://github.com/s00500/ESPUI/blob/master/docs/ui_controlpad.png)
@@ -200,17 +208,16 @@ useful for con-trolling all kinds of movements of vehicles or also of course our
 walking robots. They use a single callback per pad and have 8 or 10 different
 event types to differentiate the button actions.
 
-* P_LEFT_DOWN 
-* P_LEFT_UP
-* P_RIGHT_DOWN 
-* P_RIGHT_UP
-* P_FOR_DOWN 
-* P_FOR_UP
-* P_BACK_DOWN 
-* P_BACK_UP
-* P_CENTER_DOWN 
-* P_CENTER_UP
-
+- P_LEFT_DOWN
+- P_LEFT_UP
+- P_RIGHT_DOWN
+- P_RIGHT_UP
+- P_FOR_DOWN
+- P_FOR_UP
+- P_BACK_DOWN
+- P_BACK_UP
+- P_CENTER_DOWN
+- P_CENTER_UP
 
 #### Labels
 
@@ -237,7 +244,7 @@ Use the .toInt
 
 #### Number Input
 
-TODO: Add image
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_number.png)
 
 The numberinput can be used to directly input numbers to your program. You can
 enter a Value into it and when you are done with your change it is sent to the
@@ -245,7 +252,7 @@ ESP.
 
 #### Text Input
 
-TODO: Add image
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_text.png)
 
 The textinput works very similar like the number input but with a string. You
 can enter a String into it and when you are done with your change it is sent to
@@ -253,17 +260,42 @@ the ESP.
 
 #### Graph
 
-TODO: Add image
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_graph.png)
 
-// TODO: add docs
+The graph widget can display graph points with timestamp at wich they arrive
 
-#### Using Tabs
+#### Option select
 
-TODO: Add image
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_select1.png)
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_select2.png)
 
-// TODO: add Text for tabs
+The option select works by first creating a select widget like so
 
-#### Initialisation of the UI
+`uint16_t select1 = ESPUI.addControl( ControlType::Select, "Select:", "", ControlColor::Alizarin, tab1, &selectExample );`
+
+And then adding Options to it like seperate widgets, specifying the select as the parent:
+
+```
+ESPUI.addControl( ControlType::Option, "Option1", "Opt1", ControlColor::Alizarin, select1 );
+ESPUI.addControl( ControlType::Option, "Option2", "Opt2", ControlColor::Alizarin, select1 );
+ESPUI.addControl( ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1 );
+```
+
+Check the **tabbedGui** example for a working demo
+
+### Using Tabs
+
+![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_tabs.png)
+
+Tabs can be used to organize your widgets in pages. Check the tabbedGui example.
+Tabs can be created using the generic functions like so:
+`ESPUI.addControl( ControlType::Tab, "Settings 1", "Settings 1" );`
+
+Then all widgets for the tab need to be added to it by specifying the tab as the parrent (widgets not added to a tab will be shown above the tab selctor)
+
+`ESPUI.addControl( ControlType::Text, "Text Title:", "a Text Field", ControlColor::Alizarin, tab1, &textCall );`
+
+### Initialisation of the UI
 
 After all the elements are configured you can use `ESPUI.begin("Some Title");`
 to start the UI interface. (Or `ESPUI.beginSPIFFS("Some Title");` respectively)
@@ -271,7 +303,7 @@ Make sure you setup a working network connection or AccesPoint **before** (See
 gui.ino example). The web interface can then be used from multiple devices at once and
 also shows an connection status in the top bar.
 
-#### Log output
+### Log output
 
 ESPUI has several different log levels. You can set them using the
 `ESPUI.setVerbosity(Verbosity::VerboseJSON)` function.
@@ -286,7 +318,7 @@ VerboseJSON outputs the most debug information.
 
 # Notes for Development
 
-If you want to work on the HTML/CSS/JS files, do make changes in the *data*
+If you want to work on the HTML/CSS/JS files, do make changes in the _data_
 directory. When you need to transfer that code to the ESP, run
 `tools/prepare_static_ui_sources.py -a` (this script needs **python3** with the
 modules **htmlmin**, **jsmin** and **csscompressor**). This will generate a) minified files

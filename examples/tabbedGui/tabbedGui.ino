@@ -18,7 +18,6 @@ const char* hostname = "espui";
 uint16_t button1;
 uint16_t switchOne;
 uint16_t status;
-uint16_t millisLabelId;
 
 void numberCall( Control* sender, int type ) {
   Serial.println( sender->value );
@@ -255,7 +254,6 @@ void loop( void ) {
   static bool switchi = false;
 
   if ( millis() - oldTime > 5000 ) {
-    ESPUI.updateControlValue( millisLabelId, String( millis() ) );
     switchi = !switchi;
     ESPUI.updateControlValue( switchOne, switchi ? "1" : "0" );
 
