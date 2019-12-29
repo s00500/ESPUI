@@ -22,11 +22,12 @@
     },
     {
       "name": "ArduinoJson",
+      "version": "5.13.4",
       "authors": "Benoit Blanchon",
       "frameworks": "arduino"
     }
   ],
-  "version": "2.0.0-alpha",
+  "version": "2.0.0",
   "frameworks": "arduino",
   "platforms": "*"
 }
