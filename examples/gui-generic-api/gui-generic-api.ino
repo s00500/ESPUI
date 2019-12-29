@@ -13,15 +13,16 @@ DNSServer dnsServer;
 
 const char *ssid = "ESPUI";
 const char *password = "espui";
-
 const char *hostname = "espui";
 
-int statusLabelId;
-int graphId;
-int millisLabelId;
-int testSwitchId;
+uint16_t status;
+uint16_t button1;
+uint16_t millisLabelId;
+uint16_t switchOne;
 
-void numberCall(Control *sender, int type) { Serial.println(sender->value); }
+void numberCall( Control* sender, int type ) {
+  Serial.println( sender->value );
+}
 
 void textCall(Control *sender, int type) {
   Serial.print("Text: ID: ");
@@ -35,10 +36,6 @@ void slider(Control *sender, int type) {
   Serial.print(sender->id);
   Serial.print(", Value: ");
   Serial.println(sender->value);
-  // Like all Control Values in ESPUI slider values are Strings. To use them as int simply do this:
-  int sliderValueWithOffset = sender->value.toInt() + 100;
-  Serial.print("SliderValue with offset");
-  Serial.println(sliderValueWithOffset);
 }
 
 void buttonCallback(Control *sender, int type) {
@@ -57,15 +54,22 @@ void buttonExample(Control *sender, int type) {
   switch (type) {
   case B_DOWN:
     Serial.println("Status: Start");
-    ESPUI.print(statusLabelId, "Start");
+    ESPUI.updateControlValue(status, "Start");
+
+    ESPUI.getControl(button1)->color = ControlColor::Carrot;
+    ESPUI.updateControl(button1);
     break;
 
   case B_UP:
     Serial.println("Status: Stop");
-    ESPUI.print(statusLabelId, "Stop");
+    ESPUI.updateControlValue(status, "Stop");
+
+    ESPUI.getControl(button1)->color = ControlColor::Peterriver;
+    ESPUI.updateControl(button1);
     break;
   }
 }
+
 void padExample(Control *sender, int value) {
   switch (value) {
   case P_LEFT_DOWN:
@@ -126,6 +130,13 @@ void switchExample(Control *sender, int value) {
 
   Serial.print(" ");
   Serial.println(sender->id);
+}
+
+void selectExample(Control *sender, int value) {
+  Serial.print("Select: ID: ");
+  Serial.print(sender->id);
+  Serial.print(", Value: ");
+  Serial.println(sender->value);
 }
 
 void otherSwitchExample(Control *sender, int value) {
@@ -193,27 +204,33 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
-  statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
-  millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
-  ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
-  ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
-  ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
-  ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
-  testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
-  ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-  ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30);
-  ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
-  ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
-  ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+  status = ESPUI.addControl(ControlType::Label, "Status:", "Stop", ControlColor::Turquoise);
 
-  graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
+  uint16_t select1 = ESPUI.addControl(ControlType::Select, "Select:", "", ControlColor::Alizarin, Control::noParent, &selectExample);
+
+  ESPUI.addControl(ControlType::Option, "Option1", "Opt1", ControlColor::Alizarin, select1);
+  ESPUI.addControl(ControlType::Option, "Option2", "Opt2", ControlColor::Alizarin, select1);
+  ESPUI.addControl(ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1);
+
+  ESPUI.addControl(ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, Control::noParent, &textCall);
+
+  millisLabelId = ESPUI.addControl(ControlType::Label, "Millis:", "0", ControlColor::Emerald, Control::noParent);
+  button1 = ESPUI.addControl(ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, Control::noParent, &buttonCallback);
+  ESPUI.addControl(ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, Control::noParent, &buttonExample);
+  ESPUI.addControl(ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, Control::noParent, &padExample);
+  ESPUI.addControl(ControlType::Pad, "Pad without center", "", ControlColor::Carrot, Control::noParent, &padExample);
+  switchOne = ESPUI.addControl(ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, Control::noParent, &switchExample);
+  ESPUI.addControl(ControlType::Switcher, "Switch two", "", ControlColor::None, Control::noParent, &otherSwitchExample);
+  ESPUI.addControl(ControlType::Slider, "Slider one", "30", ControlColor::Alizarin, Control::noParent, &slider);
+  ESPUI.addControl(ControlType::Slider, "Slider two", "100", ControlColor::Alizarin, Control::noParent, &slider);
+  ESPUI.addControl(ControlType::Number, "Number:", "50", ControlColor::Alizarin, Control::noParent, &numberCall);
 
   /*
    * .begin loads and serves all files from PROGMEM directly.
    * If you want to serve the files from SPIFFS use ESPUI.beginSPIFFS
    * (.prepareFileSystem has to be run in an empty sketch before)
    */
- 
+
   // Enable this option if you want sliders to be continuous (update during move) and not discrete (update on stop)
   // ESPUI.sliderContinuous = true;
 
@@ -236,13 +253,10 @@ void loop(void) {
   static bool testSwitchState = false;
 
   if (millis() - oldTime > 5000) {
-    ESPUI.print(millisLabelId, String(millis()));
-
-    ESPUI.addGraphPoint(graphId, random(1, 50));
-
+    ESPUI.updateControlValue(millisLabelId, String(millis()));
     testSwitchState = !testSwitchState;
-    ESPUI.updateSwitcher(testSwitchId, testSwitchState);
-    
+    ESPUI.updateControlValue(switchOne, testSwitchState ? "1" : "0");
+
     oldTime = millis();
   }
 }

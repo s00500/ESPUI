@@ -21,7 +21,7 @@ def parse_arguments(args=None):
     parser = argparse.ArgumentParser(
         description="Prepares ESPUI header files by minifying and gzipping HTML, JS and CSS source files.")
     parser.add_argument("--auto", "--all", "-a", dest="auto", action="store_true",
-                        help="Automatically find all source files in examples/gui/data/ and write C header files to src/")
+                        help="Automatically find all source files in data/ and write C header files to src/")
     parser.add_argument("--source", "--sources", "-s", dest="sources", default=None,
                         help="Sources directory containing CSS or JS files OR one specific file to minify")
     parser.add_argument("--target", "-t", dest="target", default=None,
@@ -120,7 +120,7 @@ def check_args(args):
         sys.exit(abort)
 
 def main(args):
-    args.sources = os.path.realpath(args.sources or os.sep.join((os.path.dirname(os.path.realpath(__file__)), "..", "examples", "gui", "data")))
+    args.sources = os.path.realpath(args.sources or os.sep.join((os.path.dirname(os.path.realpath(__file__)), "..", "data")))
     args.target  = os.path.realpath(args.target  or os.sep.join((os.path.dirname(os.path.realpath(__file__)), "..", "src")))
     check_args(args)
     if os.path.isfile(args.sources):

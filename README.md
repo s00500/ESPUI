@@ -1,4 +1,4 @@
-# ESPUI
+# ESPUI (v2.X)
 
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
 
@@ -14,71 +14,90 @@ So if you either don't know how or just don't want to waste time: this is your
 simple solution user interface without the need of internet connectivity or any
 additional servers.
 
-I completely rewrote the EasyUI Library created by ayushsharma82
-[Here](https://github.com/ayushsharma82/) Now it uses ESPAsyncWebserver and is
-mainly to be used with the ESP32 Processor.
+The Library runs fine on any kind of **ESP8266** and **ESP32** (NodeMCU Boards, usw)
 
-# Important notes
+## Changelog for 2.0:
 
-Currently ESPUI only supports ArduinoJSON 5.x, please keep that in mind! Version
-6 support is work in progress
+- ArduinoJSON 6.10.0 Support
+- split pad into pad and padWithCenter
+- Cleaned Order or parameters on switch
+- cleaned Order of parameters on pad
+- Changes all numbers to actually be numbers (slider value, number value, min and max)
+
+### Added features
+
+- Tabs by @eringerli #45
+- Generic API by @eringerli
+- Min Max on slider by @eringerli
+- OptionList by @eringerli
+- Public Access to ESPAsyncServer
+- Graph Widget (Persist save graph in local storage #10)
+
+## Further Roadmap
+
+- Slider css issues
+- implement Gauge
+- File upload ?
 
 ## Dependencies
 
 This library is dependent on the following libraries to function properly.
 
 - [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
-- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) **(VERSIONS 5.x only
-  currently)**
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Last tested with
+  version 6.10.0)
 
-**Plus for ESP8266**
-
-- [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
-
-**Additionally necessary for ESP32**
-
-- [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
+- (_For ESP8266_) [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
+- (_For ESP32_) [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
 
 ## How to Install
 
 Make sure all the dependencies are installed, then install like so:
+
+#### Using PlattformIO (_recommended_)
+
+Just include this library as a dependency on lib_deps like so:
+
+```
+lib_deps =
+    ESPUI
+    ESPAsyncWebserver
+    ESPAsyncTCP # or AsyncTCP on ESP32
+```
 
 #### Directly Through Arduino IDE (_recommended_)
 
 You can find this Library in the Arduino IDE library manager Go to Sketch >
 Include Library > Library Manager > Search for "ESPUI" > Install
 
-#### Manual Install
+#### Manual Install Arduino IDE
 
-For Windows: Download the
+_For Windows:_ Download the
 [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the
 .zip in Documents>Arduino>Libraries>{Place "ESPUI" folder Here}
 
-For Linux: Download the
+_For Linux:_ Download the
 [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the
 .zip in Sketchbook/Libraries/{Place "ESPUI" folder Here}
 
-For macOs: Download the
+_For macOs:_ Download the
 [Repository](https://github.com/s00500/ESPUI/archive/master.zip) and extract the
 .zip in ~/Documents/Arduino/libraries/{Place "ESPUI" folder Here}
 
-#### Manually through IDE
-
-Download the [Repository](https://github.com/s00500/ESPUI/archive/master.zip),
 Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
 
 ## Getting started
 
-ESPUI serves several files to the browser to build up its webinterface. This can
-be achieved in 2 ways: _PROGMEM_ or _SPIFFS_
+ESPUI serves several files to the browser to build up its web interface. This
+can be achieved in 2 ways: _PROGMEM_ or _SPIFFS_
 
 _When `ESPUI.begin()` is called the default is serving files from Memory and
 ESPUI should work out of the box!_
 
-But if this causes your program to _use too much memory_ you can burn the files
-into the SPIFFS filesystem on the ESP. There are now two ways to do this: you
-can either use the ESP file upload tool or you use the library function
-`ESPUI.prepareFileSystem()`
+**OPTIONAL:** But if this causes your program to _use too much memory_ you can
+burn the files into the SPIFFS filesystem on the ESP. There are now two ways to
+do this: you can either use the ESP file upload tool or you use the library
+function `ESPUI.prepareFileSystem()`
 
 #### Simple filesystem preparation (_recommended_)
 
@@ -88,58 +107,37 @@ will create all needed files. Congratulations, you are done, from now on you
 just need to to this again when there is a library update, or when you want to
 use another chip :-) Now you can upload your normal sketch, when you do not call
 the `ESPUI.prepareFileSystem()` function the compiler will strip out all the
-unnecessary that is already saved in the chip's filesystem and you have more
-programm memory to work with.
-
-#### Manual way (mainly for development)
-
-To do this download and install me-no-devs wonderful
-[ESP32 sketch data uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin)
-or for ESP8266
-[ESP8266 sketch data uploader](https://github.com/esp8266/arduino-esp8266fs-plugin)
-
-Then open the **gui** example sketch and select "Upload Sketch Data" from the
-Tools menu for your processor. Now you are set to go and use any code you want
-to with this library
+unnecessary strings that are already saved in the chip's filesystem and you have
+more program memory to work with.
 
 ## User interface Elements
 
-- Label (updateable)
+- Label
 - Button
-- Switch (updateable)
+- Switch
 - Control pad
 - Control pad with center button
 - Slider
-- Text Input (updateable)
-- Numberinput (updateable)
+- Text Input
+- Numberinput
+- Graph
+- Option select
 
-Checkout the example for the usage
+Checkout the example for the usage or see the detailed info below
 
 ## Available colors:
 
-- COLOR_TURQUOISE
-- COLOR_EMERALD
-- COLOR_PETERRIVER
-- COLOR_WETASPHALT
-- COLOR_SUNFLOWER
-- COLOR_CARROT
-- COLOR_ALIZARIN
-- COLOR_NONE
+- Turquoise
+- Emerald
+- Peterriver
+- Wetasphalt
+- Sunflower
+- Carrot
+- Alizarin
+- Dark
+- None
 
-## Roadmap :
-
-- ~~Setup SPIFFS using values in program memory~~
-- ~~ESP8266 support~~
-- ~~PlattformIO Integration~~
-- ~~Multiline Labels~~
-- ~~GZip Files and serve from memory~~
-- Datagraph output -> _WIP_
-- ~~Number input ~~
-- ~~Text input ~~
-- Dokumentation for Text and number widget
-- Number min and max value
-- proper return value (as int and not as string) for slider
-- Maybe a slider range setting, meanwhile please use _map()_
+(Use like `ControlColor::Sunflower`)
 
 ## Documentation
 
@@ -147,17 +145,15 @@ The heart of ESPUI is
 [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's
 frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like
 lightweight [zepto.js](https://zeptojs.com/) for Handling Click Events Etc. The
-communication between the _ESP32_ and the client browser works using web
+communication between the _ESP_ and the client browser works using web
 sockets. ESPUI does not need network access and can be used in standalone access
-point mode. All assets are loaded from the internal SPIFFS filesystem of the
-ESP32.
+point mode, all resources are loaded directly from the ESPs memory.
 
 This section will explain in detail how the Library is to be used from the
-Arduino code side. As of now the Facilino blocks are not implemented. In the
-arduino setup() routine the interface can be customised by adding UI Elements.
+Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements.
 This is done by calling the corresponding library methods on the Library object
-ESPUI. Eg: `ESPUI.button(“button”, &myCallback);` creates a button in the
-interface that calls the “myCallback” function when changed. All buttons and
+`ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the
+interface that calls the `myCallback(Control *sender, int value)` function when changed. All buttons and
 items call their callback whenever there is a state change from them. This means
 the button will call the callback when it is pressed and also again when it is
 released. To separate different events an integer number with the event name is
@@ -169,8 +165,11 @@ of the UI library:
 
 ![Buttons](https://github.com/s00500/ESPUI/blob/master/docs/ui_button.png)
 
-Buttons have a name and a callback value. They have one event for press and one
-for release.
+Buttons have a name and a callback value. They have one event for press (`B_DOWN`) and one
+for release (`B_UP`).
+
+- B_DOWN
+- B_UP
 
 #### Switch
 
@@ -178,8 +177,11 @@ for release.
 
 Switches sync their state on all connected devices. This means when you change
 their value they change visibly on all tablets or computers that currently
-display the interface. They also have two types of events: one for turning on
-and one for turning off.
+display the interface. They also have two types of events: one when turning on (`S_ACTIVE`)
+and one when turning off (`S_INACTIVE`).
+
+- S_ACTIVE
+- S_INACTIVE
 
 #### Buttonpad
 
@@ -190,13 +192,24 @@ useful for con-trolling all kinds of movements of vehicles or also of course our
 walking robots. They use a single callback per pad and have 8 or 10 different
 event types to differentiate the button actions.
 
+- P_LEFT_DOWN
+- P_LEFT_UP
+- P_RIGHT_DOWN
+- P_RIGHT_UP
+- P_FOR_DOWN
+- P_FOR_UP
+- P_BACK_DOWN
+- P_BACK_UP
+- P_CENTER_DOWN
+- P_CENTER_UP
+
 #### Labels
 
 ![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_labels.png)
 
 Labels are a nice tool to get information from the robot to the user interface.
 This can be done to show states, values of sensors and configuration parameters.
-To send data from the code use `ESP.print(labelId, “Text”);` . Labels get a name
+To send data from the code use `ESP.print(labelId, "Text");` . Labels get a name
 on creation and a initial value. The name is not changeable once the UI
 initialised.
 
@@ -205,36 +218,140 @@ the normal `<br>` tag in the string you print to the label
 
 #### Slider
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_slider.png)
+![slider](https://github.com/s00500/ESPUI/blob/master/docs/ui_slider.png)
 
 The Slider can be used to slide through a value from 1 to 100. Slides provide
 realtime data, are touch compatible and can be used to for example control a
 Servo. The current value is shown while the slider is dragged in a little bubble
-over the handle.
+over the handle. In the Callback the slider does not return an int but a String.
+Use the .toInt function to convert the value, see the **gui** example to check how it works.
 
-#### Initialisation of the UI
+A slider usually only sends a new value when it is released to save the esps from being spammed with values. This behaviour can be cahnged globally using a property of the ESPUI object before `begin()`:
 
-After all the elements are configured you can use `ESPUI.begin(“Some Title”);`
-to start the UI interface. (Or `ESPUI.beginSPIFFS(“Some Title”);` respectively)
+```
+  ESPUI.sliderContinuous = true;
+  ESPUI.begin("ESPUI Control");
+```
+
+#### Number Input
+
+![number](https://github.com/s00500/ESPUI/blob/master/docs/ui_number.png)
+
+The numberinput can be used to directly input numbers to your program. You can
+enter a Value into it and when you are done with your change it is sent to the
+ESP.
+
+A number box needs to have a min and a max value. To set it up just use:
+
+`ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);`
+
+#### Text Input
+
+![text](https://github.com/s00500/ESPUI/blob/master/docs/ui_text.png)
+
+The textinput works very similar like the number input but with a string. You
+can enter a String into it and when you are done with your change it is sent to
+the ESP.
+
+#### Graph
+
+![graph](https://github.com/s00500/ESPUI/blob/master/docs/ui_graph.png)
+
+The graph widget can display graph points with timestamp at wich they arrive
+
+Use `ESPUI.addGraphPoint(graphId, random(1, 50));` to add a new value at the current time, use `ESPUI.clearGraph(graphId)` to clear the entire graph.
+Graph points are saved in the browser in **localstorage** to be persistant, clear local storageto remove the points or use clearGraph() from a bbutton callback to provide a clear button.
+
+#### Option select
+
+![option1](https://github.com/s00500/ESPUI/blob/master/docs/ui_select1.png)
+![option2](https://github.com/s00500/ESPUI/blob/master/docs/ui_select2.png)
+
+The option select works by first creating a select widget like so
+
+`uint16_t select1 = ESPUI.addControl( ControlType::Select, "Select:", "", ControlColor::Alizarin, tab1, &selectExample );`
+
+And then adding Options to it like seperate widgets, specifying the select as the parent:
+
+```
+ESPUI.addControl( ControlType::Option, "Option1", "Opt1", ControlColor::Alizarin, select1 );
+ESPUI.addControl( ControlType::Option, "Option2", "Opt2", ControlColor::Alizarin, select1 );
+ESPUI.addControl( ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1 );
+```
+
+Check the **tabbedGui** example for a working demo
+
+### Using Tabs
+
+![tabs](https://github.com/s00500/ESPUI/blob/master/docs/ui_tabs.png)
+
+Tabs can be used to organize your widgets in pages. Check the tabbedGui example.
+Tabs can be created using the generic functions like so:
+`ESPUI.addControl( ControlType::Tab, "Settings 1", "Settings 1" );`
+
+Then all widgets for the tab need to be added to it by specifying the tab as the parrent (widgets not added to a tab will be shown above the tab selctor)
+
+`ESPUI.addControl( ControlType::Text, "Text Title:", "a Text Field", ControlColor::Alizarin, tab1, &textCall );`
+
+### Initialisation of the UI
+
+After all the elements are configured you can use `ESPUI.begin("Some Title");`
+to start the UI interface. (Or `ESPUI.beginSPIFFS("Some Title");` respectively)
 Make sure you setup a working network connection or AccesPoint **before** (See
-example). The web interface can then be used from multiple devices at once and
-also shows an connection status in the top bar. The library is designed to be
-easy to use and can still be extended with a lot of more functionality.
+gui.ino example). The web interface can then be used from multiple devices at once and
+also shows an connection status in the top bar.
+
+### Advanced: Generic creation and updates of control widgets
+
+There are 2 generic functions to create and update controls, to see them in action check the **gui-generic-api** example.
+
+To create a generic control use:
+`uint16_t switchOne = ESPUI.addControl(ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, Control::noParent, &switchExample);`
+
+Then its value can be updated by doing:
+
+`ESPUI.updateControlValue(status, "Start");`
+
+You can also update other parameters of the control like its color using:
+
+```
+    ESPUI.getControl(switchOne)->color = ControlColor::Carrot;
+    ESPUI.updateControl(switchOne);
+```
+
+### Log output
+
+ESPUI has several different log levels. You can set them using the
+`ESPUI.setVerbosity(Verbosity::VerboseJSON)` function.
+
+Loglevels are:
+
+- `Verbosity::Quiet` (default)
+- `Verbosity::Verbose`
+- `Verbosity::VerboseJSON`
+
+VerboseJSON outputs the most debug information.
+
+### Advanced properties
+
+If you have many different widgets it might be necessary to adjust the JSON Buffers used internally in ESPUI before .begin() :
+
+```
+ ESPUI.jsonUpdateDocumentSize = 2000; // This is the default, and this value is not affected by the amount of widgets
+ ESPUI.jsonInitialDocumentSize = 8000; // This is the default, adjust when you have too many widgets or options
+ ESPUI.begin("ESPUI Control");
+```
 
 # Notes for Development
 
-If you want to work on the HTML/CSS/JS files, do make changes in the
-`examples/gui/data` directory. When you need to transfer that code to the ESP,
-run `tools/prepare_static_ui_sources.py -a` (this script needs python3 with the
-modules htmlmin, jsmin and csscompressor). This will generate a) minified files
-next to the original files to be uploaded with the ESP32 sketch data uploader
-mentioned above and b) the C header files in `src` that contain the minified and
-gzipped HTML/CSS/JS data (which are used by the **prepareFileSystem** example
-sketch or when they are served from PROGMEM; see above in the section "Getting
-started"). Alternatively, you can duplicate the `examples/gui` directory and
-work on the copy. Then specify the `--source` and `--target` arguments to the
+If you want to work on the HTML/CSS/JS files, do make changes in the _data_
+directory. When you need to transfer that code to the ESP, run
+`tools/prepare_static_ui_sources.py -a` (this script needs **python3** with the
+modules **htmlmin**, **jsmin** and **csscompressor**). This will generate a) minified files
+next to the original files and b) the C header files in `src` that contain the minified and
+gzipped HTML/CSS/JS data. Alternatively, you can specify the `--source` and `--target` arguments to the
 `prepare_static_ui_sources.py` script (run the script without arguments for
-help).
+help) if you want to use different locations.
 
 If you don't have a python environment, you need to minify and gzip the
 HTML/CSS/JS files manually. I wrote a little useful jsfiddle for this,
@@ -242,9 +359,11 @@ HTML/CSS/JS files manually. I wrote a little useful jsfiddle for this,
 
 If you change something in HTML/CSS/JS and want to create a pull request, please
 do include the minified versions and corresponding C header files in your
-commits.
+commits. (Do **NOT** commit all the minified versions for the non changed files)
 
 # Contribute
 
 Liked this Library? You can **support** me by sending me a :coffee:
-[Coffee](https://paypal.me/lukasbachschwell/3).
+[Coffee](https://paypal.me/lukasbachschwell/5).
+
+Otherwise I really welcome **Pull Requests**.

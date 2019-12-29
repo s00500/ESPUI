@@ -6,26 +6,38 @@
 #include "dataStyleCSS.h"
 
 #include "dataControlsJS.h"
+#include "dataGraphJS.h"
 #include "dataSliderJS.h"
+#include "dataTabbedcontentJS.h"
 #include "dataZeptoJS.h"
 
 #include <ESPAsyncWebServer.h>
 #include <functional>
 
+uint16_t Control::idCounter = 0;
+
 // ################# Spiffs functions
 #if defined(ESP32)
 void listDir(const char *dirname, uint8_t levels) {
-  Serial.printf("Listing directory: %s\n", dirname);
+  if (ESPUI.verbosity) {
+    Serial.printf("Listing directory: %s\n", dirname);
+  }
 
   File root = SPIFFS.open(dirname);
 
   if (!root) {
-    Serial.println("Failed to open directory");
+    if (ESPUI.verbosity) {
+      Serial.println("Failed to open directory");
+    }
+
     return;
   }
 
   if (!root.isDirectory()) {
-    Serial.println("Not a directory");
+    if (ESPUI.verbosity) {
+      Serial.println("Not a directory");
+    }
+
     return;
   }
 
@@ -33,16 +45,21 @@ void listDir(const char *dirname, uint8_t levels) {
 
   while (file) {
     if (file.isDirectory()) {
-      Serial.print("  DIR : ");
-      Serial.println(file.name());
+      if (ESPUI.verbosity) {
+        Serial.print("  DIR : ");
+        Serial.println(file.name());
+      }
+
       if (levels) {
         listDir(file.name(), levels - 1);
       }
     } else {
-      Serial.print("  FILE: ");
-      Serial.print(file.name());
-      Serial.print("  SIZE: ");
-      Serial.println(file.size());
+      if (ESPUI.verbosity) {
+        Serial.print("  FILE: ");
+        Serial.print(file.name());
+        Serial.print("  SIZE: ");
+        Serial.println(file.size());
+      }
     }
 
     file = root.openNextFile();
@@ -56,6 +73,7 @@ void listDir(const char *dirname, uint8_t levels) {
 
   String str = "";
   Dir dir = SPIFFS.openDir("/");
+
   while (dir.next()) {
     Serial.print("  FILE: ");
     Serial.print(dir.fileName());
@@ -71,55 +89,90 @@ void ESPUIClass::list() {
     Serial.println("SPIFFS Mount Failed");
     return;
   }
+
   listDir("/", 1);
 #if defined(ESP32)
+
   Serial.println(SPIFFS.totalBytes());
   Serial.println(SPIFFS.usedBytes());
+
 #else
   FSInfo fs_info;
   SPIFFS.info(fs_info);
 
   Serial.println(fs_info.totalBytes);
   Serial.println(fs_info.usedBytes);
+
 #endif
 }
 
 void deleteFile(const char *path) {
-  if (DEBUG_ESPUI) Serial.print(SPIFFS.exists(path));
+  if (ESPUI.verbosity) {
+    Serial.print(SPIFFS.exists(path));
+  }
+
   if (!SPIFFS.exists(path)) {
-    Serial.printf("File: %s does not exist, not deleting\n", path);
+    if (ESPUI.verbosity) {
+      Serial.printf("File: %s does not exist, not deleting\n", path);
+    }
+
     return;
   }
 
-  Serial.printf("Deleting file: %s\n", path);
+  if (ESPUI.verbosity) {
+    Serial.printf("Deleting file: %s\n", path);
+  }
 
   if (SPIFFS.remove(path)) {
-    Serial.println("File deleted");
+    if (ESPUI.verbosity) {
+      Serial.println("File deleted");
+    }
   } else {
-    Serial.println("Delete failed");
+    if (ESPUI.verbosity) {
+      Serial.println("Delete failed");
+    }
   }
 }
 
 void writeFile(const char *path, const char *data) {
-  Serial.printf("Writing file: %s\n", path);
+  if (ESPUI.verbosity) {
+    Serial.printf("Writing file: %s\n", path);
+  }
 
   File file = SPIFFS.open(path, FILE_WRITE);
+
   if (!file) {
-    Serial.println("Failed to open file for writing");
+    if (ESPUI.verbosity) {
+      Serial.println("Failed to open file for writing");
+    }
+
     return;
   }
+
 #if defined(ESP32)
+
   if (file.print(data)) {
-    Serial.println("File written");
+    if (ESPUI.verbosity) {
+      Serial.println("File written");
+    }
   } else {
-    Serial.println("Write failed");
+    if (ESPUI.verbosity) {
+      Serial.println("Write failed");
+    }
   }
+
 #else
+
   if (file.print(FPSTR(data))) {
-    Serial.println("File written");
+    if (ESPUI.verbosity) {
+      Serial.println("File written");
+    }
   } else {
-    Serial.println("Write failed");
+    if (ESPUI.verbosity) {
+      Serial.println("Write failed");
+    }
   }
+
 #endif
   file.close();
 }
@@ -129,20 +182,34 @@ void writeFile(const char *path, const char *data) {
 void ESPUIClass::prepareFileSystem() {
   // this function should only be used once
 
-  Serial.println("About to prepare filesystem...");
+  if (this->verbosity) {
+    Serial.println("About to prepare filesystem...");
+  }
 
 #if defined(ESP32)
   SPIFFS.format();
+
   if (!SPIFFS.begin(true)) {
-    Serial.println("SPIFFS Mount Failed");
+    if (this->verbosity) {
+      Serial.println("SPIFFS Mount Failed");
+    }
+
     return;
   }
-  listDir("/", 1);
-  Serial.println("SPIFFS Mount ESP32 Done");
+
+  if (this->verbosity) {
+    listDir("/", 1);
+    Serial.println("SPIFFS Mount ESP32 Done");
+  }
+
 #else
   SPIFFS.format();
   SPIFFS.begin();
-  Serial.println("SPIFFS Mount ESP8266 Done");
+
+  if (this->verbosity) {
+    Serial.println("SPIFFS Mount ESP8266 Done");
+  }
+
 #endif
 
   deleteFile("/index.htm");
@@ -153,8 +220,12 @@ void ESPUIClass::prepareFileSystem() {
   deleteFile("/js/zepto.min.js");
   deleteFile("/js/controls.js");
   deleteFile("/js/slider.js");
+  deleteFile("/js/graph.js");
+  deleteFile("/js/tabbedcontent.js");
 
-  Serial.println("Cleanup done");
+  if (this->verbosity) {
+    Serial.println("Cleanup done");
+  }
 
   // Now write
   writeFile("/index.htm", HTML_INDEX);
@@ -165,454 +236,384 @@ void ESPUIClass::prepareFileSystem() {
   writeFile("/js/zepto.min.js", JS_ZEPTO);
   writeFile("/js/controls.js", JS_CONTROLS);
   writeFile("/js/slider.js", JS_SLIDER);
+  writeFile("/js/graph.js", JS_GRAPH);
 
-  Serial.println("Done Initializing filesystem :-)");
+  writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
+
+  if (this->verbosity) {
+    Serial.println("Done Initializing filesystem :-)");
+  }
 
 #if defined(ESP32)
-  if (DEBUG_ESPUI) listDir("/", 1);
+
+  if (this->verbosity) {
+    listDir("/", 1);
+  }
+
 #endif
 
   SPIFFS.end();
 }
 
 // Handle Websockets Communication
-void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
-               AwsEventType type, void *arg, uint8_t *data, size_t len) {
+void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
-    case WS_EVT_DISCONNECT: {
-      if (DEBUG_ESPUI) Serial.printf("Disconnected!\n");
-      break;
+  case WS_EVT_DISCONNECT: {
+    if (ESPUI.verbosity) {
+      Serial.printf("Disconnected!\n");
     }
-    case WS_EVT_PONG: {
-      if (DEBUG_ESPUI) Serial.printf("Received PONG!\n");
-      break;
+
+    break;
+  }
+
+  case WS_EVT_PONG: {
+    if (ESPUI.verbosity) {
+      Serial.printf("Received PONG!\n");
     }
-    case WS_EVT_ERROR: {
-      if (DEBUG_ESPUI) Serial.printf("WebSocket Error!\n");
-      break;
+
+    break;
+  }
+
+  case WS_EVT_ERROR: {
+    if (ESPUI.verbosity) {
+      Serial.printf("WebSocket Error!\n");
     }
-    case WS_EVT_CONNECT: {
-      if (DEBUG_ESPUI) {
-        Serial.print("Connected: ");
-        Serial.println(client->id());
+
+    break;
+  }
+
+  case WS_EVT_CONNECT: {
+    if (ESPUI.verbosity) {
+      Serial.print("Connected: ");
+      Serial.println(client->id());
+    }
+
+    ESPUI.jsonDom(client);
+
+    if (ESPUI.verbosity) {
+      Serial.println("JSON Data Sent to Client!");
+    }
+  } break;
+
+  case WS_EVT_DATA: {
+    String msg = "";
+    msg.reserve(len + 1);
+
+    for (size_t i = 0; i < len; i++) {
+      msg += (char)data[i];
+    }
+
+    uint16_t id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
+
+    if (ESPUI.verbosity >= Verbosity::VerboseJSON) {
+      Serial.print("WS rec: ");
+      Serial.println(msg);
+      Serial.print("WS recognised ID: ");
+      Serial.println(id);
+    }
+
+    Control *c = ESPUI.getControl(id);
+
+    if (c == nullptr) {
+      if (ESPUI.verbosity) {
+        Serial.print("No control found for ID ");
+        Serial.println(id);
       }
 
-      ESPUI.jsonDom(client);
-      if (DEBUG_ESPUI) {
-        Serial.println("JSON Data Sent to Client!");
-      }
-    } break;
-    case WS_EVT_DATA: {
-      String msg = "";
-      for (size_t i = 0; i < len; i++) {
-        msg += (char)data[i];
+      return;
+    }
+
+    if (c->callback == nullptr) {
+      if (ESPUI.verbosity) {
+        Serial.print("No callback found for ID ");
+        Serial.println(id);
       }
 
-      int id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
-      if (id >= ESPUI.cIndex) {
-        if (DEBUG_ESPUI) Serial.println("Maleformated id in websocket message");
-        return;
+      return;
+    }
+
+    if (msg.startsWith("bdown:")) {
+      c->callback(c, B_DOWN);
+    } else if (msg.startsWith("bup:")) {
+      c->callback(c, B_UP);
+    } else if (msg.startsWith("pfdown:")) {
+      c->callback(c, P_FOR_DOWN);
+    } else if (msg.startsWith("pfup:")) {
+      c->callback(c, P_FOR_UP);
+    } else if (msg.startsWith("pldown:")) {
+      c->callback(c, P_LEFT_DOWN);
+    } else if (msg.startsWith("plup:")) {
+      c->callback(c, P_LEFT_UP);
+    } else if (msg.startsWith("prdown:")) {
+      c->callback(c, P_RIGHT_DOWN);
+    } else if (msg.startsWith("prup:")) {
+      c->callback(c, P_RIGHT_UP);
+    } else if (msg.startsWith("pbdown:")) {
+      c->callback(c, P_BACK_DOWN);
+    } else if (msg.startsWith("pbup:")) {
+      c->callback(c, P_BACK_UP);
+    } else if (msg.startsWith("pcdown:")) {
+      c->callback(c, P_CENTER_DOWN);
+    } else if (msg.startsWith("pcup:")) {
+      c->callback(c, P_CENTER_UP);
+    } else if (msg.startsWith("sactive:")) {
+      c->value = "1";
+      ESPUI.updateControl(c, client->id());
+      c->callback(c, S_ACTIVE);
+    } else if (msg.startsWith("sinactive:")) {
+      c->value = "0";
+      ESPUI.updateControl(c, client->id());
+      c->callback(c, S_INACTIVE);
+    } else if (msg.startsWith("slvalue:")) {
+      c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
+      c->callback(c, SL_VALUE);
+    } else if (msg.startsWith("nvalue:")) {
+      c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
+      c->callback(c, N_VALUE);
+    } else if (msg.startsWith("tvalue:")) {
+      c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
+      c->callback(c, T_VALUE);
+    } else if (msg.startsWith("svalue:")) {
+      c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+      ESPUI.updateControl(c, client->id());
+      c->callback(c, S_VALUE);
+    } else {
+      if (ESPUI.verbosity) {
+        Serial.println("Malformated message from the websocket");
       }
+    }
+  } break;
 
-      Control *c =
-          ESPUI.controls[msg.substring(msg.lastIndexOf(':') + 1).toInt()];
-
-      if (msg.startsWith("bdown:")) {
-        c->callback(*c, B_DOWN);
-      } else if (msg.startsWith("bup:")) {
-        c->callback(*c, B_UP);
-      } else if (msg.startsWith("pfdown:")) {
-        c->callback(*c, P_FOR_DOWN);
-      } else if (msg.startsWith("pfup:")) {
-        c->callback(*c, P_FOR_UP);
-      } else if (msg.startsWith("pldown:")) {
-        c->callback(*c, P_LEFT_DOWN);
-      } else if (msg.startsWith("plup:")) {
-        c->callback(*c, P_LEFT_UP);
-      } else if (msg.startsWith("prdown:")) {
-        c->callback(*c, P_RIGHT_DOWN);
-      } else if (msg.startsWith("prup:")) {
-        c->callback(*c, P_RIGHT_UP);
-      } else if (msg.startsWith("pbdown:")) {
-        c->callback(*c, P_BACK_DOWN);
-      } else if (msg.startsWith("pbup:")) {
-        c->callback(*c, P_BACK_UP);
-      } else if (msg.startsWith("pcdown:")) {
-        c->callback(*c, P_CENTER_DOWN);
-      } else if (msg.startsWith("pcup:")) {
-        c->callback(*c, P_CENTER_UP);
-      } else if (msg.startsWith("sactive:")) {
-        ESPUI.updateSwitcher(c->id, true);
-        c->callback(*c, S_ACTIVE);
-      } else if (msg.startsWith("sinactive:")) {
-        ESPUI.updateSwitcher(c->id, false);
-        c->callback(*c, S_INACTIVE);
-      } else if (msg.startsWith("slvalue:")) {
-        int value =
-            msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
-        ESPUI.updateSlider(c->id, value, client->id());
-        c->callback(*c, SL_VALUE);
-      } else if (msg.startsWith("nvalue:")) {
-        int value =
-            msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':')).toInt();
-        ESPUI.updateNumber(c->id, value, client->id());
-        c->callback(*c, N_VALUE);
-      } else if (msg.startsWith("tvalue:")) {
-        String value =
-            msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
-        ESPUI.updateText(c->id, value, client->id());
-        c->callback(*c, T_VALUE);
-      }
-    } break;
-    default:
-      break;
+  default:
+    break;
   }
 }
 
-int ESPUIClass::label(const char *label, int color, String value) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
+uint16_t ESPUIClass::addControl(ControlType type, const char *label, String value, ControlColor color, uint16_t parentControl,
+                                void (*callback)(Control *, int)) {
+  Control *control = new Control(type, label, callback, value, color, parentControl);
+
+  if (this->controls == nullptr) {
+    this->controls = control;
+  } else {
+    Control *iterator = this->controls;
+
+    while (iterator->next != nullptr) {
+      iterator = iterator->next;
+    }
+
+    iterator->next = control;
   }
 
-  Control *newL = new Control();
-  newL->type = UI_LABEL;
-  newL->label = label;
-  newL->color = color;
-  if (value != "")
-    newL->value = value;  // Init with labeltext
-  else
-    newL->value = String(label);
-  newL->callback = NULL;
-  newL->id = cIndex;
-  controls[cIndex] = newL;
-  cIndex++;
-  return cIndex - 1;
+  return control->id;
 }
 
-int ESPUIClass::graph(const char *label, int color) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
+uint16_t ESPUIClass::label(const char *label, ControlColor color, String value) { return addControl(ControlType::Label, label, value, color); }
+
+uint16_t ESPUIClass::graph(const char *label, ControlColor color) { return addControl(ControlType::Graph, label, "", color); }
+
+uint16_t ESPUIClass::slider(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min, int max) {
+  uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback);
+  addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
+  addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
+
+  return sliderId;
+}
+
+uint16_t ESPUIClass::button(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
+  return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::switcher(const char *label, void (*callback)(Control *, int), ControlColor color, bool startState) {
+  return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::pad(const char *label, void (*callback)(Control *, int), ControlColor color) {
+  return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
+}
+uint16_t ESPUIClass::padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color) {
+  return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::number(const char *label, void (*callback)(Control *, int), ControlColor color, int number, int min, int max) {
+  uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
+  addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
+  addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+  return numberId;
+}
+
+uint16_t ESPUIClass::gauge(const char *label, ControlColor color, int number, int min, int max) {
+  uint16_t numberId = addControl(ControlType::Gauge, label, String(number), color, Control::noParent);
+  addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
+  addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+  return numberId;
+}
+
+uint16_t ESPUIClass::accelerometer(const char *label, void (*callback)(Control *, int), ControlColor color) {
+  return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::text(const char *label, void (*callback)(Control *, int), ControlColor color, String value) {
+  return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
+}
+
+Control *ESPUIClass::getControl(uint16_t id) {
+  Control *control = this->controls;
+
+  while (control != nullptr) {
+    if (control->id == id) {
+      return control;
+    }
+
+    control = control->next;
   }
 
-  Control *newG = new Control();
-  newG->type = UI_GRAPH;
-  newG->label = label;
-  newG->color = color;
-  newG->id = cIndex;
-  controls[cIndex] = newG;
-  cIndex++;
-  return cIndex - 1;
+  return nullptr;
 }
 
-// TODO: this still needs a range setting
-int ESPUIClass::slider(const char *label, void (*callBack)(Control, int),
-                       int color, String value) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
+void ESPUIClass::updateControl(Control *control, int clientId) {
+  if (!control) {
+    return;
   }
 
-  Control *newSL = new Control();
-  newSL->type = UI_SLIDER;
-  newSL->label = label;
-  newSL->color = color;
-  if (value != "")
-    newSL->value = value;
-  else
-    newSL->value = "";  // TODO: init with half value
-  newSL->callback = callBack;
-  newSL->id = cIndex;
-  controls[cIndex] = newSL;
-  cIndex++;
-  return cIndex - 1;
-}
+  String json;
+  DynamicJsonDocument document(jsonUpdateDocumentSize);
+  JsonObject root = document.to<JsonObject>();
 
-int ESPUIClass::button(const char *label, void (*callBack)(Control, int),
-                       int color, String value) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
+  root["type"] = (int)control->type + ControlType::UpdateOffset;
+  root["value"] = control->value;
+  root["id"] = control->id;
+  root["color"] = (int)control->color;
+  serializeJson(document, json);
+
+  if (this->verbosity >= Verbosity::VerboseJSON) {
+    Serial.println(json);
   }
 
-  Control *newB = new Control();
-  newB->type = UI_BUTTON;
-  newB->label = label;
-  newB->color = color;
-
-  if (value != "")
-    newB->value = value;  // Init with labeltext
-  else
-    newB->value = String(label);
-
-  newB->callback = callBack;
-  newB->id = cIndex;
-  controls[cIndex] = newB;
-  cIndex++;
-  return cIndex - 1;
-}
-
-int ESPUIClass::switcher(const char *label, bool startState,
-                         void (*callBack)(Control, int), int color) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
-  }
-
-  Control *newS = new Control();
-  newS->type = UI_SWITCHER;
-  newS->label = label;
-  newS->color = color;
-  newS->value = String(startState);
-  newS->callback = callBack;
-  newS->id = cIndex;
-  controls[cIndex] = newS;
-  cIndex++;
-  return cIndex - 1;
-}
-
-int ESPUIClass::pad(const char *label, bool center,
-                    void (*callBack)(Control, int), int color) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
-  }
-
-  Control *newP = new Control();
-  if (center)
-    newP->type = UI_CPAD;
-  else
-    newP->type = UI_PAD;
-  newP->label = label;
-  newP->color = color;
-  newP->callback = callBack;
-  newP->id = cIndex;
-  controls[cIndex] = newP;
-  cIndex++;
-  return cIndex - 1;
-}
-
-// TODO: min and max need to be saved, they also need to be sent to the frontend
-int ESPUIClass::number(const char *label, void (*callBack)(Control, int),
-                       int color, int number, int min, int max) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
-  }
-
-  Control *newN = new Control();
-  newN->type = UI_NUMBER;
-  newN->label = label;
-  newN->color = color;
-  newN->value = String(number);
-  newN->callback = callBack;
-  newN->id = cIndex;
-  controls[cIndex] = newN;
-  cIndex++;
-  return cIndex - 1;
-}
-
-int ESPUIClass::text(const char *label, void (*callBack)(Control, int),
-                     int color, String value) {
-  if (labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element " + String(label) +
-                     " exists, skipping creating element!");
-    return -1;
-  }
-
-  Control *newT = new Control();
-  newT->type = UI_TEXT_INPUT;
-  newT->label = label;
-  newT->color = color;
-  newT->value = value;
-  newT->callback = callBack;
-  newT->id = cIndex;
-  controls[cIndex] = newT;
-  cIndex++;
-  return cIndex - 1;
-}
-
-void ESPUIClass::print(int id, String value) {
-  if (id < cIndex && controls[id]->type == UI_LABEL) {
-    controls[id]->value = value;
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_LABEL;
-    root["value"] = value;
-    root["id"] = String(id);
-    root.printTo(json);
+  if (clientId < 0) {
     this->ws->textAll(json);
-  } else {
-    if (DEBUG_ESPUI)
-      Serial.println(String("Error: ") + String(id) + String(" is no label"));
-  }
-}
-
-void ESPUIClass::print(String label, String value) {
-  if (!labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element does not " + String(label) +
-                     " exist, cannot update!");
     return;
   }
-  print(getIdByLabel(label), value);
-}
-
-void ESPUIClass::updateSlider(int id, int nValue, int clientId) {
-  if (id < cIndex && controls[id]->type == UI_SLIDER) {
-    controls[id]->value = nValue;
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_SLIDER;
-    root["value"] = nValue;
-    root["id"] = String(id);
-    root.printTo(json);
-    textThem(json, clientId);
-  } else {
-    if (DEBUG_ESPUI)
-      Serial.println(String("Error: ") + String(id) + String(" is no slider"));
-  }
-}
-
-void ESPUIClass::updateSlider(String label, int nValue, int clientId) {
-  if (!labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element does not " + String(label) +
-                     " exist, cannot update!");
-    return;
-  }
-  updateSlider(getIdByLabel(label), nValue, clientId);
-}
-
-void ESPUIClass::updateSwitcher(int id, bool nValue, int clientId) {
-  if (id < cIndex && controls[id]->type == UI_SWITCHER) {
-    controls[id]->value = nValue ? 1 : 0;
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_SWITCHER;
-    root["value"] = nValue ? 1 : 0;
-    root["id"] = String(id);
-    root.printTo(json);
-    textThem(json, clientId);
-  } else {
-    if (DEBUG_ESPUI)
-      Serial.println(String("Error: ") + String(id) +
-                     String(" is no switcher"));
-  }
-}
-
-void ESPUIClass::updateSwitcher(String label, bool nValue, int clientId) {
-  if (!labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element does not " + String(label) +
-                     " exist, cannot update!");
-    return;
-  }
-  updateSwitcher(getIdByLabel(label), nValue, clientId);
-}
-
-void ESPUIClass::updateNumber(int id, int number, int clientId) {
-  if (id < cIndex && controls[id]->type == UI_NUMBER) {
-    controls[id]->value = number;
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_NUMBER;
-    root["value"] = String(number);
-    root["id"] = String(id);
-    root.printTo(json);
-    textThem(json, clientId);
-  } else {
-    if (DEBUG_ESPUI)
-      Serial.println(String("Error: ") + String(id) + String(" is no number"));
-  }
-}
-
-void ESPUIClass::updateNumber(String label, int number, int clientId) {
-  if (!labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element does not " + String(label) +
-                     " exist, cannot update!");
-    return;
-  }
-  updateNumber(getIdByLabel(label), number, clientId);
-}
-
-void ESPUIClass::updateText(int id, String text, int clientId) {
-  if (id < cIndex && controls[id]->type == UI_TEXT_INPUT) {
-    controls[id]->value = text;
-    String json;
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["type"] = UPDATE_TEXT_INPUT;
-    root["value"] = String(text);
-    root["id"] = String(id);
-    root.printTo(json);
-    textThem(json, clientId);
-  } else {
-    if (DEBUG_ESPUI)
-      Serial.println(String("Error: ") + String(id) + String(" is no number"));
-  }
-}
-
-void ESPUIClass::updateText(String label, String text, int clientId) {
-  if (!labelExists(label)) {
-    if (DEBUG_ESPUI)
-      Serial.println("UI ERROR: Element does not " + String(label) +
-                     " exist, cannot update!");
-    return;
-  }
-  updateText(getIdByLabel(label), text, clientId);
-}
-
-// This is a hacky workaround because ESPAsyncWebServer does not have a function
-// like this and it's clients array is private
-void ESPUIClass::textThem(String text, int clientId) {
+  // This is a hacky workaround because ESPAsyncWebServer does not have a
+  // function like this and it's clients array is private
   int tryId = 0;
+
   for (int count = 0; count < this->ws->count();) {
     if (this->ws->hasClient(tryId)) {
       if (clientId != tryId) {
-        this->ws->client(tryId)->text(text);
+        this->ws->client(tryId)->text(json);
+
+        if (this->verbosity >= Verbosity::VerboseJSON) {
+          Serial.println(json);
+        }
       }
+
       count++;
     }
+
     tryId++;
   }
 }
 
-int ESPUIClass::getIdByLabel(String label) {
-  for (int i = 0; i < cIndex; i++) {
-    if (String(controls[i]->label) == label) return i;
+void ESPUIClass::updateControl(uint16_t id, int clientId) {
+  Control *control = getControl(id);
+
+  if (!control) {
+    if (this->verbosity) {
+      Serial.println(String("Error: There is no control with ID ") + String(id));
+    }
+    return;
   }
-  return -1;  // failed, nonexistant
+
+  updateControl(control, clientId);
 }
 
-bool ESPUIClass::labelExists(String label) {
-  for (int i = 0; i < cIndex; i++) {
-    if (String(controls[i]->label) == label) return true;
+void ESPUIClass::updateControlValue(Control *control, String value, int clientId) {
+  if (!control) {
+    return;
   }
-  return false;
+
+  control->value = value;
+  updateControl(control, clientId);
 }
 
+void ESPUIClass::updateControlValue(uint16_t id, String value, int clientId) {
+  Control *control = getControl(id);
+
+  if (!control) {
+    if (this->verbosity) {
+      Serial.println(String("Error: There is no control with ID ") + String(id));
+    }
+    return;
+  }
+
+  updateControlValue(control, value, clientId);
+}
+
+void ESPUIClass::print(uint16_t id, String value) { updateControlValue(id, value); }
+
+void ESPUIClass::updateLabel(uint16_t id, String value) { updateControlValue(id, value); }
+
+void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId) { updateControlValue(id, String(nValue), clientId); }
+
+void ESPUIClass::updateSwitcher(uint16_t id, bool nValue, int clientId) { updateControlValue(id, String(nValue ? "1" : "0"), clientId); }
+
+void ESPUIClass::updateNumber(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
+
+void ESPUIClass::updateText(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
+
+void ESPUIClass::updateSelect(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
+
+void ESPUIClass::updateGauge(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
+
+void ESPUIClass::clearGraph(uint16_t id, int clientId) {}
+
+void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId) {
+  Control *control = getControl(id);
+  if (!control) {
+    return;
+  }
+
+  String json;
+  DynamicJsonDocument document(jsonUpdateDocumentSize);
+  JsonObject root = document.to<JsonObject>();
+
+  root["type"] = (int)ControlType::GraphPoint;
+  root["value"] = nValue;
+  root["id"] = control->id;
+  serializeJson(document, json);
+
+  if (this->verbosity >= Verbosity::VerboseJSON) {
+    Serial.println(json);
+  }
+
+  if (clientId < 0) {
+    this->ws->textAll(json);
+    return;
+  }
+  // This is a hacky workaround because ESPAsyncWebServer does not have a
+  // function like this and it's clients array is private
+  int tryId = 0;
+
+  for (int count = 0; count < this->ws->count();) {
+    if (this->ws->hasClient(tryId)) {
+      if (clientId != tryId) {
+        this->ws->client(tryId)->text(json);
+
+        if (this->verbosity >= Verbosity::VerboseJSON) {
+          Serial.println(json);
+        }
+      }
+
+      count++;
+    }
+
+    tryId++;
+  }
+}
 /*
 Convert & Transfer Arduino elements to JSON elements
 Initially this function used to send the control element data individually.
@@ -621,109 +622,126 @@ sent as one blob at the beginning. Therefore a new type is used as well
 */
 void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
   String json;
-  DynamicJsonBuffer jsonBuffer(2000);
-  JsonObject &root = jsonBuffer.createObject();
-  root["type"] = UI_INITIAL_GUI;
-  JsonArray &items = jsonBuffer.createArray();
+  DynamicJsonDocument document(jsonInitialDocumentSize);
+  document["type"] = (int)UI_INITIAL_GUI;
+  document["sliderContinuous"] = sliderContinuous;
+  JsonArray items = document.createNestedArray("controls");
 
-  for (int i = -1; i < cIndex; i++) {
-    JsonObject &item = jsonBuffer.createObject();
+  Control *control = this->controls;
 
-    if (i == -1) {
-      item["type"] = UI_TITEL;
-      item["label"] = String(ui_title);
-    } else {
-      item["type"] = controls[i]->type;
-      item["label"] = String(controls[i]->label);
-      item["value"] = String(controls[i]->value);
-      item["color"] = String(controls[i]->color);
-      item["id"] = String(i);
+  JsonObject titleItem = items.createNestedObject();
+  titleItem["type"] = (int)UI_TITLE;
+  titleItem["label"] = ui_title;
+
+  while (control != nullptr) {
+    JsonObject item = items.createNestedObject();
+
+    item["id"] = String(control->id);
+    item["type"] = (int)control->type;
+    item["label"] = control->label;
+    item["value"] = String(control->value);
+    item["color"] = (int)control->color;
+
+    if (control->parentControl != Control::noParent) {
+      item["parentControl"] = String(control->parentControl);
     }
-    items.add(item);
+
+    // special case for selects: to preselect an option, you have to add
+    // "selected" to <option>
+    if (control->type == ControlType::Option) {
+      if (ESPUI.getControl(control->parentControl)->value == control->value) {
+        item["selected"] = "selected";
+      } else {
+        item["selected"] = "";
+      }
+    }
+
+    control = control->next;
   }
 
   // Send as one big bunch
-  root["controls"] = items;
-  root.printTo(json);
+  serializeJson(document, json);
+
+  if (this->verbosity >= Verbosity::VerboseJSON) {
+    Serial.println(json);
+  }
+
   client->text(json);
 }
 
-void ESPUIClass::beginSPIFFS(const char *_title) {
-  begin(_title, NULL, NULL);
-  basicAuth = false;
-}
-
-void ESPUIClass::beginSPIFFS(const char *_title, const char *username,
-                             const char *password) {
+void ESPUIClass::beginSPIFFS(const char *_title, const char *username, const char *password) {
   ui_title = _title;
+  this->basicAuthUsername = username;
+  this->basicAuthPassword = password;
+
+  if (username == nullptr && password == nullptr) {
+    basicAuth = false;
+  } else {
+    basicAuth = true;
+  }
+
   server = new AsyncWebServer(80);
   ws = new AsyncWebSocket("/ws");
 
   if (!SPIFFS.begin()) {
-    Serial.println(
-        "SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO "
-        "PREPARE YOUR ESP!!!!!!!");
+    if (ESPUI.verbosity) {
+      Serial.println("SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO PREPARE YOUR ESP!!!!!!!");
+    }
+
     return;
   }
-  listDir("/", 1);
+
+  if (ESPUI.verbosity) {
+    listDir("/", 1);
+  }
 
   if (!SPIFFS.exists("/index.htm")) {
-    Serial.println(
-        "Please read the README!!!!!!!, Make sure to "
-        "ESPUI.prepareFileSystem() once in an empty sketch");
+    if (ESPUI.verbosity) {
+      Serial.println("Please read the README!!!!!!!, Make sure to ESPUI.prepareFileSystem() once in an empty sketch");
+    }
+
     return;
   }
 
   ws->onEvent(onWsEvent);
   server->addHandler(ws);
 
-  if (basicAuth && username != NULL && password != NULL) {
-    basicAuthPassword = password;
-    basicAuthUsername = username;
-    basicAuth = true;
-    if (WS_AUTHENTICATION)
-      ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
-    server->serveStatic("/", SPIFFS, "/")
-        .setDefaultFile("index.htm")
-        .setAuthentication(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword);
+  if (basicAuth) {
+    if (WS_AUTHENTICATION) {
+      ws->setAuthentication(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword);
+    }
 
-  } else if (basicAuth) {
-    Serial.println(
-        "Could not enable BasicAuth: Username or password are not set");
+    server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
   } else {
     server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
   }
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    request->send(200, "text/plain",
-                  String(ESP.getFreeHeap()) + " In SPIFFSmode");
+    }
+
+    request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In SPIFFSmode");
   });
 
-  server->onNotFound(
-      [](AsyncWebServerRequest *request) { request->send(404); });
+  server->onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 
   server->begin();
-  if (DEBUG_ESPUI) Serial.println("UI Initialized");
+
+  if (this->verbosity) {
+    Serial.println("UI Initialized");
+  }
 }
 
-void ESPUIClass::begin(const char *_title) {
-  begin(_title, NULL, NULL);
-  basicAuth = false;
-}
+void ESPUIClass::begin(const char *_title, const char *username, const char *password) {
+  basicAuthUsername = username;
+  basicAuthPassword = password;
 
-void ESPUIClass::begin(const char *_title, const char *username,
-                       const char *password) {
-  if (basicAuth && username != NULL && password != NULL) {
-    basicAuthPassword = password;
-    basicAuthUsername = username;
+  if (username != nullptr && password != nullptr) {
     basicAuth = true;
-  } else if (basicAuth) {
-    Serial.println(
-        "Could not enable BasicAuth: Username or password are not set");
+  } else {
+    basicAuth = false;
   }
 
   ui_title = _title;
@@ -734,56 +752,66 @@ void ESPUIClass::begin(const char *_title, const char *username,
   ws->onEvent(onWsEvent);
   server->addHandler(ws);
 
-  if (basicAuth && username != NULL && password != NULL) {
-    basicAuthPassword = password;
-    basicAuthUsername = username;
-    basicAuth = true;
-    if (WS_AUTHENTICATION)
-      ws->setAuthentication(this->basicAuthUsername, this->basicAuthPassword);
-
-  } else if (basicAuth) {
-    Serial.println(
-        "Could not enable BasicAuth: Username or password are not set");
-  }
+  if (basicAuth && WS_AUTHENTICATION)
+    ws->setAuthentication(username, password);
 
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    AsyncWebServerResponse *response =
-        request->beginResponse_P(200, "text/html", HTML_INDEX);
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/html", HTML_INDEX);
     request->send(response);
   });
 
   // Javascript files
 
   server->on("/js/zepto.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
 
   server->on("/js/controls.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    AsyncWebServerResponse *response =
-        request->beginResponse_P(200, "application/javascript",
-                                 JS_CONTROLS_GZIP, sizeof(JS_CONTROLS_GZIP));
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_CONTROLS_GZIP, sizeof(JS_CONTROLS_GZIP));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
 
   server->on("/js/slider.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->on("/js/graph.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
+      return request->requestAuthentication();
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_GRAPH_GZIP, sizeof(JS_GRAPH_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+
+  server->on("/js/tabbedcontent.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
+      return request->requestAuthentication();
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "application/javascript", JS_TABBEDCONTENT_GZIP, sizeof(JS_TABBEDCONTENT_GZIP));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
@@ -791,40 +819,43 @@ void ESPUIClass::begin(const char *_title, const char *username,
   // Stylesheets
 
   server->on("/css/style.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    AsyncWebServerResponse *response = request->beginResponse_P(
-        200, "text/css", CSS_STYLE_GZIP, sizeof(CSS_STYLE_GZIP));
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", CSS_STYLE_GZIP, sizeof(CSS_STYLE_GZIP));
     response->addHeader("Content-Encoding", "gzip");
     request->send(response);
   });
 
-  server->on(
-      "/css/normalize.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-        if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                      ESPUI.basicAuthPassword))
-          return request->requestAuthentication();
-        AsyncWebServerResponse *response = request->beginResponse_P(
-            200, "text/css", CSS_NORMALIZE_GZIP, sizeof(CSS_NORMALIZE_GZIP));
-        response->addHeader("Content-Encoding", "gzip");
-        request->send(response);
-      });
+  server->on("/css/normalize.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
+      return request->requestAuthentication();
+    }
+
+    AsyncWebServerResponse *response = request->beginResponse_P(200, "text/css", CSS_NORMALIZE_GZIP, sizeof(CSS_NORMALIZE_GZIP));
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
 
   // Heap for general Servertest
   server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
-    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername,
-                                                  ESPUI.basicAuthPassword))
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword)) {
       return request->requestAuthentication();
-    request->send(200, "text/plain",
-                  String(ESP.getFreeHeap()) + " In Memorymode");
+    }
+
+    request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In Memorymode");
   });
 
-  server->onNotFound(
-      [](AsyncWebServerRequest *request) { request->send(404); });
+  server->onNotFound([](AsyncWebServerRequest *request) { request->send(404); });
 
   server->begin();
-  if (DEBUG_ESPUI) Serial.println("UI Initialized");
+
+  if (this->verbosity) {
+    Serial.println("UI Initialized");
+  }
 }
+
+void ESPUIClass::setVerbosity(Verbosity v) { this->verbosity = v; }
 
 ESPUIClass ESPUI;
