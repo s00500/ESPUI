@@ -1,15 +1,3 @@
-- Cleanup and extend Documentation
-  - Number field ✅
-  - Text field ✅
-  - Data directory ✅
-  - Verbosity setting ✅
-  - Tab usage ✅
-  - OptionList ✅
-  -
-  - Graph Usage
-  - Number min and max value to docs
-  - Generic creation and updates
-
 # ESPUI (v2.X)
 
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
@@ -230,7 +218,7 @@ the normal `<br>` tag in the string you print to the label
 
 #### Slider
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_slider.png)
+![slider](https://github.com/s00500/ESPUI/blob/master/docs/ui_slider.png)
 
 The Slider can be used to slide through a value from 1 to 100. Slides provide
 realtime data, are touch compatible and can be used to for example control a
@@ -247,15 +235,19 @@ A slider usually only sends a new value when it is released to save the esps fro
 
 #### Number Input
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_number.png)
+![number](https://github.com/s00500/ESPUI/blob/master/docs/ui_number.png)
 
 The numberinput can be used to directly input numbers to your program. You can
 enter a Value into it and when you are done with your change it is sent to the
 ESP.
 
+A number box needs to have a min and a max value. To set it up just use:
+
+`ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);`
+
 #### Text Input
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_text.png)
+![text](https://github.com/s00500/ESPUI/blob/master/docs/ui_text.png)
 
 The textinput works very similar like the number input but with a string. You
 can enter a String into it and when you are done with your change it is sent to
@@ -263,14 +255,17 @@ the ESP.
 
 #### Graph
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_graph.png)
+![graph](https://github.com/s00500/ESPUI/blob/master/docs/ui_graph.png)
 
 The graph widget can display graph points with timestamp at wich they arrive
 
+Use `ESPUI.addGraphPoint(graphId, random(1, 50));` to add a new value at the current time, use `ESPUI.clearGraph(graphId)` to clear the entire graph.
+Graph points are saved in the browser in **localstorage** to be persistant, clear local storageto remove the points or use clearGraph() from a bbutton callback to provide a clear button.
+
 #### Option select
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_select1.png)
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_select2.png)
+![option1](https://github.com/s00500/ESPUI/blob/master/docs/ui_select1.png)
+![option2](https://github.com/s00500/ESPUI/blob/master/docs/ui_select2.png)
 
 The option select works by first creating a select widget like so
 
@@ -288,7 +283,7 @@ Check the **tabbedGui** example for a working demo
 
 ### Using Tabs
 
-![labels](https://github.com/s00500/ESPUI/blob/master/docs/ui_tabs.png)
+![tabs](https://github.com/s00500/ESPUI/blob/master/docs/ui_tabs.png)
 
 Tabs can be used to organize your widgets in pages. Check the tabbedGui example.
 Tabs can be created using the generic functions like so:
@@ -305,6 +300,24 @@ to start the UI interface. (Or `ESPUI.beginSPIFFS("Some Title");` respectively)
 Make sure you setup a working network connection or AccesPoint **before** (See
 gui.ino example). The web interface can then be used from multiple devices at once and
 also shows an connection status in the top bar.
+
+### Advanced: Generic creation and updates of control widgets
+
+There are 2 generic functions to create and update controls, to see them in action check the **gui-generic-api** example.
+
+To create a generic control use:
+`uint16_t switchOne = ESPUI.addControl(ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, Control::noParent, &switchExample);`
+
+Then its value can be updated by doing:
+
+`ESPUI.updateControlValue(status, "Start");`
+
+You can also update other parameters of the control like its color using:
+
+```
+    ESPUI.getControl(switchOne)->color = ControlColor::Carrot;
+    ESPUI.updateControl(switchOne);
+```
 
 ### Log output
 
