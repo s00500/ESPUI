@@ -22,7 +22,6 @@
     },
     {
       "name": "ArduinoJson",
-      "version": "5.13.4",
       "authors": "Benoit Blanchon",
       "frameworks": "arduino"
     }
