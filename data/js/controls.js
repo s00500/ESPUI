@@ -198,7 +198,17 @@ function handleVisibilityChange() {
 
 function start() {
   document.addEventListener("visibilitychange", handleVisibilityChange, false);
-  websock = new WebSocket("ws://" + window.location.hostname + "/ws");
+  if (
+    window.location.port != "" ||
+    window.location.port != 80 ||
+    window.location.port != 443
+  ) {
+    websock = new WebSocket(
+      "ws://" + window.location.hostname + ":" + window.location.port + "/ws"
+    );
+  } else {
+    websock = new WebSocket("ws://" + window.location.hostname + "/ws");
+  }
   websock.onopen = function(evt) {
     console.log("websock open");
     $("#conStatus").addClass("color-green");
