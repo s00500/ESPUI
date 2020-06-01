@@ -1,10 +1,7 @@
 {
-	"langs": 
-	{
-		"en-GB": 
-		{
-			"keys": 
-			{
+	"langs": {
+		"en-GB": {
+			"keys": {
 				"LANG_SUBCATERGORY_ESPUI": "User Interface",
 				"LANG_ESPUI_ESPUI_TITLE": "Title",
 				"LANG_ESPUI_ESPUI_HOTSPOT": "Enable Wifi Hotspot Code",
@@ -21,6 +18,26 @@
 				"LANG_ESPUI_SWITCH_SWITCH": "UI Switch",
 				"LANG_ESPUI_PAD_PAD": "UI Pad",
 				"LANG_ESPUI_PAD_CENTER": "Center button?"
+			}
+		},
+		"zh-CN": {
+			"keys": {
+				"LANG_SUBCATERGORY_ESPUI": "用户接口",
+				"LANG_ESPUI_ESPUI_TITLE": "标题",
+				"LANG_ESPUI_ESPUI_HOTSPOT": "启用无线热点代码",
+				"LANG_ESPUI_ESPUI_TOOLTIP": "在ESP32/ESP8266创建一网络接口",
+				"LANG_ESPUI_BUTTON_BUTTON": "UI 按钮",
+				"LANG_ESPUI_NAME": "名称",
+				"LANG_ESPUI_COLOR": "颜色",
+				"LANG_ESPUI_TEXT": "文本",
+				"LANG_ESPUI_BUTTON_TOOLTIP": "一个网页接口的按钮",
+				"LANG_ESPUI_LABEL_LABEL": "UI 标签",
+				"LANG_ESPUI_LABEL": "标签",
+				"LANG_ESPUI_LABEL_TOOLTIP": "一个网页接口的标签，你可通过修改代码去更新它",
+				"LANG_ESPUI_STATE": "状态",
+				"LANG_ESPUI_SWITCH_SWITCH": "UI 开关",
+				"LANG_ESPUI_PAD_PAD": "UI 面板",
+				"LANG_ESPUI_PAD_CENTER": "中间按钮?"
 			}
 		}
 	}
