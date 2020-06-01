@@ -76,10 +76,12 @@ enum ControlType : uint8_t {
   UpdateGauge,
   UpdateAccel,
 
-  InitialGui = 200
+  InitialGui = 200,
+  Reload = 201
 };
 
 #define UI_INITIAL_GUI ControlType::InitialGui
+#define UI_RELOAD ControlType::Reload
 
 #define UI_TITLE ControlType::Title
 #define UI_LABEL ControlType::Label
@@ -185,6 +187,7 @@ public:
 
   uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise,
                       uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
+  bool remControl(uint16_t id, bool reload_ui = true);
 
   // create Elements
   uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");         // Create Event Button
@@ -218,6 +221,8 @@ public:
   void updateControl(uint16_t id, int clientId = -1);
   void updateControl(Control *control, int clientId = -1);
 
+  void reload();
+
   void print(uint16_t id, String value);
   void updateLabel(uint16_t id, String value);
   void updateSwitcher(uint16_t id, bool nValue, int clientId = -1);
@@ -234,6 +239,7 @@ public:
   const char *ui_title = "ESPUI"; // Store UI Title and Header Name
   Control *controls = nullptr;
   void jsonDom(AsyncWebSocketClient *client);
+  void jsonReload(AsyncWebSocketClient *client);
 
   Verbosity verbosity;
 
