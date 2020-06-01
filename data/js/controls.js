@@ -47,7 +47,7 @@ const UI_STEP = 16;
 const UPDATE_STEP = 116;
 
 const UI_GAUGE = 17;
-const UPTDATE_GAUGE = 117;
+const UPDATE_GAUGE = 117;
 const UI_ACCEL = 18;
 const UPTDATE_ACCEL = 117;
 
@@ -171,9 +171,7 @@ function restoreGraphData(id) {
 }
 
 function restart() {
-  $(document)
-    .add("*")
-    .off();
+  $(document).add("*").off();
   $("#row").html("");
   websock.close();
   start();
@@ -186,7 +184,7 @@ function conStatusError() {
   $("#conStatus").html("Error / No Connection &#8635;");
   $("#conStatus").off();
   $("#conStatus").on({
-    click: restart
+    click: restart,
   });
 }
 
@@ -209,24 +207,24 @@ function start() {
   } else {
     websock = new WebSocket("ws://" + window.location.hostname + "/ws");
   }
-  websock.onopen = function(evt) {
+  websock.onopen = function (evt) {
     console.log("websock open");
     $("#conStatus").addClass("color-green");
     $("#conStatus").text("Connected");
     websockConnected = true;
   };
 
-  websock.onclose = function(evt) {
+  websock.onclose = function (evt) {
     console.log("websock close");
     conStatusError();
   };
 
-  websock.onerror = function(evt) {
+  websock.onerror = function (evt) {
     console.log(evt);
     conStatusError();
   };
 
-  var handleEvent = function(evt) {
+  var handleEvent = function (evt) {
     //console.log(evt);
     var data = JSON.parse(evt.data);
     var e = document.body;
@@ -238,7 +236,7 @@ function start() {
         }
         data.controls.forEach(element => {
           var fauxEvent = {
-            data: JSON.stringify(element)
+            data: JSON.stringify(element),
           };
           handleEvent(fauxEvent);
         });
@@ -303,14 +301,14 @@ function start() {
             "</button></div>"
         );
         $("#btn" + data.id).on({
-          touchstart: function(e) {
+          touchstart: function (e) {
             e.preventDefault();
             buttonclick(data.id, true);
           },
-          touchend: function(e) {
+          touchend: function (e) {
             e.preventDefault();
             buttonclick(data.id, false);
-          }
+          },
         });
         break;
 
@@ -410,54 +408,54 @@ function start() {
         );
 
         $("#pf" + data.id).on({
-          touchstart: function(e) {
+          touchstart: function (e) {
             e.preventDefault();
             padclick(UP, data.id, true);
           },
-          touchend: function(e) {
+          touchend: function (e) {
             e.preventDefault();
             padclick(UP, data.id, false);
-          }
+          },
         });
         $("#pl" + data.id).on({
-          touchstart: function(e) {
+          touchstart: function (e) {
             e.preventDefault();
             padclick(LEFT, data.id, true);
           },
-          touchend: function(e) {
+          touchend: function (e) {
             e.preventDefault();
             padclick(LEFT, data.id, false);
-          }
+          },
         });
         $("#pr" + data.id).on({
-          touchstart: function(e) {
+          touchstart: function (e) {
             e.preventDefault();
             padclick(RIGHT, data.id, true);
           },
-          touchend: function(e) {
+          touchend: function (e) {
             e.preventDefault();
             padclick(RIGHT, data.id, false);
-          }
+          },
         });
         $("#pb" + data.id).on({
-          touchstart: function(e) {
+          touchstart: function (e) {
             e.preventDefault();
             padclick(DOWN, data.id, true);
           },
-          touchend: function(e) {
+          touchend: function (e) {
             e.preventDefault();
             padclick(DOWN, data.id, false);
-          }
+          },
         });
         $("#pc" + data.id).on({
-          touchstart: function(e) {
+          touchstart: function (e) {
             e.preventDefault();
             padclick(CENTER, data.id, true);
           },
-          touchend: function(e) {
+          touchend: function (e) {
             e.preventDefault();
             padclick(CENTER, data.id, false);
-          }
+          },
         });
 
         break;
@@ -554,15 +552,13 @@ function start() {
         );
         $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
 
-        tabs = $(".tabscontent")
-          .tabbedContent({ loop: true })
-          .data("api");
+        tabs = $(".tabscontent").tabbedContent({ loop: true }).data("api");
         // switch to tab...
         $("a")
-          .filter(function() {
+          .filter(function () {
             return $(this).attr("href") === "#click-to-switch";
           })
-          .on("click", function(e) {
+          .on("click", function (e) {
             var tab = prompt("Tab to switch to (number or id)?");
             if (!tabs.switchTab(tab)) {
               alert("That tab does not exist :\\");
@@ -862,43 +858,31 @@ function switcher(number, state) {
   }
 }
 
-var rangeSlider = function(isDiscrete) {
+var rangeSlider = function (isDiscrete) {
   var slider = $(".range-slider"),
     range = $(".range-slider__range"),
     value = $(".range-slider__value");
 
-  slider.each(function() {
-    value.each(function() {
-      var value = $(this)
-        .prev()
-        .attr("value");
+  slider.each(function () {
+    value.each(function () {
+      var value = $(this).prev().attr("value");
       $(this).html(value);
     });
 
     if (!isDiscrete) {
       range.on({
-        input: function() {
-          sliderchange(
-            $(this)
-              .attr("id")
-              .replace(/^\D+/g, "")
-          );
-        }
+        input: function () {
+          sliderchange($(this).attr("id").replace(/^\D+/g, ""));
+        },
       });
     } else {
       range.on({
-        input: function() {
-          $(this)
-            .next()
-            .html(this.value);
+        input: function () {
+          $(this).next().html(this.value);
         },
-        change: function() {
-          sliderchange(
-            $(this)
-              .attr("id")
-              .replace(/^\D+/g, "")
-          );
-        }
+        change: function () {
+          sliderchange($(this).attr("id").replace(/^\D+/g, ""));
+        },
       });
     }
   });
