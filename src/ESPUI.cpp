@@ -411,6 +411,52 @@ uint16_t ESPUIClass::addControl(ControlType type, const char *label, String valu
   return control->id;
 }
 
+bool ESPUIClass::remControl(uint16_t id, bool reload_ui)
+{
+  if(nullptr == this->controls) return false;
+
+  Control * it = this->controls;
+  
+  if(id == it->id) {
+    this->controls = it->next;
+    delete it;
+    if(reload_ui) {
+      reload();
+    }
+    return true;
+  }
+
+  Control * it_next = it->next;
+  while(nullptr != it_next && id != it_next->id) {
+    it = it_next;
+    it_next = it_next->next;
+  }
+
+  if(nullptr != it_next) {
+    it->next = it_next->next;
+    delete it_next;
+    if(reload_ui) {
+      reload();
+    }    
+    return true;
+  }
+  
+  return false;
+}
+
+void ESPUIClass::reload()
+{
+  int tryId = 0;
+
+  for (int count = 0; count < this->ws->count();) {
+    if (this->ws->hasClient(tryId)) {
+      ESPUI.jsonReload(this->ws->client(tryId));
+      count++;
+    }
+    tryId++;
+  }
+}
+
 uint16_t ESPUIClass::label(const char *label, ControlColor color, String value) { return addControl(ControlType::Label, label, value, color); }
 
 uint16_t ESPUIClass::graph(const char *label, ControlColor color) { return addControl(ControlType::Graph, label, "", color); }
@@ -667,6 +713,22 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient *client) {
   }
 
   client->text(json);
+}
+
+void ESPUIClass::jsonReload(AsyncWebSocketClient *client)
+{
+  String json;
+  DynamicJsonDocument document(jsonUpdateDocumentSize);
+  JsonObject root = document.to<JsonObject>();
+
+  root["type"] = (int)UI_RELOAD;
+  serializeJson(document, json);
+
+  if (this->verbosity >= Verbosity::VerboseJSON) {
+    Serial.println(json);
+  }
+
+  this->ws->textAll(json);
 }
 
 void ESPUIClass::beginSPIFFS(const char *_title, const char *username, const char *password) {
