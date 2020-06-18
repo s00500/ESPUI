@@ -1,4 +1,5 @@
 const UI_INITIAL_GUI = 200;
+const UI_RELOAD = 201;
 const UPDATE_OFFSET = 100;
 
 const UI_TITEL = 0;
@@ -241,6 +242,9 @@ function start() {
           handleEvent(fauxEvent);
         });
         break;
+	  case UI_RELOAD:
+		window.location.reload();
+		break;
 
       case UI_TITEL:
         document.title = data.label;
