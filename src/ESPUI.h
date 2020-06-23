@@ -206,9 +206,8 @@ public:
   void prepareFileSystem(); // Initially preps the filesystem and loads a lot of stuff into SPIFFS
   void list();              // Lists SPIFFS directory
 
-  uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise,
-                      uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
-  bool remControl(uint16_t id, bool reload_ui = true);
+  uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise, uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
+  bool removeControl(uint16_t id, bool force_reload_ui = false);
 
   // create Elements
   uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");         // Create Event Button
@@ -223,10 +222,9 @@ public:
   uint16_t text(const char *label, void (*callback)(Control *, int), ControlColor color, String value = ""); // Create a Text Input Control
 
   // Output only
-  uint16_t label(const char *label, ControlColor color, String value = ""); // Create Label
-  uint16_t graph(const char *label, ControlColor color);                    // Create Graph display
-  uint16_t gauge(const char *label, ControlColor color, int value, int min = 0,
-                 int max = 100); // Create Gauge display
+  uint16_t label(const char *label, ControlColor color, String value = "");                     // Create Label
+  uint16_t graph(const char *label, ControlColor color);                                        // Create Graph display
+  uint16_t gauge(const char *label, ControlColor color, int value, int min = 0, int max = 100); // Create Gauge display
 
   // Input only
   uint16_t accelerometer(const char *label, void (*callback)(Control *, int), ControlColor color);
@@ -241,8 +239,6 @@ public:
 
   void updateControl(uint16_t id, int clientId = -1);
   void updateControl(Control *control, int clientId = -1);
-
-  void reload();
 
   void print(uint16_t id, String value);
   void updateLabel(uint16_t id, String value);
@@ -259,8 +255,8 @@ public:
   // Variables
   const char *ui_title = "ESPUI"; // Store UI Title and Header Name
   Control *controls = nullptr;
+  void jsonReload();
   void jsonDom(AsyncWebSocketClient *client);
-  void jsonReload(AsyncWebSocketClient *client);
 
   Verbosity verbosity;
 

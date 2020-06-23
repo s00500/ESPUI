@@ -1,4 +1,4 @@
-# ESPUI (v2.X)
+# ESPUI
 
 ![ESPUI](https://github.com/s00500/ESPUI/blob/master/docs/ui_complete.png)
 
