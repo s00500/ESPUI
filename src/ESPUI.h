@@ -33,7 +33,8 @@
 
 // Message Types (and control types)
 
-enum ControlType : uint8_t {
+enum ControlType : uint8_t
+{
   // fixed controls
   Title = 0,
 
@@ -103,7 +104,18 @@ enum ControlType : uint8_t {
 #define CLEAR_GRAPH ControlType::ClearGraph
 
 // Colors
-enum ControlColor : uint8_t { Turquoise, Emerald, Peterriver, Wetasphalt, Sunflower, Carrot, Alizarin, Dark, None = 0xFF };
+enum ControlColor : uint8_t
+{
+  Turquoise,
+  Emerald,
+  Peterriver,
+  Wetasphalt,
+  Sunflower,
+  Carrot,
+  Alizarin,
+  Dark,
+  None = 0xFF
+};
 #define COLOR_TURQUOISE ControlColor::Turquoise
 #define COLOR_EMERALD ControlColor::Emerald
 #define COLOR_PETERRIVER ControlColor::Peterriver
@@ -114,7 +126,8 @@ enum ControlColor : uint8_t { Turquoise, Emerald, Peterriver, Wetasphalt, Sunflo
 #define COLOR_DARK ControlColor::Dark
 #define COLOR_NONE ControlColor::None
 
-class Control {
+class Control
+{
 public:
   ControlType type;
   uint16_t id; // just mirroring the id here for practical reasons
@@ -129,7 +142,8 @@ public:
 
   Control(ControlType type, const char *label, void (*callback)(Control *, int), String value, ControlColor color,
           uint16_t parentControl = Control::noParent)
-      : type(type), label(label), callback(callback), value(value), color(color), parentControl(parentControl), next(nullptr) {
+      : type(type), label(label), callback(callback), value(value), color(color), parentControl(parentControl), next(nullptr)
+  {
     id = idCounter++;
   }
 
@@ -164,11 +178,18 @@ private:
 #define T_VALUE 10
 #define S_VALUE 11
 
-enum Verbosity : uint8_t { Quiet = 0, Verbose, VerboseJSON };
+enum Verbosity : uint8_t
+{
+  Quiet = 0,
+  Verbose,
+  VerboseJSON
+};
 
-class ESPUIClass {
+class ESPUIClass
+{
 public:
-  ESPUIClass() {
+  ESPUIClass()
+  {
     verbosity = Verbosity::Quiet;
     jsonUpdateDocumentSize = 2000;
     jsonInitialDocumentSize = 8000;
@@ -185,15 +206,14 @@ public:
   void prepareFileSystem(); // Initially preps the filesystem and loads a lot of stuff into SPIFFS
   void list();              // Lists SPIFFS directory
 
-  uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise,
-                      uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
-  bool remControl(uint16_t id, bool reload_ui = true);
+  uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise, uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
+  bool removeControl(uint16_t id, bool force_reload_ui = false);
 
   // create Elements
   uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");         // Create Event Button
   uint16_t switcher(const char *label, void (*callback)(Control *, int), ControlColor color, bool startState = false); // Create Toggle Button
   uint16_t pad(const char *label, void (*callback)(Control *, int), ControlColor color);                               // Create Pad Control
-  uint16_t padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color); // Create Pad Control with Centerbutton
+  uint16_t padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color);                     // Create Pad Control with Centerbutton
 
   uint16_t slider(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min = 0,
                   int max = 100); // Create Slider Control
@@ -202,10 +222,9 @@ public:
   uint16_t text(const char *label, void (*callback)(Control *, int), ControlColor color, String value = ""); // Create a Text Input Control
 
   // Output only
-  uint16_t label(const char *label, ControlColor color, String value = ""); // Create Label
-  uint16_t graph(const char *label, ControlColor color);                    // Create Graph display
-  uint16_t gauge(const char *label, ControlColor color, int value, int min = 0,
-                 int max = 100); // Create Gauge display
+  uint16_t label(const char *label, ControlColor color, String value = "");                     // Create Label
+  uint16_t graph(const char *label, ControlColor color);                                        // Create Graph display
+  uint16_t gauge(const char *label, ControlColor color, int value, int min = 0, int max = 100); // Create Gauge display
 
   // Input only
   uint16_t accelerometer(const char *label, void (*callback)(Control *, int), ControlColor color);
@@ -220,8 +239,6 @@ public:
 
   void updateControl(uint16_t id, int clientId = -1);
   void updateControl(Control *control, int clientId = -1);
-
-  void reload();
 
   void print(uint16_t id, String value);
   void updateLabel(uint16_t id, String value);
@@ -238,8 +255,8 @@ public:
   // Variables
   const char *ui_title = "ESPUI"; // Store UI Title and Header Name
   Control *controls = nullptr;
+  void jsonReload();
   void jsonDom(AsyncWebSocketClient *client);
-  void jsonReload(AsyncWebSocketClient *client);
 
   Verbosity verbosity;
 

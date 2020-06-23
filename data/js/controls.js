@@ -232,6 +232,11 @@ function start() {
     var center = "";
     switch (data.type) {
       case UI_INITIAL_GUI:
+        // Clear current elements
+        $("#row").html("");
+        $("#tabsnav").html("");
+        $("#tabscontent").html("");
+
         if (data.sliderContinuous) {
           sliderContinuous = data.sliderContinuous;
         }
@@ -242,9 +247,9 @@ function start() {
           handleEvent(fauxEvent);
         });
         break;
-	  case UI_RELOAD:
-		window.location.reload();
-		break;
+      case UI_RELOAD:
+        window.location.reload();
+        break;
 
       case UI_TITEL:
         document.title = data.label;
