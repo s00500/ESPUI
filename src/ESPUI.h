@@ -11,7 +11,7 @@
 
 #if defined(ESP32)
 
-#include "SPIFFS.h"
+#include "LittleFS.h"
 #include "WiFi.h"
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -23,7 +23,7 @@
 #include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <FS.h>
+#include <LittleFS.h>
 #include <Hash.h>
 #include <SPIFFSEditor.h>
 
@@ -33,7 +33,8 @@
 
 // Message Types (and control types)
 
-enum ControlType : uint8_t {
+enum ControlType : uint8_t
+{
   // fixed controls
   Title = 0,
 
@@ -101,7 +102,18 @@ enum ControlType : uint8_t {
 #define CLEAR_GRAPH ControlType::ClearGraph
 
 // Colors
-enum ControlColor : uint8_t { Turquoise, Emerald, Peterriver, Wetasphalt, Sunflower, Carrot, Alizarin, Dark, None = 0xFF };
+enum ControlColor : uint8_t
+{
+  Turquoise,
+  Emerald,
+  Peterriver,
+  Wetasphalt,
+  Sunflower,
+  Carrot,
+  Alizarin,
+  Dark,
+  None = 0xFF
+};
 #define COLOR_TURQUOISE ControlColor::Turquoise
 #define COLOR_EMERALD ControlColor::Emerald
 #define COLOR_PETERRIVER ControlColor::Peterriver
@@ -112,7 +124,8 @@ enum ControlColor : uint8_t { Turquoise, Emerald, Peterriver, Wetasphalt, Sunflo
 #define COLOR_DARK ControlColor::Dark
 #define COLOR_NONE ControlColor::None
 
-class Control {
+class Control
+{
 public:
   ControlType type;
   uint16_t id; // just mirroring the id here for practical reasons
@@ -127,7 +140,8 @@ public:
 
   Control(ControlType type, const char *label, void (*callback)(Control *, int), String value, ControlColor color,
           uint16_t parentControl = Control::noParent)
-      : type(type), label(label), callback(callback), value(value), color(color), parentControl(parentControl), next(nullptr) {
+      : type(type), label(label), callback(callback), value(value), color(color), parentControl(parentControl), next(nullptr)
+  {
     id = idCounter++;
   }
 
@@ -162,11 +176,18 @@ private:
 #define T_VALUE 10
 #define S_VALUE 11
 
-enum Verbosity : uint8_t { Quiet = 0, Verbose, VerboseJSON };
+enum Verbosity : uint8_t
+{
+  Quiet = 0,
+  Verbose,
+  VerboseJSON
+};
 
-class ESPUIClass {
+class ESPUIClass
+{
 public:
-  ESPUIClass() {
+  ESPUIClass()
+  {
     verbosity = Verbosity::Quiet;
     jsonUpdateDocumentSize = 2000;
     jsonInitialDocumentSize = 8000;
@@ -190,7 +211,7 @@ public:
   uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");         // Create Event Button
   uint16_t switcher(const char *label, void (*callback)(Control *, int), ControlColor color, bool startState = false); // Create Toggle Button
   uint16_t pad(const char *label, void (*callback)(Control *, int), ControlColor color);                               // Create Pad Control
-  uint16_t padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color); // Create Pad Control with Centerbutton
+  uint16_t padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color);                     // Create Pad Control with Centerbutton
 
   uint16_t slider(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min = 0,
                   int max = 100); // Create Slider Control
