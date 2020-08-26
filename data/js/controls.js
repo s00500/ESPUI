@@ -226,7 +226,7 @@ function start() {
   };
 
   var handleEvent = function (evt) {
-    //console.log(evt);
+    console.log(evt);
     var data = JSON.parse(evt.data);
     var e = document.body;
     var center = "";
@@ -750,7 +750,7 @@ function start() {
         break;
 
       case UPDATE_SLIDER:
-        slider_move($("#sl" + data.id), data.value, "100", false);
+        slider_move($("#id" + data.id), data.value, "100", false);
         break;
 
       case UPDATE_NUMBER:

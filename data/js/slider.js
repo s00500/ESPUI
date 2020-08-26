@@ -10,7 +10,7 @@ function rkmd_rangeSlider(selector) {
   slider_offset = self.offset().left;
   sliderDiscrete = self;
 
-  sliderDiscrete.each(function(i, v) {
+  sliderDiscrete.each(function (i, v) {
     curnt = $(this);
     curnt.append(sliderDiscrete_tmplt());
     range = curnt.find('input[type="range"]');
@@ -25,7 +25,7 @@ function rkmd_rangeSlider(selector) {
     slider_label.find("span").text(range_val);
   });
 
-  self.on("mousedown touchstart", ".slider-handle", function(e) {
+  self.on("mousedown touchstart", ".slider-handle", function (e) {
     if (e.button === 2) {
       return false;
     }
@@ -37,14 +37,14 @@ function rkmd_rangeSlider(selector) {
       return false;
     }
     $(this).addClass("is-active");
-    var moveFu = function(e) {
+    var moveFu = function (e) {
       var pageX = e.pageX || e.changedTouches[0].pageX;
       var slider_new_width = pageX - slider_offset;
       if (slider_new_width <= slider_width && !(slider_new_width < "0")) {
         slider_move(parents, slider_new_width, slider_width, true);
       }
     };
-    var upFu = function(e) {
+    var upFu = function (e) {
       $(this).off(handlers);
       parents.find(".is-active").removeClass("is-active");
     };
@@ -53,12 +53,12 @@ function rkmd_rangeSlider(selector) {
       mousemove: moveFu,
       touchmove: moveFu,
       mouseup: upFu,
-      touchend: upFu
+      touchend: upFu,
     };
     $(document).on(handlers);
   });
 
-  self.on("mousedown touchstart", ".slider", function(e) {
+  self.on("mousedown touchstart", ".slider", function (e) {
     if (e.button === 2) {
       return false;
     }
@@ -76,13 +76,13 @@ function rkmd_rangeSlider(selector) {
     if (slider_new_width <= slider_width && !(slider_new_width < "0")) {
       slider_move(parents, slider_new_width, slider_width, true);
     }
-    var upFu = function(e) {
+    var upFu = function (e) {
       $(this).off(handlers);
     };
 
     var handlers = {
       mouseup: upFu,
-      touchend: upFu
+      touchend: upFu,
     };
     $(document).on(handlers);
   });
@@ -104,13 +104,14 @@ function slider_move(parents, newW, sliderW, send) {
   var slider_fill = parents.find(".slider-fill");
   var slider_handle = parents.find(".slider-handle");
   var range = parents.find('input[type="range"]');
+  range.next().html(newW); // update value
 
   slider_fill.css("width", slider_new_val + "%");
   slider_handle.css({
     left: slider_new_val + "%",
     transition: "none",
     "-webkit-transition": "none",
-    "-moz-transition": "none"
+    "-moz-transition": "none",
   });
 
   range.val(slider_new_val);
