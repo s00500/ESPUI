@@ -256,7 +256,7 @@ public:
   const char *ui_title = "ESPUI"; // Store UI Title and Header Name
   Control *controls = nullptr;
   void jsonReload();
-  void jsonDom(AsyncWebSocketClient *client);
+  void jsonDom(AsyncWebSocketClient *client = nullptr);
 
   Verbosity verbosity;
 

@@ -563,7 +563,7 @@ bool ESPUIClass::removeControl(uint16_t id, bool force_reload_ui)
     }
     else
     {
-      jsonDom();
+      jsonDom(); // resends to all
     }
     return true;
   }
@@ -670,6 +670,10 @@ void ESPUIClass::updateControl(Control *control, int clientId)
 
   if (clientId < 0)
   {
+    if (this->verbosity >= Verbosity::VerboseJSON)
+    {
+      Serial.println("TextAll");
+    }
     this->ws->textAll(json);
     return;
   }
@@ -684,11 +688,6 @@ void ESPUIClass::updateControl(Control *control, int clientId)
       if (clientId != tryId)
       {
         this->ws->client(tryId)->text(json);
-
-        if (this->verbosity >= Verbosity::VerboseJSON)
-        {
-          Serial.println(json);
-        }
       }
 
       count++;
