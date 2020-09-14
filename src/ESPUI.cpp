@@ -500,7 +500,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
   }
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char *label, String value, ControlColor color, uint16_t parentControl,
+uint16_t ESPUIClass::addControl(ControlType type, const char *label, const String& value, ControlColor color, uint16_t parentControl,
                                 void (*callback)(Control *, int))
 {
   Control *control = new Control(type, label, callback, value, color, parentControl);
@@ -571,7 +571,7 @@ bool ESPUIClass::removeControl(uint16_t id, bool force_reload_ui)
   return false;
 }
 
-uint16_t ESPUIClass::label(const char *label, ControlColor color, String value) { return addControl(ControlType::Label, label, value, color); }
+uint16_t ESPUIClass::label(const char *label, ControlColor color, const String& value) { return addControl(ControlType::Label, label, value, color); }
 
 uint16_t ESPUIClass::graph(const char *label, ControlColor color) { return addControl(ControlType::Graph, label, "", color); }
 
@@ -584,7 +584,7 @@ uint16_t ESPUIClass::slider(const char *label, void (*callback)(Control *, int),
   return sliderId;
 }
 
-uint16_t ESPUIClass::button(const char *label, void (*callback)(Control *, int), ControlColor color, String value)
+uint16_t ESPUIClass::button(const char *label, void (*callback)(Control *, int), ControlColor color, const String& value)
 {
   return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
 }
@@ -624,7 +624,7 @@ uint16_t ESPUIClass::accelerometer(const char *label, void (*callback)(Control *
   return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::text(const char *label, void (*callback)(Control *, int), ControlColor color, String value)
+uint16_t ESPUIClass::text(const char *label, void (*callback)(Control *, int), ControlColor color, const String& value)
 {
   return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
 }
@@ -713,7 +713,7 @@ void ESPUIClass::updateControl(uint16_t id, int clientId)
   updateControl(control, clientId);
 }
 
-void ESPUIClass::updateControlValue(Control *control, String value, int clientId)
+void ESPUIClass::updateControlValue(Control *control, const String& value, int clientId)
 {
   if (!control)
   {
@@ -724,7 +724,7 @@ void ESPUIClass::updateControlValue(Control *control, String value, int clientId
   updateControl(control, clientId);
 }
 
-void ESPUIClass::updateControlValue(uint16_t id, String value, int clientId)
+void ESPUIClass::updateControlValue(uint16_t id, const String& value, int clientId)
 {
   Control *control = getControl(id);
 
@@ -740,9 +740,9 @@ void ESPUIClass::updateControlValue(uint16_t id, String value, int clientId)
   updateControlValue(control, value, clientId);
 }
 
-void ESPUIClass::print(uint16_t id, String value) { updateControlValue(id, value); }
+void ESPUIClass::print(uint16_t id, const String& value) { updateControlValue(id, value); }
 
-void ESPUIClass::updateLabel(uint16_t id, String value) { updateControlValue(id, value); }
+void ESPUIClass::updateLabel(uint16_t id, const String& value) { updateControlValue(id, value); }
 
 void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId) { updateControlValue(id, String(nValue), clientId); }
 
@@ -750,9 +750,9 @@ void ESPUIClass::updateSwitcher(uint16_t id, bool nValue, int clientId) { update
 
 void ESPUIClass::updateNumber(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
 
-void ESPUIClass::updateText(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
+void ESPUIClass::updateText(uint16_t id, const String& text, int clientId) { updateControlValue(id, text, clientId); }
 
-void ESPUIClass::updateSelect(uint16_t id, String text, int clientId) { updateControlValue(id, text, clientId); }
+void ESPUIClass::updateSelect(uint16_t id, const String& text, int clientId) { updateControlValue(id, text, clientId); }
 
 void ESPUIClass::updateGauge(uint16_t id, int number, int clientId) { updateControlValue(id, String(number), clientId); }
 

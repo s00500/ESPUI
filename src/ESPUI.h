@@ -140,7 +140,7 @@ public:
 
   static constexpr uint16_t noParent = 0xffff;
 
-  Control(ControlType type, const char *label, void (*callback)(Control *, int), String value, ControlColor color,
+  Control(ControlType type, const char *label, void (*callback)(Control *, int), const String& value, ControlColor color,
           uint16_t parentControl = Control::noParent)
       : type(type), label(label), callback(callback), value(value), color(color), parentControl(parentControl), next(nullptr)
   {
@@ -206,11 +206,11 @@ public:
   void prepareFileSystem(); // Initially preps the filesystem and loads a lot of stuff into SPIFFS
   void list();              // Lists SPIFFS directory
 
-  uint16_t addControl(ControlType type, const char *label, String value = String(""), ControlColor color = ControlColor::Turquoise, uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
+  uint16_t addControl(ControlType type, const char *label, const String& value = String(""), ControlColor color = ControlColor::Turquoise, uint16_t parentControl = Control::noParent, void (*callback)(Control *, int) = nullptr);
   bool removeControl(uint16_t id, bool force_reload_ui = false);
 
   // create Elements
-  uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, String value = "");         // Create Event Button
+  uint16_t button(const char *label, void (*callback)(Control *, int), ControlColor color, const String& value = "");         // Create Event Button
   uint16_t switcher(const char *label, void (*callback)(Control *, int), ControlColor color, bool startState = false); // Create Toggle Button
   uint16_t pad(const char *label, void (*callback)(Control *, int), ControlColor color);                               // Create Pad Control
   uint16_t padWithCenter(const char *label, void (*callback)(Control *, int), ControlColor color);                     // Create Pad Control with Centerbutton
@@ -219,10 +219,10 @@ public:
                   int max = 100); // Create Slider Control
   uint16_t number(const char *label, void (*callback)(Control *, int), ControlColor color, int value, int min = 0,
                   int max = 100);                                                                            // Create a Number Input Control
-  uint16_t text(const char *label, void (*callback)(Control *, int), ControlColor color, String value = ""); // Create a Text Input Control
+  uint16_t text(const char *label, void (*callback)(Control *, int), ControlColor color, const String& value = ""); // Create a Text Input Control
 
   // Output only
-  uint16_t label(const char *label, ControlColor color, String value = "");                     // Create Label
+  uint16_t label(const char *label, ControlColor color, const String& value = "");                     // Create Label
   uint16_t graph(const char *label, ControlColor color);                                        // Create Graph display
   uint16_t gauge(const char *label, ControlColor color, int value, int min = 0, int max = 100); // Create Gauge display
 
@@ -234,19 +234,19 @@ public:
   Control *getControl(uint16_t id);
 
   // Update Elements
-  void updateControlValue(uint16_t id, String value, int clientId = -1);
-  void updateControlValue(Control *control, String value, int clientId = -1);
+  void updateControlValue(uint16_t id, const String& value, int clientId = -1);
+  void updateControlValue(Control *control, const String& value, int clientId = -1);
 
   void updateControl(uint16_t id, int clientId = -1);
   void updateControl(Control *control, int clientId = -1);
 
-  void print(uint16_t id, String value);
-  void updateLabel(uint16_t id, String value);
+  void print(uint16_t id, const String& value);
+  void updateLabel(uint16_t id, const String& value);
   void updateSwitcher(uint16_t id, bool nValue, int clientId = -1);
   void updateSlider(uint16_t id, int nValue, int clientId = -1);
   void updateNumber(uint16_t id, int nValue, int clientId = -1);
-  void updateText(uint16_t id, String nValue, int clientId = -1);
-  void updateSelect(uint16_t id, String nValue, int clientId = -1);
+  void updateText(uint16_t id, const String& nValue, int clientId = -1);
+  void updateSelect(uint16_t id, const String& nValue, int clientId = -1);
   void updateGauge(uint16_t id, int number, int clientId);
 
   void clearGraph(uint16_t id, int clientId = -1);
