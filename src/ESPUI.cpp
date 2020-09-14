@@ -22,7 +22,7 @@ void listDir(const char *dirname, uint8_t levels)
 {
   if (ESPUI.verbosity)
   {
-    Serial.printf("Listing directory: %s\n", dirname);
+    Serial.printf_P(F("Listing directory: %s\n"), dirname);
   }
 
   File root = LittleFS.open(dirname);
@@ -31,7 +31,7 @@ void listDir(const char *dirname, uint8_t levels)
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Failed to open directory");
+      Serial.println(F("Failed to open directory"));
     }
 
     return;
@@ -41,7 +41,7 @@ void listDir(const char *dirname, uint8_t levels)
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Not a directory");
+      Serial.println(F("Not a directory"));
     }
 
     return;
@@ -55,7 +55,7 @@ void listDir(const char *dirname, uint8_t levels)
     {
       if (ESPUI.verbosity)
       {
-        Serial.print("  DIR : ");
+        Serial.print(F("  DIR : "));
         Serial.println(file.name());
       }
 
@@ -68,9 +68,9 @@ void listDir(const char *dirname, uint8_t levels)
     {
       if (ESPUI.verbosity)
       {
-        Serial.print("  FILE: ");
+        Serial.print(F("  FILE: "));
         Serial.print(file.name());
-        Serial.print("  SIZE: ");
+        Serial.print(F("  SIZE: "));
         Serial.println(file.size());
       }
     }
@@ -83,16 +83,16 @@ void listDir(const char *dirname, uint8_t levels)
 void listDir(const char *dirname, uint8_t levels)
 {
   // ignoring levels for esp8266
-  Serial.printf("Listing directory: %s\n", dirname);
+  Serial.printf_P(PSTR("Listing directory: %s\n"), dirname);
 
   String str = "";
   Dir dir = LittleFS.openDir("/");
 
   while (dir.next())
   {
-    Serial.print("  FILE: ");
+    Serial.print(F("  FILE: "));
     Serial.print(dir.fileName());
-    Serial.print("  SIZE: ");
+    Serial.print(F("  SIZE: "));
     Serial.println(dir.fileSize());
   }
 }
@@ -103,7 +103,7 @@ void ESPUIClass::list()
 {
   if (!LittleFS.begin())
   {
-    Serial.println("SPIFFS Mount Failed");
+    Serial.println(F("SPIFFS Mount Failed"));
     return;
   }
 
@@ -134,7 +134,7 @@ void deleteFile(const char *path)
   {
     if (ESPUI.verbosity)
     {
-      Serial.printf("File: %s does not exist, not deleting\n", path);
+      Serial.printf_P(PSTR("File: %s does not exist, not deleting\n"), path);
     }
 
     return;
@@ -142,21 +142,21 @@ void deleteFile(const char *path)
 
   if (ESPUI.verbosity)
   {
-    Serial.printf("Deleting file: %s\n", path);
+    Serial.printf_P(PSTR("Deleting file: %s\n"), path);
   }
 
   if (LittleFS.remove(path))
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("File deleted");
+      Serial.println(F("File deleted"));
     }
   }
   else
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Delete failed");
+      Serial.println(F("Delete failed"));
     }
   }
 }
@@ -165,7 +165,7 @@ void writeFile(const char *path, const char *data)
 {
   if (ESPUI.verbosity)
   {
-    Serial.printf("Writing file: %s\n", path);
+    Serial.printf_P(PSTR("Writing file: %s\n"), path);
   }
 
   File file = LittleFS.open(path, FILE_WRITE);
@@ -174,7 +174,7 @@ void writeFile(const char *path, const char *data)
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Failed to open file for writing");
+      Serial.println(F("Failed to open file for writing"));
     }
 
     return;
@@ -186,14 +186,14 @@ void writeFile(const char *path, const char *data)
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("File written");
+      Serial.println(F("File written"));
     }
   }
   else
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Write failed");
+      Serial.println(F("Write failed"));
     }
   }
 
@@ -203,14 +203,14 @@ void writeFile(const char *path, const char *data)
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("File written");
+      Serial.println(F("File written"));
     }
   }
   else
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Write failed");
+      Serial.println(F("Write failed"));
     }
   }
 
@@ -226,7 +226,7 @@ void ESPUIClass::prepareFileSystem()
 
   if (this->verbosity)
   {
-    Serial.println("About to prepare filesystem...");
+    Serial.println(F("About to prepare filesystem..."));
   }
 
 #if defined(ESP32)
@@ -236,7 +236,7 @@ void ESPUIClass::prepareFileSystem()
   {
     if (this->verbosity)
     {
-      Serial.println("SPIFFS Mount Failed");
+      Serial.println(F("SPIFFS Mount Failed"));
     }
 
     return;
@@ -245,7 +245,7 @@ void ESPUIClass::prepareFileSystem()
   if (this->verbosity)
   {
     listDir("/", 1);
-    Serial.println("SPIFFS Mount ESP32 Done");
+    Serial.println(F("SPIFFS Mount ESP32 Done"));
   }
 
 #else
@@ -254,7 +254,7 @@ void ESPUIClass::prepareFileSystem()
 
   if (this->verbosity)
   {
-    Serial.println("SPIFFS Mount ESP8266 Done");
+    Serial.println(F("SPIFFS Mount ESP8266 Done"));
   }
 
 #endif
@@ -272,7 +272,7 @@ void ESPUIClass::prepareFileSystem()
 
   if (this->verbosity)
   {
-    Serial.println("Cleanup done");
+    Serial.println(F("Cleanup done"));
   }
 
   // Now write
@@ -290,7 +290,7 @@ void ESPUIClass::prepareFileSystem()
 
   if (this->verbosity)
   {
-    Serial.println("Done Initializing filesystem :-)");
+    Serial.println(F("Done Initializing filesystem :-)"));
   }
 
 #if defined(ESP32)
@@ -314,7 +314,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
   {
     if (ESPUI.verbosity)
     {
-      Serial.printf("Disconnected!\n");
+      Serial.print(F("Disconnected!\n"));
     }
 
     break;
@@ -324,7 +324,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
   {
     if (ESPUI.verbosity)
     {
-      Serial.printf("Received PONG!\n");
+      Serial.print(F("Received PONG!\n"));
     }
 
     break;
@@ -334,7 +334,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
   {
     if (ESPUI.verbosity)
     {
-      Serial.printf("WebSocket Error!\n");
+      Serial.print(F("WebSocket Error!\n"));
     }
 
     break;
@@ -344,7 +344,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
   {
     if (ESPUI.verbosity)
     {
-      Serial.print("Connected: ");
+      Serial.print(F("Connected: "));
       Serial.println(client->id());
     }
 
@@ -352,7 +352,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 
     if (ESPUI.verbosity)
     {
-      Serial.println("JSON Data Sent to Client!");
+      Serial.println(F("JSON Data Sent to Client!"));
     }
   }
   break;
@@ -371,9 +371,9 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 
     if (ESPUI.verbosity >= Verbosity::VerboseJSON)
     {
-      Serial.print("WS rec: ");
+      Serial.print(F("WS rec: "));
       Serial.println(msg);
-      Serial.print("WS recognised ID: ");
+      Serial.print(F("WS recognised ID: "));
       Serial.println(id);
     }
 
@@ -383,7 +383,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     {
       if (ESPUI.verbosity)
       {
-        Serial.print("No control found for ID ");
+        Serial.print(F("No control found for ID "));
         Serial.println(id);
       }
 
@@ -394,92 +394,92 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     {
       if (ESPUI.verbosity)
       {
-        Serial.print("No callback found for ID ");
+        Serial.print(F("No callback found for ID "));
         Serial.println(id);
       }
 
       return;
     }
 
-    if (msg.startsWith("bdown:"))
+    if (msg.startsWith(F("bdown:")))
     {
       c->callback(c, B_DOWN);
     }
-    else if (msg.startsWith("bup:"))
+    else if (msg.startsWith(F("bup:")))
     {
       c->callback(c, B_UP);
     }
-    else if (msg.startsWith("pfdown:"))
+    else if (msg.startsWith(F("pfdown:")))
     {
       c->callback(c, P_FOR_DOWN);
     }
-    else if (msg.startsWith("pfup:"))
+    else if (msg.startsWith(F("pfup:")))
     {
       c->callback(c, P_FOR_UP);
     }
-    else if (msg.startsWith("pldown:"))
+    else if (msg.startsWith(F("pldown:")))
     {
       c->callback(c, P_LEFT_DOWN);
     }
-    else if (msg.startsWith("plup:"))
+    else if (msg.startsWith(F("plup:")))
     {
       c->callback(c, P_LEFT_UP);
     }
-    else if (msg.startsWith("prdown:"))
+    else if (msg.startsWith(F("prdown:")))
     {
       c->callback(c, P_RIGHT_DOWN);
     }
-    else if (msg.startsWith("prup:"))
+    else if (msg.startsWith(F("prup:")))
     {
       c->callback(c, P_RIGHT_UP);
     }
-    else if (msg.startsWith("pbdown:"))
+    else if (msg.startsWith(F("pbdown:")))
     {
       c->callback(c, P_BACK_DOWN);
     }
-    else if (msg.startsWith("pbup:"))
+    else if (msg.startsWith(F("pbup:")))
     {
       c->callback(c, P_BACK_UP);
     }
-    else if (msg.startsWith("pcdown:"))
+    else if (msg.startsWith(F("pcdown:")))
     {
       c->callback(c, P_CENTER_DOWN);
     }
-    else if (msg.startsWith("pcup:"))
+    else if (msg.startsWith(F("pcup:")))
     {
       c->callback(c, P_CENTER_UP);
     }
-    else if (msg.startsWith("sactive:"))
+    else if (msg.startsWith(F("sactive:")))
     {
       c->value = "1";
       ESPUI.updateControl(c, client->id());
       c->callback(c, S_ACTIVE);
     }
-    else if (msg.startsWith("sinactive:"))
+    else if (msg.startsWith(F("sinactive:")))
     {
       c->value = "0";
       ESPUI.updateControl(c, client->id());
       c->callback(c, S_INACTIVE);
     }
-    else if (msg.startsWith("slvalue:"))
+    else if (msg.startsWith(F("slvalue:")))
     {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
       ESPUI.updateControl(c, client->id());
       c->callback(c, SL_VALUE);
     }
-    else if (msg.startsWith("nvalue:"))
+    else if (msg.startsWith(F("nvalue:")))
     {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
       ESPUI.updateControl(c, client->id());
       c->callback(c, N_VALUE);
     }
-    else if (msg.startsWith("tvalue:"))
+    else if (msg.startsWith(F("tvalue:")))
     {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
       ESPUI.updateControl(c, client->id());
       c->callback(c, T_VALUE);
     }
-    else if (msg.startsWith("svalue:"))
+    else if (msg.startsWith(F("svalue:")))
     {
       c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
       ESPUI.updateControl(c, client->id());
@@ -489,7 +489,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     {
       if (ESPUI.verbosity)
       {
-        Serial.println("Malformated message from the websocket");
+        Serial.println(F("Malformated message from the websocket"));
       }
     }
   }
@@ -672,7 +672,7 @@ void ESPUIClass::updateControl(Control *control, int clientId)
   {
     if (this->verbosity >= Verbosity::VerboseJSON)
     {
-      Serial.println("TextAll");
+      Serial.println(F("TextAll"));
     }
     this->ws->textAll(json);
     return;
@@ -705,7 +705,7 @@ void ESPUIClass::updateControl(uint16_t id, int clientId)
   {
     if (this->verbosity)
     {
-      Serial.println(String("Error: There is no control with ID ") + String(id));
+      Serial.printf_P(PSTR("Error: There is no control with ID %d"), id);
     }
     return;
   }
@@ -732,7 +732,7 @@ void ESPUIClass::updateControlValue(uint16_t id, const String& value, int client
   {
     if (this->verbosity)
     {
-      Serial.println(String("Error: There is no control with ID ") + String(id));
+      Serial.printf_P(PSTR("Error: There is no control with ID %d"), id);
     }
     return;
   }
@@ -918,7 +918,7 @@ void ESPUIClass::beginSPIFFS(const char *_title, const char *username, const cha
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO PREPARE YOUR ESP!!!!!!!");
+      Serial.println(F("SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO PREPARE YOUR ESP!!!!!!!"));
     }
 
     return;
@@ -933,7 +933,7 @@ void ESPUIClass::beginSPIFFS(const char *_title, const char *username, const cha
   {
     if (ESPUI.verbosity)
     {
-      Serial.println("Please read the README!!!!!!!, Make sure to ESPUI.prepareFileSystem() once in an empty sketch");
+      Serial.println(F("Please read the README!!!!!!!, Make sure to ESPUI.prepareFileSystem() once in an empty sketch"));
     }
 
     return;
@@ -971,7 +971,7 @@ void ESPUIClass::beginSPIFFS(const char *_title, const char *username, const cha
 
   if (this->verbosity)
   {
-    Serial.println("UI Initialized");
+    Serial.println(F("UI Initialized"));
   }
 }
 
@@ -1107,7 +1107,7 @@ void ESPUIClass::begin(const char *_title, const char *username, const char *pas
 
   if (this->verbosity)
   {
-    Serial.println("UI Initialized");
+    Serial.println(F("UI Initialized"));
   }
 }
 
