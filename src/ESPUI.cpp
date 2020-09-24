@@ -26,7 +26,7 @@ void listDir(const char* dirname, uint8_t levels)
     }
 #endif
 
-    File root = LittleFS.open(dirname);
+    File root = SPIFFS.open(dirname);
 
     if (!root)
     {
@@ -119,11 +119,10 @@ void ESPUIClass::list()
     listDir("/", 1);
 #if defined(ESP32)
 
-    Serial.println(LittleFS.totalBytes());
-    Serial.println(LittleFS.usedBytes());
+    Serial.println(SPIFFS.totalBytes());
+    Serial.println(SPIFFS.usedBytes());
 
-#else
-    FSInfo fs_info;
+#else FSInfo fs_info;
     LittleFS.info(fs_info);
 
     Serial.println(fs_info.totalBytes);
@@ -263,9 +262,9 @@ void ESPUIClass::prepareFileSystem()
 #endif
 
 #if defined(ESP32)
-    LittleFS.format();
+    SPIFFS.format();
 
-    if (!LittleFS.begin(true))
+    if (!SPIFFS.begin(true))
     {
 #if defined(DEBUG_ESPUI)
         if (this->verbosity)
@@ -347,7 +346,11 @@ void ESPUIClass::prepareFileSystem()
 
 #endif
 
+#if defined(ESP32)
+    SPIFFS.end();
+#else
     LittleFS.end();
+#endif
 }
 
 // Handle Websockets Communication
@@ -356,8 +359,7 @@ void onWsEvent(
 {
     switch (type)
     {
-    case WS_EVT_DISCONNECT:
-    {
+    case WS_EVT_DISCONNECT: {
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
@@ -368,8 +370,7 @@ void onWsEvent(
         break;
     }
 
-    case WS_EVT_PONG:
-    {
+    case WS_EVT_PONG: {
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
@@ -380,8 +381,7 @@ void onWsEvent(
         break;
     }
 
-    case WS_EVT_ERROR:
-    {
+    case WS_EVT_ERROR: {
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
@@ -392,8 +392,7 @@ void onWsEvent(
         break;
     }
 
-    case WS_EVT_CONNECT:
-    {
+    case WS_EVT_CONNECT: {
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
@@ -413,8 +412,7 @@ void onWsEvent(
     }
     break;
 
-    case WS_EVT_DATA:
-    {
+    case WS_EVT_DATA: {
         String msg = "";
         msg.reserve(len + 1);
 
@@ -544,7 +542,7 @@ void onWsEvent(
         else if (msg.startsWith("tabvalue:"))
         {
             c->callback(c, client->id());
-        }        
+        }
         else if (msg.startsWith(F("svalue:")))
         {
             c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
@@ -864,7 +862,7 @@ void ESPUIClass::updateGauge(uint16_t id, int number, int clientId)
     updateControlValue(id, String(number), clientId);
 }
 
-void ESPUIClass::clearGraph(uint16_t id, int clientId) {}
+void ESPUIClass::clearGraph(uint16_t id, int clientId) { }
 
 void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
 {
