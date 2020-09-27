@@ -6,15 +6,13 @@
 
 #include "Arduino.h"
 #include "ArduinoJson.h"
-#include "FS.h"
 #include "stdlib_noniso.h"
 
 #if defined(ESP32)
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 
-#include "FS.h"
-#include "LittleFS.h"
+#include "SPIFFS.h"
 #include "WiFi.h"
 
 #else

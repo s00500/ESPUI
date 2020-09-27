@@ -110,11 +110,19 @@ void listDir(const char* dirname, uint8_t levels)
 
 void ESPUIClass::list()
 {
-    if (!LittleFS.begin())
-    {
-        Serial.println(F("SPIFFS Mount Failed"));
-        return;
-    }
+#if defined(ESP32)
+  if (!SPIFFS.begin())
+  {
+    Serial.println(F("SPIFFS Mount Failed"));
+    return;
+  }
+#else 
+if (!LittleFS.begin())
+  {
+    Serial.println(F("LittleFS Mount Failed"));
+    return;
+  }
+#endif
 
     listDir("/", 1);
 #if defined(ESP32)
@@ -133,6 +141,20 @@ void ESPUIClass::list()
 
 void deleteFile(const char* path)
 {
+ #if defined(ESP32)
+  bool exists = SPIFFS.exists(path);
+#else
+  bool exists = LittleFS.exists(path);
+#endif
+#if defined(DEBUG_ESPUI)
+  if (ESPUI.verbosity)
+  {
+    Serial.print(exists);
+  }
+#endif
+
+  if (!exists)
+  {
 #if defined(DEBUG_ESPUI)
     if (ESPUI.verbosity)
     {
@@ -152,7 +174,14 @@ void deleteFile(const char* path)
         return;
     }
 
-#if defined(DEBUG_ESPUI)
+#if defined(ESP32)
+  bool didRemove = SPIFFS.remove(path);
+#else
+  bool didRemove = LittleFS.remove(path);
+#endif
+  if (didRemove)
+  {
+      #if defined(DEBUG_ESPUI)
     if (ESPUI.verbosity)
     {
         Serial.printf_P(PSTR("Deleting file: %s\n"), path);
@@ -181,6 +210,15 @@ void deleteFile(const char* path)
 
 void writeFile(const char* path, const char* data)
 {
+
+#if defined(ESP32)
+  File file = SPIFFS.open(path, FILE_WRITE);
+#else
+  File file = LittleFS.open(path, FILE_WRITE);
+#endif
+
+  if (!file)
+  {
 #if defined(DEBUG_ESPUI)
     if (ESPUI.verbosity)
     {
@@ -1012,19 +1050,35 @@ void ESPUIClass::jsonReload()
 
 void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const char* password)
 {
-    ui_title = _title;
-    this->basicAuthUsername = username;
-    this->basicAuthPassword = password;
+  ui_title = _title;
+  this->basicAuthUsername = username;
+  this->basicAuthPassword = password;
 
-    if (username == nullptr && password == nullptr)
-    {
-        basicAuth = false;
-    }
-    else
-    {
-        basicAuth = true;
-    }
+  if (username == nullptr && password == nullptr)
+  {
+    basicAuth = false;
+  }
+  else
+  {
+    basicAuth = true;
+  }
 
+  server = new AsyncWebServer(80);
+  ws = new AsyncWebSocket("/ws");
+
+#if defined(ESP32)
+  bool fsBegin = SPIFFS.begin();
+#else
+  bool fsBegin = LittleFS.begin();
+#endif
+  if (!fsBegin)
+  {
+#if defined(DEBUG_ESPUI)
+    if (ESPUI.verbosity)
+    {
+      Serial.println(F("FS Mount Failed, PLEASE CHECK THE README ON HOW TO PREPARE YOUR ESP!!!!!!!"));
+    }
+#endif
     server = new AsyncWebServer(80);
     ws = new AsyncWebSocket("/ws");
 
@@ -1038,9 +1092,13 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
         }
 #endif
 
-        return;
-    }
-
+#if defined(ESP32)
+  bool indexExists = SPIFFS.exists("/index.htm");
+#else
+  bool indexExists = LittleFS.exists("/index.htm");
+#endif
+  if (!indexExists)
+  {
 #if defined(DEBUG_ESPUI)
     if (ESPUI.verbosity)
     {
@@ -1072,7 +1130,24 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
         }
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
     }
-    else
+#if defined(ESP32)
+    server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
+#else
+    server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
+#endif
+  }
+  else
+  {
+#if defined(ESP32)
+    server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
+#else
+    server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
+#endif
+  }
+
+  // Heap for general Servertest
+  server->on("/heap", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword))
     {
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
     }
