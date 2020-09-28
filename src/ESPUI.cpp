@@ -1,8 +1,9 @@
+#include "ESPUI.h"
+
 #include <functional>
 
 #include <ESPAsyncWebServer.h>
 
-#include "ESPUI.h"
 #include "dataControlsJS.h"
 #include "dataGraphJS.h"
 #include "dataIndexHTML.h"
