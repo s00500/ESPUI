@@ -557,7 +557,7 @@ function start() {
 
       case UI_TAB:
         $("#tabsnav").append(
-          "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + " </a></li>"
+          "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + "</a></li>"
         );
         $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
 
