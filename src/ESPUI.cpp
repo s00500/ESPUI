@@ -541,6 +541,10 @@ void onWsEvent(
             ESPUI.updateControl(c, client->id());
             c->callback(c, T_VALUE);
         }
+        else if (msg.startsWith("tabvalue:"))
+        {
+            c->callback(c, client->id());
+        }        
         else if (msg.startsWith(F("svalue:")))
         {
             c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
