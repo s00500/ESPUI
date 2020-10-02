@@ -13,7 +13,7 @@
 #include "dataTabbedcontentJS.h"
 #include "dataZeptoJS.h"
 
-uint16_t Control::idCounter = 0;
+uint16_t Control::idCounter = 1;
 
 // ################# Spiffs functions
 #if defined(ESP32)
