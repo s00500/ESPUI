@@ -557,7 +557,7 @@ function start() {
 
       case UI_TAB:
         $("#tabsnav").append(
-          "<li><a href='#tab" + data.id + "'>" + data.value + "</a></li>"
+          "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + "</a></li>"
         );
         $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
 
@@ -812,6 +812,11 @@ function numberchange(number) {
 function textchange(number) {
   var val = $("#text" + number).val();
   websock.send("tvalue:" + val + ":" + number);
+}
+
+function tabclick(number) {
+  var val = $("#tab" + number).val();
+  websock.send("tabvalue:" + val + ":" + number);
 }
 
 function selectchange(number) {
