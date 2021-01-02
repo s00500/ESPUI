@@ -380,28 +380,28 @@ function start() {
             data.id +
             ", false)' id='pf" +
             data.id +
-            "'>▲</a></li>" +
+            "'>&#9650;</a></li>" +
             "<li><a onmousedown='padclick(RIGHT, " +
             data.id +
             ", true)' onmouseup='padclick(RIGHT, " +
             data.id +
             ", false)' id='pr" +
             data.id +
-            "'>▲</a></li>" +
+            "'>&#9650;</a></li>" +
             "<li><a onmousedown='padclick(LEFT, " +
             data.id +
             ", true)' onmouseup='padclick(LEFT, " +
             data.id +
             ", false)' id='pl" +
             data.id +
-            "'>▲</a></li>" +
+            "'>&#9650;</a></li>" +
             "<li><a onmousedown='padclick(DOWN, " +
             data.id +
             ", true)' onmouseup='padclick(DOWN, " +
             data.id +
             ", false)' id='pb" +
             data.id +
-            "'>▲</a></li>" +
+            "'>&#9650;</a></li>" +
             "</ul>" +
             (data.type == UI_CPAD
               ? "<a class='confirm' onmousedown='padclick(CENTER," +
