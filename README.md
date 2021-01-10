@@ -104,7 +104,7 @@ function `ESPUI.prepareFileSystem()`
 Just open the example sketch **prepareFileSystem** and run it on the ESP, (give
 it up to 30 seconds, you can see the status on the Serial Monitor), The library
 will create all needed files. Congratulations, you are done, from now on you
-just need to to this again when there is a library update, or when you want to
+just need to do this again when there is a library update, or when you want to
 use another chip :-) Now you can upload your normal sketch, when you do not call
 the `ESPUI.prepareFileSystem()` function the compiler will strip out all the
 unnecessary strings that are already saved in the chip's filesystem and you have
