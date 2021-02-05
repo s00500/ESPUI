@@ -799,9 +799,11 @@ function start() {
   websock.onmessage = handleEvent;
 }
 
+var sliderCache = {};
 function sliderchange(number) {
   var val = $("#sl" + number).val();
-  websock.send("slvalue:" + val + ":" + number);
+  sliderCache[number] !== val && websock.send("slvalue:" + val + ":" + number);
+  sliderCache[number] = val;
 }
 
 function numberchange(number) {
