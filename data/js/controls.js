@@ -861,9 +861,11 @@ function switcher(number, state) {
     if ($("#s" + number).is(":checked")) {
       websock.send("sactive:" + number);
       $("#sl" + number).addClass("checked");
+      $("#sl" + number).prop("checked", true);
     } else {
       websock.send("sinactive:" + number);
       $("#sl" + number).removeClass("checked");
+      $("#sl" + number).prop("checked", false);
     }
   } else if (state == 1) {
     $("#sl" + number).addClass("checked");
