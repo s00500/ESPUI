@@ -134,18 +134,21 @@ public:
     void (*callback)(Control*, int);
     String value;
     ControlColor color;
+	bool visible;
     uint16_t parentControl;
     Control* next;
+
 
     static constexpr uint16_t noParent = 0xffff;
 
     Control(ControlType type, const char* label, void (*callback)(Control*, int), const String& value,
-        ControlColor color, uint16_t parentControl = Control::noParent)
+        ControlColor color, bool visible = true, uint16_t parentControl = Control::noParent)
         : type(type),
           label(label),
           callback(callback),
           value(value),
           color(color),
+          visible(visible),
           parentControl(parentControl),
           next(nullptr)
     {
@@ -159,6 +162,7 @@ public:
           callback(control.callback),
           value(control.value),
           color(control.color),
+          visible(control.visible),
           parentControl(control.parentControl),
           next(control.next)
     { }
@@ -295,3 +299,4 @@ private:
 
 extern ESPUIClass ESPUI;
 #endif
+
