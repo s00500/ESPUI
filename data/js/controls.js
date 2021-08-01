@@ -263,6 +263,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -279,6 +280,7 @@ function start() {
             "</span>" +
             "</div>"
         );
+		}
         break;
 
       case UI_BUTTON:
@@ -288,6 +290,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -319,6 +322,7 @@ function start() {
             buttonclick(data.id, false);
           },
         });
+		}
         break;
 
       case UI_SWITCHER:
@@ -328,6 +332,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -353,6 +358,7 @@ function start() {
             "</div>"
         );
         switcher(data.id, data.value);
+		}
         break;
 
       case UI_CPAD:
@@ -363,6 +369,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -466,7 +473,7 @@ function start() {
             padclick(CENTER, data.id, false);
           },
         });
-
+		}
         break;
 
       //https://codepen.io/seanstopnik/pen/CeLqA
@@ -477,6 +484,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -499,6 +507,7 @@ function start() {
             "</div>"
         );
         rangeSlider(!sliderContinuous);
+		}
         break;
 
       case UI_NUMBER:
@@ -508,6 +517,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -526,6 +536,7 @@ function start() {
             ")' />" +
             "</div>"
         );
+		}
         break;
 
       case UI_TEXT_INPUT:
@@ -535,6 +546,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -553,9 +565,11 @@ function start() {
             ")' />" +
             "</div>"
         );
+		}
         break;
 
       case UI_TAB:
+		if (data.visible) {
         $("#tabsnav").append(
           "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + "</a></li>"
         );
@@ -574,6 +588,7 @@ function start() {
             }
             e.preventDefault();
           });
+		}
         break;
 
       case UI_SELECT:
@@ -583,6 +598,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -599,6 +615,7 @@ function start() {
             ")' />" +
             "</div>"
         );
+		}
         break;
 
       case UI_OPTION:
@@ -651,6 +668,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -671,6 +689,7 @@ function start() {
         );
         graphData[data.id] = restoreGraphData(data.id);
         renderGraphSvg(graphData[data.id], "graph" + data.id);
+		}
         break;
       case ADD_GRAPH_POINT:
         var ts = Math.round(new Date().getTime() / 1000);
@@ -690,6 +709,7 @@ function start() {
         } else {
           parent = $("#row");
         }
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -708,6 +728,7 @@ function start() {
             ")' />" +
             "</div>"
         );
+		}
         break;
 
       case UI_ACCEL:
@@ -719,6 +740,7 @@ function start() {
           parent = $("#row");
         }
         hasAccel = true;
+		if (data.visible) {
         parent.append(
           "<div id='id" +
             data.id +
@@ -739,6 +761,7 @@ function start() {
         );
 
         requestOrientationPermission();
+		}
         break;
 
       case UPDATE_LABEL:
@@ -799,11 +822,9 @@ function start() {
   websock.onmessage = handleEvent;
 }
 
-var sliderCache = {};
 function sliderchange(number) {
   var val = $("#sl" + number).val();
-  sliderCache[number] !== val && websock.send("slvalue:" + val + ":" + number);
-  sliderCache[number] = val;
+  websock.send("slvalue:" + val + ":" + number);
 }
 
 function numberchange(number) {
