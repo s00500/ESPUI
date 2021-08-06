@@ -138,7 +138,6 @@ public:
     uint16_t parentControl;
     Control* next;
 
-
     static constexpr uint16_t noParent = 0xffff;
 
     Control(ControlType type, const char* label, void (*callback)(Control*, int), const String& value,
@@ -299,4 +298,3 @@ private:
 
 extern ESPUIClass ESPUI;
 #endif
-
