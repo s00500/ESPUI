@@ -134,7 +134,7 @@ public:
     void (*callback)(Control*, int);
     String value;
     ControlColor color;
-	bool visible;
+    bool visible;
     uint16_t parentControl;
     Control* next;
 
