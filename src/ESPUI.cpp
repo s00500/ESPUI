@@ -590,7 +590,7 @@ void onWsEvent(
 uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
     uint16_t parentControl, void (*callback)(Control*, int))
 {
-    Control* control = new Control(type, label, callback, value, color, parentControl);
+    Control* control = new Control(type, label, callback, value, color, true, parentControl);
 
     if (this->controls == nullptr)
     {
@@ -755,6 +755,7 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     root["type"] = (int)control->type + ControlType::UpdateOffset;
     root["value"] = control->value;
     root["id"] = control->id;
+    root["visible"] = control->visible;
     root["color"] = (int)control->color;
     serializeJson(document, json);
 
@@ -969,6 +970,7 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient* client)
         item["label"] = control->label;
         item["value"] = String(control->value);
         item["color"] = (int)control->color;
+        item["visible"] = (int)control->visible;
 
         if (control->parentControl != Control::noParent)
         {
