@@ -215,10 +215,10 @@ public:
     bool sliderContinuous;
 
     void setVerbosity(Verbosity verbosity);
-    void begin(const char* _title, const char* username = nullptr,
-        const char* password = nullptr); // Setup server and page in Memorymode
-    void beginSPIFFS(const char* _title, const char* username = nullptr,
-        const char* password = nullptr); // Setup server and page in SPIFFSmode
+    void begin(const char* _title, const char* username = nullptr, const char* password = nullptr,
+        uint16_t port = 80); // Setup server and page in Memorymode
+    void beginSPIFFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
+        uint16_t port = 80); // Setup server and page in SPIFFSmode
 
     void prepareFileSystem(); // Initially preps the filesystem and loads a lot of
                               // stuff into SPIFFS
