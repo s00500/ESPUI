@@ -896,31 +896,24 @@ function switcher(number, state) {
 }
 
 var rangeSlider = function (isDiscrete) {
-  var slider = $(".range-slider"),
-    range = $(".range-slider__range"),
-    value = $(".range-slider__value");
+  var range = $(".range-slider__range");
+  var slidercb = function() {
+    sliderchange($(this).attr("id").replace(/^\D+/g, ""));
+  };
 
-  slider.each(function () {
-    value.each(function () {
-      var value = $(this).prev().attr("value");
-      $(this).html(value);
-    });
+  range.on({input: function() {
+    $(this).next().html(this.value)}
+  });
 
-    if (!isDiscrete) {
-      range.on({
-        input: function () {
-          sliderchange($(this).attr("id").replace(/^\D+/g, ""));
-        },
-      });
-    } else {
-      range.on({
-        input: function () {
-          $(this).next().html(this.value);
-        },
-        change: function () {
-          sliderchange($(this).attr("id").replace(/^\D+/g, ""));
-        },
-      });
+  range.each(function() {
+    $(this).next().html(this.value);
+    if($(this).attr("callbackSet") != "true") {
+      if (!isDiscrete) {
+        $(this).on({input: slidercb}); //input fires when dragging
+      } else {
+        $(this).on({change: slidercb}); //change fires only once released
+      }
+      $(this).attr("callbackSet", "true");
     }
   });
 };
