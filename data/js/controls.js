@@ -817,6 +817,11 @@ function start() {
         element.addClass(colorClass(data.color));
       }
     }
+
+    $(".range-slider__range").each(function(){ 
+      $(this)[0].value = $(this).attr("value");
+      $(this).next().html($(this).attr("value"));
+    });
   };
 
   websock.onmessage = handleEvent;
