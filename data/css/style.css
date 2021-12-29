@@ -400,6 +400,11 @@ button {
   background-color: #999999;
 }
 
+button:active {
+  background-color: #666666;
+  transform: translateX(4px) translateY(4px);
+}
+
 /* Main Head Part
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
