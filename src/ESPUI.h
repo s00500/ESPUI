@@ -77,11 +77,13 @@ enum ControlType : uint8_t
     UpdateAccel,
 
     InitialGui = 200,
-    Reload = 201
+    Reload = 201,
+    ExtendGUI = 210
 };
 
 #define UI_INITIAL_GUI ControlType::InitialGui
 #define UI_RELOAD ControlType::Reload
+#define UI_EXTEND_GUI ControlType::ExtendGUI
 
 #define UI_TITLE ControlType::Title
 #define UI_LABEL ControlType::Label
@@ -294,6 +296,8 @@ private:
     const char* basicAuthUsername = nullptr;
     const char* basicAuthPassword = nullptr;
     bool basicAuth = true;
+
+    Control *prepareJSONChunk(AsyncWebSocketClient* client, Control *control, JsonArray *items);
 };
 
 extern ESPUIClass ESPUI;

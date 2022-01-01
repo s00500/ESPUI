@@ -2,6 +2,8 @@ const UI_INITIAL_GUI = 200;
 const UI_RELOAD = 201;
 const UPDATE_OFFSET = 100;
 
+const UI_EXTEND_GUI = 210;
+
 const UI_TITEL = 0;
 
 const UI_PAD = 1;
@@ -230,6 +232,7 @@ function start() {
     var data = JSON.parse(evt.data);
     var e = document.body;
     var center = "";
+
     switch (data.type) {
       case UI_INITIAL_GUI:
         // Clear current elements
@@ -247,6 +250,16 @@ function start() {
           handleEvent(fauxEvent);
         });
         break;
+
+      case UI_EXTEND_GUI:
+        data.controls.forEach(element => {
+          var fauxEvent = {
+            data: JSON.stringify(element),
+          };
+          handleEvent(fauxEvent);
+        });
+        break;
+      
       case UI_RELOAD:
         window.location.reload();
         break;
