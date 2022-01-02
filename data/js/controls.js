@@ -233,6 +233,9 @@ function start() {
     var e = document.body;
     var center = "";
 
+    panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "'" : "";
+    elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "'" : "";
+
     switch (data.type) {
       case UI_INITIAL_GUI:
         // Clear current elements
@@ -278,9 +281,9 @@ function start() {
         }
 		if (data.visible) {
         parent.append(
-          "<div id='id" +
+          "<div id='id" + 
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -288,7 +291,7 @@ function start() {
             "</h5><hr/>" +
             "<span id='l" +
             data.id +
-            "' class='label label-wrap'>" +
+            "' " + elementStyle + " class='label label-wrap'>" +
             data.value +
             "</span>" +
             "</div>"
@@ -307,7 +310,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='one columns card tcenter " +
+            "' " + panelStyle + " class='one columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -315,7 +318,7 @@ function start() {
             "</h5><hr/>" +
             "<button id='btn" +
             data.id +
-            "' " +
+            "' " + elementStyle + " " +
             "onmousedown='buttonclick(" +
             data.id +
             ", true)' " +
@@ -349,7 +352,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='one columns card tcenter " +
+            "' " + panelStyle + " class='one columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -357,7 +360,7 @@ function start() {
             "</h5><hr/>" +
             "<label id='sl" +
             data.id +
-            "' class='switch " +
+            "' " + elementStyle + " class='switch " +
             (data.value == "1" ? "checked" : "") +
             "'>" +
             "<div class='in'><input type='checkbox' id='s" +
@@ -386,7 +389,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -501,7 +504,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter card-slider " +
+            "' " + panelStyle + " class='two columns card tcenter card-slider " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -512,7 +515,7 @@ function start() {
             data.id +
             "' type='range' min='0' max='100' value='" +
             data.value +
-            "' class='range-slider__range'>" +
+            "' " + elementStyle + " class='range-slider__range'>" +
             "<span class='range-slider__value'>" +
             data.value +
             "</span>" +
@@ -534,13 +537,13 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
             data.label +
             "</h5><hr/>" +
-            "<input style='color:black;' id='num" +
+            "<input style='color:black;' " + elementStyle + " id='num" +
             data.id +
             "' type='number' value='" +
             data.value +
@@ -563,13 +566,13 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
             data.label +
             "</h5><hr/>" +
-            "<input style='color:black;' id='text" +
+            "<input style='color:black;' " + elementStyle + " id='text" +
             data.id +
             "' value='" +
             data.value +
@@ -615,13 +618,13 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
             data.label +
             "</h5><hr/>" +
-            "<select style='color:black;' id='select" +
+            "<select style='color:black;' " + elementStyle + " id='select" +
             data.id +
             "' onchange='selectchange(" +
             data.id +
@@ -685,7 +688,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -726,7 +729,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -757,7 +760,7 @@ function start() {
         parent.append(
           "<div id='id" +
             data.id +
-            "' class='two columns card tcenter " +
+            "' " + panelStyle + " class='two columns card tcenter " +
             colorClass(data.color) +
             "'>" +
             "<h5>" +
@@ -779,26 +782,44 @@ function start() {
 
       case UPDATE_LABEL:
         $("#l" + data.id).html(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#l" + data.id).attr("style", data.elementStyle);
+        }
         break;
 
       case UPDATE_SWITCHER:
         switcher(data.id, data.value == "0" ? 0 : 1);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#sl" + data.id).attr("style", data.elementStyle);
+        }
         break;
 
       case UPDATE_SLIDER:
         slider_move($("#id" + data.id), data.value, "100", false);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#sl" + data.id).attr("style", data.elementStyle);
+        }
         break;
 
       case UPDATE_NUMBER:
         $("#num" + data.id).val(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#num" + data.id).attr("style", data.elementStyle);
+        }
         break;
 
       case UPDATE_TEXT_INPUT:
         $("#text" + data.id).val(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#text" + data.id).attr("style", data.elementStyle);
+        }
         break;
 
       case UPDATE_SELECT:
         $("#select" + data.id).val(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#select" + data.id).attr("style", data.elementStyle);
+        }
         break;
 
       case UPDATE_BUTTON:
@@ -807,6 +828,9 @@ function start() {
         break;
       case UPDATE_GAUGE:
         $("#gauge" + data.id).val(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#gauge" + data.id).attr("style", data.elementStyle);
+        }
         break;
       case UPDATE_ACCEL:
         break;
@@ -818,6 +842,11 @@ function start() {
 
     if (data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
       var element = $("#id" + data.id);
+
+      if(data.hasOwnProperty('panelStyle')) {
+        $("#id" + data.id).attr("style", data.panelStyle);
+      }
+
       if (data.type == UPDATE_SLIDER) {
         element.removeClass(
           "slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin"

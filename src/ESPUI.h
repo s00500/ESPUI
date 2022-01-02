@@ -138,6 +138,8 @@ public:
     ControlColor color;
     bool visible;
     uint16_t parentControl;
+    String panelStyle;
+    String elementStyle;
     Control* next;
 
     static constexpr uint16_t noParent = 0xffff;
@@ -280,6 +282,9 @@ public:
 
     void clearGraph(uint16_t id, int clientId = -1);
     void addGraphPoint(uint16_t id, int nValue, int clientId = -1);
+
+    void setPanelStyle(uint16_t id, String style, int clientId = -1);
+    void setElementStyle(uint16_t id, String style, int clientId = -1);
 
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name

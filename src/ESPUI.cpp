@@ -756,6 +756,8 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     root["value"] = control->value;
     root["id"] = control->id;
     root["color"] = (int)control->color;
+    if(control->panelStyle != 0) root["panelStyle"] = control->panelStyle;
+    if(control->elementStyle != 0) root["elementStyle"] = control->elementStyle;
     serializeJson(document, json);
 
 #if defined(DEBUG_ESPUI)
@@ -793,6 +795,22 @@ void ESPUIClass::updateControl(Control* control, int clientId)
         }
 
         tryId++;
+    }
+}
+
+void ESPUIClass::setPanelStyle(uint16_t id, String style, int clientId) {
+    Control* control = getControl(id);
+    if(control) {
+        control->panelStyle = style;
+        updateControl(control, clientId);
+    }
+}
+
+void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId) {
+    Control* control = getControl(id);
+    if(control) {
+        control->elementStyle = style;
+        updateControl(control, clientId);
     }
 }
 
@@ -998,6 +1016,8 @@ Control *ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* con
         item["value"] = String(control->value);
         item["color"] = (int)control->color;
         item["visible"] = control->visible;
+        if(control->panelStyle != 0) item["panelStyle"] = String(control->panelStyle);
+        if(control->elementStyle != 0) item["elementStyle"] = String(control->elementStyle);
 
         if (control->parentControl != Control::noParent) {
             item["parentControl"] = String(control->parentControl);
