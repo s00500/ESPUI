@@ -757,6 +757,10 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     root["id"] = control->id;
     root["visible"] = control->visible;
     root["color"] = (int)control->color;
+    if (control->panelStyle != 0)
+        root["panelStyle"] = control->panelStyle;
+    if (control->elementStyle != 0)
+        root["elementStyle"] = control->elementStyle;
     serializeJson(document, json);
 
 #if defined(DEBUG_ESPUI)
@@ -794,6 +798,26 @@ void ESPUIClass::updateControl(Control* control, int clientId)
         }
 
         tryId++;
+    }
+}
+
+void ESPUIClass::setPanelStyle(uint16_t id, String style, int clientId)
+{
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->panelStyle = style;
+        updateControl(control, clientId);
+    }
+}
+
+void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId)
+{
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->elementStyle = style;
+        updateControl(control, clientId);
     }
 }
 
@@ -947,7 +971,8 @@ Initially this function used to send the control element data individually.
 Due to a change in the ESPAsyncWebserver library this had top be changed to be
 sent as one blob at the beginning. Therefore a new type is used as well
 */
-void ESPUIClass::jsonDom(AsyncWebSocketClient* client) {
+void ESPUIClass::jsonDom(AsyncWebSocketClient* client)
+{
 
     DynamicJsonDocument document(jsonInitialDocumentSize);
     document["type"] = (int)UI_INITIAL_GUI;
@@ -960,37 +985,43 @@ void ESPUIClass::jsonDom(AsyncWebSocketClient* client) {
     titleItem["type"] = (int)UI_TITLE;
     titleItem["label"] = ui_title;
 
-    while(1) {
+    while (1)
+    {
         control = prepareJSONChunk(client, control, &items);
 
         String json;
         serializeJson(document, json);
-    #if defined(DEBUG_ESPUI)
-        if (this->verbosity >= Verbosity::VerboseJSON) {
+#if defined(DEBUG_ESPUI)
+        if (this->verbosity >= Verbosity::VerboseJSON)
+        {
             Serial.println("Sending elements --------->");
             Serial.println(json);
         }
-    #endif
-        if (client != nullptr) client->text(json);
-        else this->ws->textAll(json);
+#endif
+        if (client != nullptr)
+            client->text(json);
+        else
+            this->ws->textAll(json);
 
-        if(control == nullptr) break;
+        if (control == nullptr)
+            break;
 
         document.clear();
         items.clear();
-        document["type"] = (int) UI_EXTEND_GUI;
+        document["type"] = (int)UI_EXTEND_GUI;
         items = document.createNestedArray("controls");
     }
 }
 
-
-/* Prepare a chunk of elements as a single JSON string. If the allowed number of elements is greater than the total number
-this will represent the entire UI and this function will return null. If a control pointer is returned then the limit 
-was reached, the currently serialised must be sent, and then processing resumed to send the next chunk. */
-Control *ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* control, JsonArray *items) {
+/* Prepare a chunk of elements as a single JSON string. If the allowed number of elements is greater than the total
+number this will represent the entire UI and this function will return null. If a control pointer is returned then the
+limit was reached, the currently serialised must be sent, and then processing resumed to send the next chunk. */
+Control* ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* control, JsonArray* items)
+{
     int elementcount = 0;
 
-    while (control != nullptr && elementcount < 10) {
+    while (control != nullptr && elementcount < 10)
+    {
         JsonObject item = items->createNestedObject();
 
         item["id"] = String(control->id);
@@ -999,18 +1030,26 @@ Control *ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* con
         item["value"] = String(control->value);
         item["color"] = (int)control->color;
         item["visible"] = (int)control->visible;
+        if (control->panelStyle != 0)
+            item["panelStyle"] = String(control->panelStyle);
+        if (control->elementStyle != 0)
+            item["elementStyle"] = String(control->elementStyle);
 
-        if (control->parentControl != Control::noParent) {
+        if (control->parentControl != Control::noParent)
+        {
             item["parentControl"] = String(control->parentControl);
         }
 
         // special case for selects: to preselect an option, you have to add
         // "selected" to <option>
-        if (control->type == ControlType::Option) {
-            if (ESPUI.getControl(control->parentControl)->value == control->value) {
+        if (control->type == ControlType::Option)
+        {
+            if (ESPUI.getControl(control->parentControl)->value == control->value)
+            {
                 item["selected"] = "selected";
             }
-            else {
+            else
+            {
                 item["selected"] = "";
             }
         }
