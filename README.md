@@ -32,6 +32,7 @@ The Library runs fine on any kind of **ESP8266** and **ESP32** (NodeMCU Boards, 
 - OptionList by @eringerli
 - Public Access to ESPAsyncServer
 - Graph Widget (Persist save graph in local storage #10)
+- Inline CSS styles by @iangray001
 
 ## Further Roadmap
 
@@ -341,6 +342,43 @@ If you have many different widgets it might be necessary to adjust the JSON Buff
  ESPUI.jsonInitialDocumentSize = 8000; // This is the default, adjust when you have too many widgets or options
  ESPUI.begin("ESPUI Control");
 ```
+
+### Inline Styles
+
+You can add custom CSS styles to controls. This allows you to style the UI with custom colors, drop shadows, 
+or other CSS effects. Add styles with the following functions:
+
+```
+ setPanelStyle(uint16_t id, String style);
+ setElementStyle(uint16_t id, String style)
+```
+
+A panel style is applied to the panel on which the UI element is placed, an element style is applied to the element itself. 
+Because CSS inline styles can only style one specific DOM element, for controls made up of multiple elements (like the pad) 
+this is limited. Element styles can be applied to all controls, but will only work correctly for the Button, Label, Slider, 
+Switcher, Number, Text, and Selector. 
+
+Dynamic update of styles is supported. When either of the above functions are called, the control is updated live. This could 
+be used to refect a warning state by changing the color of a button, or for similar effects.
+
+For example, this code will set a control's panel to a random background color:
+
+```
+ char stylecol[30]
+ sprintf(stylecol, "background-color: #%06X;", (unsigned int) random(0x0, 0xFFFFFF));
+ ESPUI.setPanelStyle(switch1, stylecol);
+```
+
+You can get quite creative with this.
+
+![Inline Styles](docs/inlinestyles.gif)
+
+Note: The images in this example are formed by setting a Label to contain an <img> tag:
+
+```
+ ESPUI.addControl(ControlType::Label, "Label", "<img src='path/to/image'>", ControlColor::Peterriver);
+```
+
 
 # Notes for Development
 
