@@ -785,7 +785,7 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     // function like this and it's clients array is private
     int tryId = 0;
 
-    for (int count = 0; count < this->ws->count();)
+    for (size_t count = 0; count < this->ws->count();)
     {
         if (this->ws->hasClient(tryId))
         {
@@ -943,7 +943,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     // function like this and it's clients array is private
     int tryId = 0;
 
-    for (int count = 0; count < this->ws->count();)
+    for (size_t count = 0; count < this->ws->count();)
     {
         if (this->ws->hasClient(tryId))
         {
