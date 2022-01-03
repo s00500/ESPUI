@@ -1035,17 +1035,21 @@ Control* ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* con
         if (control->elementStyle != 0)
             item["elementStyle"] = String(control->elementStyle);
 
-        if (control->parentControl != Control::noParent) {
+        if (control->parentControl != Control::noParent)
+        {
             item["parentControl"] = String(control->parentControl);
         }
 
         // special case for selects: to preselect an option, you have to add
         // "selected" to <option>
-        if (control->type == ControlType::Option) {
-            if (ESPUI.getControl(control->parentControl)->value == control->value) {
+        if (control->type == ControlType::Option)
+        {
+            if (ESPUI.getControl(control->parentControl)->value == control->value)
+            {
                 item["selected"] = "selected";
             }
-            else {
+            else
+            {
                 item["selected"] = "";
             }
         }
