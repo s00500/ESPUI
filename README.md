@@ -215,7 +215,17 @@ on creation and a initial value. The name is not changeable once the UI
 initialised.
 
 Labels automatically wrap your text. If you want them to have multiple lines use
-the normal `<br>` tag in the string you print to the label
+the normal `<br>` tag in the string you print to the label.
+
+In fact, because HTML can be used in the label's value, you can make a label display
+images by including an `<img>` tag. 
+
+```
+ ESPUI.label("An Image Label", ControlColor::Peterriver, "<img src='path/to/image'>");
+```
+
+This requires that the client has access to the image in question, either from the internet or a local web server.
+
 
 #### Slider
 
@@ -364,7 +374,7 @@ be used to refect a warning state by changing the color of a button, or for simi
 For example, this code will set a control's panel to a random background color:
 
 ```
- char stylecol[30]
+ char stylecol[30];
  sprintf(stylecol, "background-color: #%06X;", (unsigned int) random(0x0, 0xFFFFFF));
  ESPUI.setPanelStyle(switch1, stylecol);
 ```
@@ -373,7 +383,7 @@ You can get quite creative with this.
 
 ![Inline Styles](docs/inlinestyles.gif)
 
-Note: The images in this example are formed by setting a Label to contain an <img> tag:
+Note: The images in this example are formed by setting a Label to contain an `<img>` tag:
 
 ```
  ESPUI.addControl(ControlType::Label, "Label", "<img src='path/to/image'>", ControlColor::Peterriver);
