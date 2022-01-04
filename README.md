@@ -49,6 +49,7 @@ This library is dependent on the following libraries to function properly.
 
 - (_For ESP8266_) [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
 - (_For ESP32_) [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
+- (_For ESP32_) [lorol/LittleFS_esp32](https://github.com/lorol/LITTLEFS)
 
 ## How to Install
 
@@ -89,13 +90,13 @@ Go to Sketch>Include Library>Add .zip Library> Select the Downloaded .zip File.
 ## Getting started
 
 ESPUI serves several files to the browser to build up its web interface. This
-can be achieved in 2 ways: _PROGMEM_ or _SPIFFS_
+can be achieved in 2 ways: _PROGMEM_ or _LITTLEFS_
 
 _When `ESPUI.begin()` is called the default is serving files from Memory and
 ESPUI should work out of the box!_
 
 **OPTIONAL:** But if this causes your program to _use too much memory_ you can
-burn the files into the SPIFFS filesystem on the ESP. There are now two ways to
+burn the files into the LITTLEFS filesystem on the ESP. There are now two ways to
 do this: you can either use the ESP file upload tool or you use the library
 function `ESPUI.prepareFileSystem()`
 
@@ -296,7 +297,7 @@ Then all widgets for the tab need to be added to it by specifying the tab as the
 ### Initialisation of the UI
 
 After all the elements are configured you can use `ESPUI.begin("Some Title");`
-to start the UI interface. (Or `ESPUI.beginSPIFFS("Some Title");` respectively)
+to start the UI interface. (Or `ESPUI.beginLITTLEFS("Some Title");` respectively)
 Make sure you setup a working network connection or AccesPoint **before** (See
 gui.ino example). The web interface can then be used from multiple devices at once and
 also shows an connection status in the top bar.

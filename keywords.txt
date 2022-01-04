@@ -21,6 +21,7 @@ slider	KEYWORD2
 
 begin	KEYWORD2
 beginSPIFFS	KEYWORD2
+beginLITTLEFS	KEYWORD2
 print	KEYWORD2
 updateSwitcher	KEYWORD2
 updateSlider	KEYWORD2

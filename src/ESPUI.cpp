@@ -15,7 +15,7 @@
 
 uint16_t Control::idCounter = 1;
 
-// ################# Spiffs functions
+// ################# LITTLEFS functions
 #if defined(ESP32)
 void listDir(const char* dirname, uint8_t levels)
 {
@@ -27,7 +27,7 @@ void listDir(const char* dirname, uint8_t levels)
 #endif
 
 #if defined(ESP32)
-    File root = SPIFFS.open(dirname);
+    File root = LITTLEFS.open(dirname);
 #else
     File root = LittleFS.open(dirname);
 #endif
@@ -115,9 +115,9 @@ void listDir(const char* dirname, uint8_t levels)
 void ESPUIClass::list()
 {
 #if defined(ESP32)
-    if (!SPIFFS.begin())
+    if (!LITTLEFS.begin())
     {
-        Serial.println(F("SPIFFS Mount Failed"));
+        Serial.println(F("LITTLEFS Mount Failed"));
         return;
     }
 #else
@@ -131,8 +131,8 @@ void ESPUIClass::list()
     listDir("/", 1);
 #if defined(ESP32)
 
-    Serial.println(SPIFFS.totalBytes());
-    Serial.println(SPIFFS.usedBytes());
+    Serial.println(LITTLEFS.totalBytes());
+    Serial.println(LITTLEFS.usedBytes());
 
 #else
     FSInfo fs_info;
@@ -147,7 +147,7 @@ void ESPUIClass::list()
 void deleteFile(const char* path)
 {
 #if defined(ESP32)
-    bool exists = SPIFFS.exists(path);
+    bool exists = LITTLEFS.exists(path);
 #else
     bool exists = LittleFS.exists(path);
 #endif
@@ -172,7 +172,7 @@ void deleteFile(const char* path)
 #endif
 
 #if defined(ESP32)
-    bool didRemove = SPIFFS.remove(path);
+    bool didRemove = LITTLEFS.remove(path);
 #else
     bool didRemove = LittleFS.remove(path);
 #endif
@@ -206,7 +206,7 @@ void writeFile(const char* path, const char* data)
 #endif
 
 #if defined(ESP32)
-    File file = SPIFFS.open(path, FILE_WRITE);
+    File file = LITTLEFS.open(path, FILE_WRITE);
 #else
     File file = LittleFS.open(path, FILE_WRITE);
 #endif
@@ -269,7 +269,7 @@ void writeFile(const char* path, const char* data)
     file.close();
 }
 
-// end Spiffs functions
+// end LITTLEFS functions
 
 void ESPUIClass::prepareFileSystem()
 {
@@ -283,14 +283,14 @@ void ESPUIClass::prepareFileSystem()
 #endif
 
 #if defined(ESP32)
-    SPIFFS.format();
+    LITTLEFS.format();
 
-    if (!SPIFFS.begin(true))
+    if (!LITTLEFS.begin(true))
     {
 #if defined(DEBUG_ESPUI)
         if (this->verbosity)
         {
-            Serial.println(F("SPIFFS Mount Failed"));
+            Serial.println(F("LITTLEFS Mount Failed"));
         }
 #endif
 
@@ -301,7 +301,7 @@ void ESPUIClass::prepareFileSystem()
     if (this->verbosity)
     {
         listDir("/", 1);
-        Serial.println(F("SPIFFS Mount ESP32 Done"));
+        Serial.println(F("LITTLEFS Mount ESP32 Done"));
     }
 #endif
 
@@ -312,7 +312,7 @@ void ESPUIClass::prepareFileSystem()
 #if defined(DEBUG_ESPUI)
     if (this->verbosity)
     {
-        Serial.println(F("SPIFFS Mount ESP8266 Done"));
+        Serial.println(F("LITTLEFS Mount ESP8266 Done"));
     }
 #endif
 
@@ -368,7 +368,7 @@ void ESPUIClass::prepareFileSystem()
 #endif
 
 #if defined(ESP32)
-    SPIFFS.end();
+    LITTLEFS.end();
 #else
     LittleFS.end();
 #endif
@@ -785,7 +785,7 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     // function like this and it's clients array is private
     int tryId = 0;
 
-    for (int count = 0; count < this->ws->count();)
+    for (size_t count = 0; count < this->ws->count();)
     {
         if (this->ws->hasClient(tryId))
         {
@@ -943,7 +943,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     // function like this and it's clients array is private
     int tryId = 0;
 
-    for (int count = 0; count < this->ws->count();)
+    for (size_t count = 0; count < this->ws->count();)
     {
         if (this->ws->hasClient(tryId))
         {
@@ -1081,6 +1081,12 @@ void ESPUIClass::jsonReload()
 
 void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const char* password, uint16_t port)
 {
+    // Backwards compatibility wrapper
+    beginLITTLEFS(_title, username, password, port);
+}
+
+void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const char* password, uint16_t port)
+{
     ui_title = _title;
     this->basicAuthUsername = username;
     this->basicAuthPassword = password;
@@ -1098,7 +1104,7 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
     ws = new AsyncWebSocket("/ws");
 
 #if defined(ESP32)
-    bool fsBegin = SPIFFS.begin();
+    bool fsBegin = LITTLEFS.begin();
 #else
     bool fsBegin = LittleFS.begin();
 #endif
@@ -1107,7 +1113,7 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
-            Serial.println(F("SPIFFS Mount Failed, PLEASE CHECK THE README ON HOW TO "
+            Serial.println(F("LITTLEFS Mount Failed, PLEASE CHECK THE README ON HOW TO "
                              "PREPARE YOUR ESP!!!!!!!"));
         }
 #endif
@@ -1123,7 +1129,7 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
 #endif
 
 #if defined(ESP32)
-    bool indexExists = SPIFFS.exists("/index.htm");
+    bool indexExists = LITTLEFS.exists("/index.htm");
 #else
     bool indexExists = LittleFS.exists("/index.htm");
 #endif
@@ -1150,7 +1156,7 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
             ws->setAuthentication(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword);
         }
 #if defined(ESP32)
-        server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
+        server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
 #else
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
 #endif
@@ -1158,7 +1164,7 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
     else
     {
 #if defined(ESP32)
-        server->serveStatic("/", SPIFFS, "/").setDefaultFile("index.htm");
+        server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm");
 #else
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
 #endif
@@ -1171,7 +1177,7 @@ void ESPUIClass::beginSPIFFS(const char* _title, const char* username, const cha
             return request->requestAuthentication();
         }
 
-        request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In SPIFFSmode");
+        request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In LITTLEFS mode");
     });
 
     server->onNotFound([](AsyncWebServerRequest* request) { request->send(404); });

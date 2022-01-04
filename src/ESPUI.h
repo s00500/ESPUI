@@ -11,8 +11,8 @@
 #if defined(ESP32)
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <LITTLEFS.h>
 
-#include "SPIFFS.h"
 #include "WiFi.h"
 
 #else
@@ -24,7 +24,6 @@
 #include <ESPAsyncWebServer.h>
 #include <Hash.h>
 #include <LittleFS.h>
-#include <SPIFFSEditor.h>
 
 #define FILE_WRITE "w"
 
@@ -222,11 +221,13 @@ public:
     void begin(const char* _title, const char* username = nullptr, const char* password = nullptr,
         uint16_t port = 80); // Setup server and page in Memorymode
     void beginSPIFFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
-        uint16_t port = 80); // Setup server and page in SPIFFSmode
+        uint16_t port = 80); // Setup server and page in LITTLEFS mode (DEPRECATED, use beginLITTLEFS)
+    void beginLITTLEFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
+        uint16_t port = 80); // Setup server and page in LITTLEFS mode
 
     void prepareFileSystem(); // Initially preps the filesystem and loads a lot of
-                              // stuff into SPIFFS
-    void list(); // Lists SPIFFS directory
+                              // stuff into LITTLEFS
+    void list(); // Lists LITTLEFS directory
 
     uint16_t addControl(ControlType type, const char* label, const String& value = String(""),
         ControlColor color = ControlColor::Turquoise, uint16_t parentControl = Control::noParent,
@@ -302,7 +303,7 @@ private:
     const char* basicAuthPassword = nullptr;
     bool basicAuth = true;
 
-    Control *prepareJSONChunk(AsyncWebSocketClient* client, Control *control, JsonArray *items);
+    Control* prepareJSONChunk(AsyncWebSocketClient* client, Control* control, JsonArray* items);
 };
 
 extern ESPUIClass ESPUI;
