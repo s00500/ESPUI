@@ -220,7 +220,7 @@ void setup(void)
     ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
     testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
     ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-    ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30);
+    ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30, 0, 30);
     ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
     ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
     ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
@@ -229,7 +229,7 @@ void setup(void)
 
     /*
      * .begin loads and serves all files from PROGMEM directly.
-     * If you want to serve the files from SPIFFS use ESPUI.beginSPIFFS
+     * If you want to serve the files from LITTLEFS use ESPUI.beginLITTLEFS
      * (.prepareFileSystem has to be run in an empty sketch before)
      */
 
