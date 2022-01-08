@@ -405,8 +405,8 @@ Note: The images in this example are formed by setting a Label to contain an `<i
 
 ### Grouped controls
 
-Normally, whenever a control is added to the UI, an new panel is generated. However, when addings the control you can 
-set the "parent" of the control to an existing other control. This allows you to add multiple widgets into the same 
+Normally, whenever a control is added to the UI, a new panel is generated with a title. However, you can instead 
+set the "parent" of a new control to be an existing control. This allows you to add multiple widgets into the same 
 panel. For example:
 
 ```
@@ -415,9 +415,9 @@ panel. For example:
  ESPUI.addControl(ControlType::Button, "", "Button C", ControlColor::None, panel1, btncallback);
 ```
 
-The first call to `addControl` has no parent (or it could be set to a tab), so therefore a new panel is added containing one button
-with the value `Button A`. The two subsequent calls have their parent set to the control we added in the first so instead of adding
-a new panel, buttons are added to the existing panel from `Button A`. The result is the following:
+The first call to `addControl` has no parent (or it could be set to a tab if you are using a tabbed UI), so therefore a new panel is added containing one button
+with the value `Button A`. The two subsequent calls have their parent set to the first control we added, so instead of creating
+a new panel, the result is the following:
 
 ![Grouped buttons](docs/ui_groupedbuttons.png)
 
