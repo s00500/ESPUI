@@ -139,6 +139,7 @@ public:
     String value;
     ControlColor color;
     bool visible;
+    bool wide;
     uint16_t parentControl;
     String panelStyle;
     String elementStyle;
@@ -154,6 +155,7 @@ public:
           value(value),
           color(color),
           visible(visible),
+          wide(false),
           parentControl(parentControl),
           next(nullptr)
     {
@@ -288,6 +290,8 @@ public:
 
     void setPanelStyle(uint16_t id, String style, int clientId = -1);
     void setElementStyle(uint16_t id, String style, int clientId = -1);
+
+    void setPanelWide(uint16_t id, bool wide);
 
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name

@@ -34,7 +34,7 @@ The Library runs fine on any kind of **ESP8266** and **ESP32** (NodeMCU Boards, 
 - Graph Widget (Persist save graph in local storage #10)
 - Inline CSS styles by @iangray001
 - Separators by @iangray001
-- Grouped controls by @iangray001
+- Grouped and wide controls by @iangray001
 
 ## Further Roadmap
 
@@ -430,6 +430,23 @@ and buttons.
 ![Other grouped elements](docs/ui_groupedbuttons2.png)
 
 If you group too many elements it might throw the layout of the rest of the UI out of line. Consider adding separators to correct this.
+
+### Advanced: Wide controls
+
+Controls can be set to be displayed "wide" with the function:
+
+```
+ ESPUI.setPanelWide(controlid, true);
+```
+
+*Important!* This function should be called _before_ `ESPUI.begin` or results will be unreliable.
+
+Setting a control to wide tells ESPUI to lay out that control as if there was only a single column, even on wide displays. 
+This can be applied to every element to force a single column layout, or to individual elements to customise the display.
+
+![Wide controls](docs/ui_widecontrols.png)
+
+Note that this will have no effect on small screens.
 
 # Notes for Development
 

@@ -825,6 +825,14 @@ void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId)
     }
 }
 
+void ESPUIClass::setPanelWide(uint16_t id, bool wide) {
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->wide = wide;
+    }
+}
+
 void ESPUIClass::updateControl(uint16_t id, int clientId)
 {
     Control* control = getControl(id);
@@ -1038,6 +1046,8 @@ Control* ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* con
             item["panelStyle"] = String(control->panelStyle);
         if (control->elementStyle != 0)
             item["elementStyle"] = String(control->elementStyle);
+        if (control->wide == true)
+            item["wide"] = true;
 
         if (control->parentControl != Control::noParent)
         {

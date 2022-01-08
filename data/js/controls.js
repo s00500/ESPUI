@@ -662,6 +662,7 @@ var rangeSlider = function (isDiscrete) {
 var addToHTML = function(data) {
   panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "' " : "";
   elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "' " : "";
+  panelwide = data.hasOwnProperty('wide') ? "wide" :  "";
 
   if(!data.hasOwnProperty('parentControl') || $("#tab" + data.parentControl).length > 0) {
     //We add the control with its own panel
@@ -683,7 +684,7 @@ var addToHTML = function(data) {
       case UI_GRAPH:
       case UI_GAUGE:
       case UI_ACCEL:
-        html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns card tcenter " +
+        html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
         colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
         elementHTML(data.type, data.id, data.value, elementStyle) +
         "</div>";
