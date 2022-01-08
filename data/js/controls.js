@@ -52,7 +52,10 @@ const UPDATE_STEP = 116;
 const UI_GAUGE = 17;
 const UPDATE_GAUGE = 117;
 const UI_ACCEL = 18;
-const UPTDATE_ACCEL = 117;
+const UPDATE_ACCEL = 118;
+
+const UI_SEPARATOR = 19;
+const UPDATE_SEPARATOR = 119;
 
 const UP = 0;
 const DOWN = 1;
@@ -233,9 +236,6 @@ function start() {
     var e = document.body;
     var center = "";
 
-    panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "'" : "";
-    elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "'" : "";
-
     switch (data.type) {
       case UI_INITIAL_GUI:
         // Clear current elements
@@ -272,366 +272,130 @@ function start() {
         $("#mainHeader").html(data.label);
         break;
 
+      /*
+        Most elements have the same behaviour when added.
+      */
       case UI_LABEL:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" + 
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<span id='l" +
-            data.id +
-            "' " + elementStyle + " class='label label-wrap'>" +
-            data.value +
-            "</span>" +
-            "</div>"
-        );
-		}
+      case UI_NUMBER:
+      case UI_TEXT_INPUT:
+      case UI_SELECT:
+      case UI_GAUGE:
+      case UI_SEPARATOR:
+		    if (data.visible) addToHTML(data);
         break;
 
+      /*
+        These elements must call additional functions after being added to the DOM
+      */
       case UI_BUTTON:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
+		    if (data.visible) {
+          addToHTML(data);
+          $("#btn" + data.id).on({
+            touchstart: function (e) {
+              e.preventDefault();
+              buttonclick(data.id, true);
+            },
+            touchend: function (e) {
+              e.preventDefault();
+              buttonclick(data.id, false);
+            },
+          });
         }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='one columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<button id='btn" +
-            data.id +
-            "' " + elementStyle + " " +
-            "onmousedown='buttonclick(" +
-            data.id +
-            ", true)' " +
-            "onmouseup='buttonclick(" +
-            data.id +
-            ", false)'>" +
-            data.value +
-            "</button></div>"
-        );
-        $("#btn" + data.id).on({
-          touchstart: function (e) {
-            e.preventDefault();
-            buttonclick(data.id, true);
-          },
-          touchend: function (e) {
-            e.preventDefault();
-            buttonclick(data.id, false);
-          },
-        });
-		}
         break;
 
       case UI_SWITCHER:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
+		    if (data.visible) {
+          addToHTML(data);
+          switcher(data.id, data.value);
         }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='one columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<label id='sl" +
-            data.id +
-            "' " + elementStyle + " class='switch " +
-            (data.value == "1" ? "checked" : "") +
-            "'>" +
-            "<div class='in'><input type='checkbox' id='s" +
-            data.id +
-            "' onClick='switcher(" +
-            data.id +
-            ",null)' " +
-            (data.value == "1" ? "checked" : "") +
-            "/></div>" +
-            "</label>" +
-            "</div>"
-        );
-        switcher(data.id, data.value);
-		}
         break;
 
       case UI_CPAD:
       case UI_PAD:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<nav class='control'>" +
-            "<ul>" +
-            "<li><a onmousedown='padclick(UP, " +
-            data.id +
-            ", true)' onmouseup='padclick(UP, " +
-            data.id +
-            ", false)' id='pf" +
-            data.id +
-            "'>&#9650;</a></li>" +
-            "<li><a onmousedown='padclick(RIGHT, " +
-            data.id +
-            ", true)' onmouseup='padclick(RIGHT, " +
-            data.id +
-            ", false)' id='pr" +
-            data.id +
-            "'>&#9650;</a></li>" +
-            "<li><a onmousedown='padclick(LEFT, " +
-            data.id +
-            ", true)' onmouseup='padclick(LEFT, " +
-            data.id +
-            ", false)' id='pl" +
-            data.id +
-            "'>&#9650;</a></li>" +
-            "<li><a onmousedown='padclick(DOWN, " +
-            data.id +
-            ", true)' onmouseup='padclick(DOWN, " +
-            data.id +
-            ", false)' id='pb" +
-            data.id +
-            "'>&#9650;</a></li>" +
-            "</ul>" +
-            (data.type == UI_CPAD
-              ? "<a class='confirm' onmousedown='padclick(CENTER," +
-                data.id +
-                ", true)' onmouseup='padclick(CENTER, " +
-                data.id +
-                ", false)' id='pc" +
-                data.id +
-                "'>OK</a>"
-              : "") +
-            "</nav>" +
-            "</div>"
-        );
-
-        $("#pf" + data.id).on({
-          touchstart: function (e) {
-            e.preventDefault();
-            padclick(UP, data.id, true);
-          },
-          touchend: function (e) {
-            e.preventDefault();
-            padclick(UP, data.id, false);
-          },
-        });
-        $("#pl" + data.id).on({
-          touchstart: function (e) {
-            e.preventDefault();
-            padclick(LEFT, data.id, true);
-          },
-          touchend: function (e) {
-            e.preventDefault();
-            padclick(LEFT, data.id, false);
-          },
-        });
-        $("#pr" + data.id).on({
-          touchstart: function (e) {
-            e.preventDefault();
-            padclick(RIGHT, data.id, true);
-          },
-          touchend: function (e) {
-            e.preventDefault();
-            padclick(RIGHT, data.id, false);
-          },
-        });
-        $("#pb" + data.id).on({
-          touchstart: function (e) {
-            e.preventDefault();
-            padclick(DOWN, data.id, true);
-          },
-          touchend: function (e) {
-            e.preventDefault();
-            padclick(DOWN, data.id, false);
-          },
-        });
-        $("#pc" + data.id).on({
-          touchstart: function (e) {
-            e.preventDefault();
-            padclick(CENTER, data.id, true);
-          },
-          touchend: function (e) {
-            e.preventDefault();
-            padclick(CENTER, data.id, false);
-          },
-        });
-		}
+		    if (data.visible) {
+          addToHTML(data);
+          $("#pf" + data.id).on({
+            touchstart: function (e) {
+              e.preventDefault();
+              padclick(UP, data.id, true);
+            },
+            touchend: function (e) {
+              e.preventDefault();
+              padclick(UP, data.id, false);
+            },
+          });
+          $("#pl" + data.id).on({
+            touchstart: function (e) {
+              e.preventDefault();
+              padclick(LEFT, data.id, true);
+            },
+            touchend: function (e) {
+              e.preventDefault();
+              padclick(LEFT, data.id, false);
+            },
+          });
+          $("#pr" + data.id).on({
+            touchstart: function (e) {
+              e.preventDefault();
+              padclick(RIGHT, data.id, true);
+            },
+            touchend: function (e) {
+              e.preventDefault();
+              padclick(RIGHT, data.id, false);
+            },
+          });
+          $("#pb" + data.id).on({
+            touchstart: function (e) {
+              e.preventDefault();
+              padclick(DOWN, data.id, true);
+            },
+            touchend: function (e) {
+              e.preventDefault();
+              padclick(DOWN, data.id, false);
+            },
+          });
+          $("#pc" + data.id).on({
+            touchstart: function (e) {
+              e.preventDefault();
+              padclick(CENTER, data.id, true);
+            },
+            touchend: function (e) {
+              e.preventDefault();
+              padclick(CENTER, data.id, false);
+            },
+          });
+		    }
         break;
 
-      //https://codepen.io/seanstopnik/pen/CeLqA
       case UI_SLIDER:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
+        //https://codepen.io/seanstopnik/pen/CeLqA
+		    if (data.visible) {
+          addToHTML(data);
+          rangeSlider(!sliderContinuous);
         }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter card-slider " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<div class='range-slider'>" +
-            "<input id='sl" +
-            data.id +
-            "' type='range' min='0' max='100' value='" +
-            data.value +
-            "' " + elementStyle + " class='range-slider__range'>" +
-            "<span class='range-slider__value'>" +
-            data.value +
-            "</span>" +
-            "</div>" +
-            "</div>"
-        );
-        rangeSlider(!sliderContinuous);
-		}
-        break;
-
-      case UI_NUMBER:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<input style='color:black;' " + elementStyle + " id='num" +
-            data.id +
-            "' type='number' value='" +
-            data.value +
-            "' onchange='numberchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
-        );
-		}
-        break;
-
-      case UI_TEXT_INPUT:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<input style='color:black;' " + elementStyle + " id='text" +
-            data.id +
-            "' value='" +
-            data.value +
-            "' onchange='textchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
-        );
-		}
         break;
 
       case UI_TAB:
-		if (data.visible) {
-        $("#tabsnav").append(
-          "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + "</a></li>"
-        );
-        $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
+		    if (data.visible) {
+          $("#tabsnav").append(
+            "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + "</a></li>"
+          );
+          $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
 
-        tabs = $(".tabscontent").tabbedContent({ loop: true }).data("api");
-        // switch to tab...
-        $("a")
-          .filter(function () {
-            return $(this).attr("href") === "#click-to-switch";
-          })
-          .on("click", function (e) {
-            var tab = prompt("Tab to switch to (number or id)?");
-            if (!tabs.switchTab(tab)) {
-              alert("That tab does not exist :\\");
-            }
-            e.preventDefault();
-          });
-		}
-        break;
-
-      case UI_SELECT:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<select style='color:black;' " + elementStyle + " id='select" +
-            data.id +
-            "' onchange='selectchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
-        );
-		}
+          tabs = $(".tabscontent").tabbedContent({ loop: true }).data("api");
+          // switch to tab...
+          $("a")
+            .filter(function () {
+              return $(this).attr("href") === "#click-to-switch";
+            })
+            .on("click", function (e) {
+              var tab = prompt("Tab to switch to (number or id)?");
+              if (!tabs.switchTab(tab)) {
+                alert("That tab does not exist :\\");
+              }
+              e.preventDefault();
+            });
+		    }
         break;
 
       case UI_OPTION:
@@ -677,35 +441,13 @@ function start() {
           }
         }
         break;
+
       case UI_GRAPH:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
+		    if (data.visible) {
+          addToHTML(data);
+          graphData[data.id] = restoreGraphData(data.id);
+          renderGraphSvg(graphData[data.id], "graph" + data.id);
         }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "<figure id='graph" +
-            data.id +
-            "'>" +
-            "<figcaption>" +
-            data.label +
-            "</figcaption>" +
-            "</figure>" +
-            "</div>"
-        );
-        graphData[data.id] = restoreGraphData(data.id);
-        renderGraphSvg(graphData[data.id], "graph" + data.id);
-		}
         break;
       case ADD_GRAPH_POINT:
         var ts = Math.round(new Date().getTime() / 1000);
@@ -718,68 +460,19 @@ function start() {
         saveGraphData();
         renderGraphSvg(graphData[data.id], "graph" + data.id);
         break;
-      case UI_GAUGE:
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "WILL BE A GAUGE <input style='color:black;' id='gauge" +
-            data.id +
-            "' type='number' value='" +
-            data.value +
-            "' onchange='numberchange(" +
-            data.id +
-            ")' />" +
-            "</div>"
-        );
-		}
-        break;
 
       case UI_ACCEL:
         if (hasAccel) break;
-        var parent;
-        if (data.parentControl) {
-          parent = $("#tab" + data.parentControl);
-        } else {
-          parent = $("#row");
-        }
         hasAccel = true;
-		if (data.visible) {
-        parent.append(
-          "<div id='id" +
-            data.id +
-            "' " + panelStyle + " class='two columns card tcenter " +
-            colorClass(data.color) +
-            "'>" +
-            "<h5>" +
-            data.label +
-            "</h5><hr/>" +
-            "ACCEL // Not implemented fully!<div class='accelerometer' id='accel" +
-            data.id +
-            "' ><div class='ball" +
-            data.id +
-            "'></div><pre class='accelerometeroutput" +
-            data.id +
-            "'></pre>" +
-            "</div>"
-        );
-
-        requestOrientationPermission();
-		}
+		    if (data.visible) {
+          addToHTML(data);
+          requestOrientationPermission();
+		    }
         break;
 
+      /*
+       * Update messages change the value/style of a component without adding new HTML
+       */
       case UPDATE_LABEL:
         $("#l" + data.id).html(data.value);
         if(data.hasOwnProperty('elementStyle')) {
@@ -964,3 +657,108 @@ var rangeSlider = function (isDiscrete) {
     }
   });
 };
+
+
+var addToHTML = function(data) {
+  panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "' " : "";
+  elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "' " : "";
+
+  if(!data.hasOwnProperty('parentControl') || $("#tab" + data.parentControl).length > 0) {
+    //We add the control with its own panel
+    var parent = data.hasOwnProperty('parentControl') ? 
+      $("#tab" + data.parentControl) :
+      $("#row");
+
+    var html = "";
+    switch(data.type) {
+      case UI_LABEL:
+      case UI_BUTTON:
+      case UI_SWITCHER:
+      case UI_CPAD:
+      case UI_PAD:
+      case UI_SLIDER:
+      case UI_NUMBER:
+      case UI_TEXT_INPUT:
+      case UI_SELECT:
+      case UI_GRAPH:
+      case UI_GAUGE:
+      case UI_ACCEL:
+        html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns card tcenter " +
+        colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
+        elementHTML(data.type, data.id, data.value, elementStyle) +
+        "</div>";
+        break;
+      case UI_SEPARATOR:
+        html = "<div id='id" + data.id + "' " + panelStyle + " class='sectionbreak columns'>" +
+        "<h5>" + data.label + "</h5><hr/></div>";
+        break;
+    }
+
+    parent.append(html);
+
+  } else {
+    //We are adding to an existing panel so we only need the HTML for the element
+    var parent = $("#id" + data.parentControl);
+    parent.append(elementHTML(data.type, data.id, data.value, elementStyle));
+  }
+}
+
+var elementHTML = function(type, id, value, elementStyle) {
+  switch(type) {
+    case UI_LABEL:
+      return "<span id='l" + id + "' " + elementStyle + 
+        " class='label label-wrap'>" + value + "</span>";
+    case UI_BUTTON:
+      return "<button id='btn" + id + "' " + elementStyle + 
+        " onmousedown='buttonclick(" + id + ", true)'" +
+        " onmouseup='buttonclick(" + id + ", false)'>" +
+        value + "</button>";
+    case UI_SWITCHER:
+      return "<label id='sl" + id + "' " + elementStyle + 
+      " class='switch " + (value == "1" ? "checked" : "") + "'>" +
+      "<div class='in'>" + 
+      "<input type='checkbox' id='s" + id + "' onClick='switcher(" + id + ",null)' " + 
+      (value == "1" ? "checked" : "") + "/></div></label>";
+    case UI_CPAD:
+    case UI_PAD:
+      return "<nav class='control'><ul>" + 
+        "<li><a onmousedown='padclick(UP, " + id + ", true)' " +
+            "onmouseup='padclick(UP, " + id + ", false)' id='pf" + id + "'>&#9650;</a></li>" +
+        "<li><a onmousedown='padclick(RIGHT, " + id + ", true)' " + 
+            "onmouseup='padclick(RIGHT, " + id + ", false)' id='pr" + id + "'>&#9650;</a></li>" +
+        "<li><a onmousedown='padclick(LEFT, " + id + ", true)' " + 
+            "onmouseup='padclick(LEFT, " + id + ", false)' id='pl" + id + "'>&#9650;</a></li>" +
+        "<li><a onmousedown='padclick(DOWN, " + id + ", true)' " + 
+            "onmouseup='padclick(DOWN, " + id + ", false)' id='pb" + id + "'>&#9650;</a></li>" +
+        "</ul>" +
+        (type == UI_CPAD
+          ? "<a class='confirm' onmousedown='padclick(CENTER," + id + ", true)' " + 
+            "onmouseup='padclick(CENTER, " + id + ", false)' id='pc" + id + "'>OK</a>"
+          : "") +
+        "</nav>";
+    case UI_SLIDER:
+      return "<div class='range-slider'>" + 
+        "<input id='sl" + id + "' type='range' min='0' max='100' value='" + value + "' " + 
+        elementStyle + " class='range-slider__range'><span class='range-slider__value'>" + 
+        value + "</span></div>";
+    case UI_NUMBER:
+      return "<input style='color:black;' " + elementStyle + " id='num" + id + 
+        "' type='number' value='" + value + "' onchange='numberchange(" + id + ")' />";
+    case UI_TEXT_INPUT:
+      return "<input style='color:black;' " + elementStyle + " id='text" + id +
+        "' value='" + value + "' onchange='textchange(" + id + ")' />";
+    case UI_SELECT:
+      return "<select style='color:black;' " + elementStyle + " id='select" + id +
+        "' onchange='selectchange(" + id + ")' />";
+    case UI_GRAPH:
+      return "<figure id='graph" + id + "'><figcaption>" + label + "</figcaption></figure>";
+    case UI_GAUGE:
+      return "WILL BE A GAUGE <input style='color:black;' id='gauge" + id + 
+        "' type='number' value='" + value + "' onchange='numberchange(" + id + ")' />";
+    case UI_ACCEL:
+      return "ACCEL // Not implemented fully!<div class='accelerometer' id='accel" + id +
+        "' ><div class='ball" + id + "'></div><pre class='accelerometeroutput" + id + "'></pre>";
+    default:
+      return "";
+  }
+}

@@ -56,6 +56,7 @@ enum ControlType : uint8_t
     Step,
     Gauge,
     Accel,
+    Separator,
 
     UpdateOffset = 100,
     UpdatePad = 101,
@@ -75,6 +76,7 @@ enum ControlType : uint8_t
     UpdateStep,
     UpdateGauge,
     UpdateAccel,
+    UpdateSeparator,
 
     InitialGui = 200,
     Reload = 201,
@@ -256,6 +258,7 @@ public:
     uint16_t graph(const char* label, ControlColor color); // Create Graph display
     uint16_t gauge(const char* label, ControlColor color, int value, int min = 0,
         int max = 100); // Create Gauge display
+    uint16_t separator(const char* label); //Create separator
 
     // Input only
     uint16_t accelerometer(const char* label, void (*callback)(Control*, int), ControlColor color);

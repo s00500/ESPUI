@@ -1,5 +1,5 @@
 const char JS_CONTROLS[] PROGMEM = R"=====(
-const UI_INITIAL_GUI=200;const UI_RELOAD=201;const UPDATE_OFFSET=100;const UI_EXTEND_GUI=210;const UI_TITEL=0;const UI_PAD=1;const UPDATE_PAD=101;const UI_CPAD=2;const UPDATE_CPAD=102;const UI_BUTTON=3;const UPDATE_BUTTON=103;const UI_LABEL=4;const UPDATE_LABEL=104;const UI_SWITCHER=5;const UPDATE_SWITCHER=105;const UI_SLIDER=6;const UPDATE_SLIDER=106;const UI_NUMBER=7;const UPDATE_NUMBER=107;const UI_TEXT_INPUT=8;const UPDATE_TEXT_INPUT=108;const UI_GRAPH=9;const ADD_GRAPH_POINT=10;const CLEAR_GRAPH=109;const UI_TAB=11;const UPDATE_TAB=111;const UI_SELECT=12;const UPDATE_SELECT=112;const UI_OPTION=13;const UPDATE_OPTION=113;const UI_MIN=14;const UPDATE_MIN=114;const UI_MAX=15;const UPDATE_MAX=115;const UI_STEP=16;const UPDATE_STEP=116;const UI_GAUGE=17;const UPDATE_GAUGE=117;const UI_ACCEL=18;const UPTDATE_ACCEL=117;const UP=0;const DOWN=1;const LEFT=2;const RIGHT=3;const CENTER=4;const C_TURQUOISE=0;const C_EMERALD=1;const C_PETERRIVER=2;const C_WETASPHALT=3;const C_SUNFLOWER=4;const C_CARROT=5;const C_ALIZARIN=6;const C_DARK=7;const C_NONE=255;var graphData=new Array();var hasAccel=false;var sliderContinuous=false;function colorClass(colorId){colorId=Number(colorId);switch(colorId){case C_TURQUOISE:return"turquoise";case C_EMERALD:return"emerald";case C_PETERRIVER:return"peterriver";case C_WETASPHALT:return"wetasphalt";case C_SUNFLOWER:return"sunflower";case C_CARROT:return"carrot";case C_ALIZARIN:return"alizarin";case C_NONE:return"dark";default:return"";}}
+const UI_INITIAL_GUI=200;const UI_RELOAD=201;const UPDATE_OFFSET=100;const UI_EXTEND_GUI=210;const UI_TITEL=0;const UI_PAD=1;const UPDATE_PAD=101;const UI_CPAD=2;const UPDATE_CPAD=102;const UI_BUTTON=3;const UPDATE_BUTTON=103;const UI_LABEL=4;const UPDATE_LABEL=104;const UI_SWITCHER=5;const UPDATE_SWITCHER=105;const UI_SLIDER=6;const UPDATE_SLIDER=106;const UI_NUMBER=7;const UPDATE_NUMBER=107;const UI_TEXT_INPUT=8;const UPDATE_TEXT_INPUT=108;const UI_GRAPH=9;const ADD_GRAPH_POINT=10;const CLEAR_GRAPH=109;const UI_TAB=11;const UPDATE_TAB=111;const UI_SELECT=12;const UPDATE_SELECT=112;const UI_OPTION=13;const UPDATE_OPTION=113;const UI_MIN=14;const UPDATE_MIN=114;const UI_MAX=15;const UPDATE_MAX=115;const UI_STEP=16;const UPDATE_STEP=116;const UI_GAUGE=17;const UPDATE_GAUGE=117;const UI_ACCEL=18;const UPDATE_ACCEL=118;const UI_SEPARATOR=19;const UPDATE_SEPARATOR=119;const UP=0;const DOWN=1;const LEFT=2;const RIGHT=3;const CENTER=4;const C_TURQUOISE=0;const C_EMERALD=1;const C_PETERRIVER=2;const C_WETASPHALT=3;const C_SUNFLOWER=4;const C_CARROT=5;const C_ALIZARIN=6;const C_DARK=7;const C_NONE=255;var graphData=new Array();var hasAccel=false;var sliderContinuous=false;function colorClass(colorId){colorId=Number(colorId);switch(colorId){case C_TURQUOISE:return"turquoise";case C_EMERALD:return"emerald";case C_PETERRIVER:return"peterriver";case C_WETASPHALT:return"wetasphalt";case C_SUNFLOWER:return"sunflower";case C_CARROT:return"carrot";case C_ALIZARIN:return"alizarin";case C_NONE:return"dark";default:return"";}}
 var websock;var websockConnected=false;function requestOrientationPermission(){}
 function saveGraphData(){localStorage.setItem("espuigraphs",JSON.stringify(graphData));}
 function restoreGraphData(id){var savedData=localStorage.getItem("espuigraphs",graphData);if(savedData!=null){savedData=JSON.parse(savedData);return savedData[id];}
@@ -8,185 +8,13 @@ function restart(){$(document).add("*").off();$("#row").html("");websock.close()
 function conStatusError(){websockConnected=false;$("#conStatus").removeClass("color-green");$("#conStatus").addClass("color-red");$("#conStatus").html("Error / No Connection &#8635;");$("#conStatus").off();$("#conStatus").on({click:restart,});}
 function handleVisibilityChange(){if(!websockConnected&&!document.hidden){restart();}}
 function start(){document.addEventListener("visibilitychange",handleVisibilityChange,false);if(window.location.port!=""||window.location.port!=80||window.location.port!=443){websock=new WebSocket("ws://"+window.location.hostname+":"+window.location.port+"/ws");}else{websock=new WebSocket("ws://"+window.location.hostname+"/ws");}
-websock.onopen=function(evt){console.log("websock open");$("#conStatus").addClass("color-green");$("#conStatus").text("Connected");websockConnected=true;};websock.onclose=function(evt){console.log("websock close");conStatusError();};websock.onerror=function(evt){console.log(evt);conStatusError();};var handleEvent=function(evt){console.log(evt);var data=JSON.parse(evt.data);var e=document.body;var center="";panelStyle=data.hasOwnProperty('panelStyle')?" style='"+data.panelStyle+"'":"";elementStyle=data.hasOwnProperty('elementStyle')?" style='"+data.elementStyle+"'":"";switch(data.type){case UI_INITIAL_GUI:$("#row").html("");$("#tabsnav").html("");$("#tabscontent").html("");if(data.sliderContinuous){sliderContinuous=data.sliderContinuous;}
-data.controls.forEach(element=>{var fauxEvent={data:JSON.stringify(element),};handleEvent(fauxEvent);});break;case UI_EXTEND_GUI:data.controls.forEach(element=>{var fauxEvent={data:JSON.stringify(element),};handleEvent(fauxEvent);});break;case UI_RELOAD:window.location.reload();break;case UI_TITEL:document.title=data.label;$("#mainHeader").html(data.label);break;case UI_LABEL:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<span id='l"+
-data.id+
-"' "+elementStyle+" class='label label-wrap'>"+
-data.value+
-"</span>"+
-"</div>");}
-break;case UI_BUTTON:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='one columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<button id='btn"+
-data.id+
-"' "+elementStyle+" "+
-"onmousedown='buttonclick("+
-data.id+
-", true)' "+
-"onmouseup='buttonclick("+
-data.id+
-", false)'>"+
-data.value+
-"</button></div>");$("#btn"+data.id).on({touchstart:function(e){e.preventDefault();buttonclick(data.id,true);},touchend:function(e){e.preventDefault();buttonclick(data.id,false);},});}
-break;case UI_SWITCHER:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='one columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<label id='sl"+
-data.id+
-"' "+elementStyle+" class='switch "+
-(data.value=="1"?"checked":"")+
-"'>"+
-"<div class='in'><input type='checkbox' id='s"+
-data.id+
-"' onClick='switcher("+
-data.id+
-",null)' "+
-(data.value=="1"?"checked":"")+
-"/></div>"+
-"</label>"+
-"</div>");switcher(data.id,data.value);}
-break;case UI_CPAD:case UI_PAD:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<nav class='control'>"+
-"<ul>"+
-"<li><a onmousedown='padclick(UP, "+
-data.id+
-", true)' onmouseup='padclick(UP, "+
-data.id+
-", false)' id='pf"+
-data.id+
-"'>&#9650;</a></li>"+
-"<li><a onmousedown='padclick(RIGHT, "+
-data.id+
-", true)' onmouseup='padclick(RIGHT, "+
-data.id+
-", false)' id='pr"+
-data.id+
-"'>&#9650;</a></li>"+
-"<li><a onmousedown='padclick(LEFT, "+
-data.id+
-", true)' onmouseup='padclick(LEFT, "+
-data.id+
-", false)' id='pl"+
-data.id+
-"'>&#9650;</a></li>"+
-"<li><a onmousedown='padclick(DOWN, "+
-data.id+
-", true)' onmouseup='padclick(DOWN, "+
-data.id+
-", false)' id='pb"+
-data.id+
-"'>&#9650;</a></li>"+
-"</ul>"+
-(data.type==UI_CPAD?"<a class='confirm' onmousedown='padclick(CENTER,"+
-data.id+
-", true)' onmouseup='padclick(CENTER, "+
-data.id+
-", false)' id='pc"+
-data.id+
-"'>OK</a>":"")+
-"</nav>"+
-"</div>");$("#pf"+data.id).on({touchstart:function(e){e.preventDefault();padclick(UP,data.id,true);},touchend:function(e){e.preventDefault();padclick(UP,data.id,false);},});$("#pl"+data.id).on({touchstart:function(e){e.preventDefault();padclick(LEFT,data.id,true);},touchend:function(e){e.preventDefault();padclick(LEFT,data.id,false);},});$("#pr"+data.id).on({touchstart:function(e){e.preventDefault();padclick(RIGHT,data.id,true);},touchend:function(e){e.preventDefault();padclick(RIGHT,data.id,false);},});$("#pb"+data.id).on({touchstart:function(e){e.preventDefault();padclick(DOWN,data.id,true);},touchend:function(e){e.preventDefault();padclick(DOWN,data.id,false);},});$("#pc"+data.id).on({touchstart:function(e){e.preventDefault();padclick(CENTER,data.id,true);},touchend:function(e){e.preventDefault();padclick(CENTER,data.id,false);},});}
-break;case UI_SLIDER:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter card-slider "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<div class='range-slider'>"+
-"<input id='sl"+
-data.id+
-"' type='range' min='0' max='100' value='"+
-data.value+
-"' "+elementStyle+" class='range-slider__range'>"+
-"<span class='range-slider__value'>"+
-data.value+
-"</span>"+
-"</div>"+
-"</div>");rangeSlider(!sliderContinuous);}
-break;case UI_NUMBER:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<input style='color:black;' "+elementStyle+" id='num"+
-data.id+
-"' type='number' value='"+
-data.value+
-"' onchange='numberchange("+
-data.id+
-")' />"+
-"</div>");}
-break;case UI_TEXT_INPUT:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<input style='color:black;' "+elementStyle+" id='text"+
-data.id+
-"' value='"+
-data.value+
-"' onchange='textchange("+
-data.id+
-")' />"+
-"</div>");}
+websock.onopen=function(evt){console.log("websock open");$("#conStatus").addClass("color-green");$("#conStatus").text("Connected");websockConnected=true;};websock.onclose=function(evt){console.log("websock close");conStatusError();};websock.onerror=function(evt){console.log(evt);conStatusError();};var handleEvent=function(evt){console.log(evt);var data=JSON.parse(evt.data);var e=document.body;var center="";switch(data.type){case UI_INITIAL_GUI:$("#row").html("");$("#tabsnav").html("");$("#tabscontent").html("");if(data.sliderContinuous){sliderContinuous=data.sliderContinuous;}
+data.controls.forEach(element=>{var fauxEvent={data:JSON.stringify(element),};handleEvent(fauxEvent);});break;case UI_EXTEND_GUI:data.controls.forEach(element=>{var fauxEvent={data:JSON.stringify(element),};handleEvent(fauxEvent);});break;case UI_RELOAD:window.location.reload();break;case UI_TITEL:document.title=data.label;$("#mainHeader").html(data.label);break;case UI_LABEL:case UI_NUMBER:case UI_TEXT_INPUT:case UI_SELECT:case UI_GAUGE:case UI_SEPARATOR:if(data.visible)addToHTML(data);break;case UI_BUTTON:if(data.visible){addToHTML(data);$("#btn"+data.id).on({touchstart:function(e){e.preventDefault();buttonclick(data.id,true);},touchend:function(e){e.preventDefault();buttonclick(data.id,false);},});}
+break;case UI_SWITCHER:if(data.visible){addToHTML(data);switcher(data.id,data.value);}
+break;case UI_CPAD:case UI_PAD:if(data.visible){addToHTML(data);$("#pf"+data.id).on({touchstart:function(e){e.preventDefault();padclick(UP,data.id,true);},touchend:function(e){e.preventDefault();padclick(UP,data.id,false);},});$("#pl"+data.id).on({touchstart:function(e){e.preventDefault();padclick(LEFT,data.id,true);},touchend:function(e){e.preventDefault();padclick(LEFT,data.id,false);},});$("#pr"+data.id).on({touchstart:function(e){e.preventDefault();padclick(RIGHT,data.id,true);},touchend:function(e){e.preventDefault();padclick(RIGHT,data.id,false);},});$("#pb"+data.id).on({touchstart:function(e){e.preventDefault();padclick(DOWN,data.id,true);},touchend:function(e){e.preventDefault();padclick(DOWN,data.id,false);},});$("#pc"+data.id).on({touchstart:function(e){e.preventDefault();padclick(CENTER,data.id,true);},touchend:function(e){e.preventDefault();padclick(CENTER,data.id,false);},});}
+break;case UI_SLIDER:if(data.visible){addToHTML(data);rangeSlider(!sliderContinuous);}
 break;case UI_TAB:if(data.visible){$("#tabsnav").append("<li><a onmouseup='tabclick("+data.id+")' href='#tab"+data.id+"'>"+data.value+"</a></li>");$("#tabscontent").append("<div id='tab"+data.id+"'></div>");tabs=$(".tabscontent").tabbedContent({loop:true}).data("api");$("a").filter(function(){return $(this).attr("href")==="#click-to-switch";}).on("click",function(e){var tab=prompt("Tab to switch to (number or id)?");if(!tabs.switchTab(tab)){alert("That tab does not exist :\\");}
 e.preventDefault();});}
-break;case UI_SELECT:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<select style='color:black;' "+elementStyle+" id='select"+
-data.id+
-"' onchange='selectchange("+
-data.id+
-")' />"+
-"</div>");}
 break;case UI_OPTION:if(data.parentControl){var parent=$("#select"+data.parentControl);parent.append("<option id='option"+
 data.id+
 "' value='"+
@@ -199,57 +27,8 @@ data.label+
 break;case UI_MIN:if(data.parentControl){var parent=$("#id"+data.parentControl+" input");if(parent.size()){parent.attr("min",data.value);}}
 break;case UI_MAX:if(data.parentControl){var parent=$("#id"+data.parentControl+" input");if(parent.size()){parent.attr("max",data.value);}}
 break;case UI_STEP:if(data.parentControl){var parent=$("#id"+data.parentControl+" input");if(parent.size()){parent.attr("step",data.value);}}
-break;case UI_GRAPH:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"<figure id='graph"+
-data.id+
-"'>"+
-"<figcaption>"+
-data.label+
-"</figcaption>"+
-"</figure>"+
-"</div>");graphData[data.id]=restoreGraphData(data.id);renderGraphSvg(graphData[data.id],"graph"+data.id);}
-break;case ADD_GRAPH_POINT:var ts=Math.round(new Date().getTime()/1000);graphData[data.id].push({x:ts,y:data.value});saveGraphData();renderGraphSvg(graphData[data.id],"graph"+data.id);break;case CLEAR_GRAPH:graphData[data.id]=[];saveGraphData();renderGraphSvg(graphData[data.id],"graph"+data.id);break;case UI_GAUGE:var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"WILL BE A GAUGE <input style='color:black;' id='gauge"+
-data.id+
-"' type='number' value='"+
-data.value+
-"' onchange='numberchange("+
-data.id+
-")' />"+
-"</div>");}
-break;case UI_ACCEL:if(hasAccel)break;var parent;if(data.parentControl){parent=$("#tab"+data.parentControl);}else{parent=$("#row");}
-hasAccel=true;if(data.visible){parent.append("<div id='id"+
-data.id+
-"' "+panelStyle+" class='two columns card tcenter "+
-colorClass(data.color)+
-"'>"+
-"<h5>"+
-data.label+
-"</h5><hr/>"+
-"ACCEL // Not implemented fully!<div class='accelerometer' id='accel"+
-data.id+
-"' ><div class='ball"+
-data.id+
-"'></div><pre class='accelerometeroutput"+
-data.id+
-"'></pre>"+
-"</div>");requestOrientationPermission();}
+break;case UI_GRAPH:if(data.visible){addToHTML(data);graphData[data.id]=restoreGraphData(data.id);renderGraphSvg(graphData[data.id],"graph"+data.id);}
+break;case ADD_GRAPH_POINT:var ts=Math.round(new Date().getTime()/1000);graphData[data.id].push({x:ts,y:data.value});saveGraphData();renderGraphSvg(graphData[data.id],"graph"+data.id);break;case CLEAR_GRAPH:graphData[data.id]=[];saveGraphData();renderGraphSvg(graphData[data.id],"graph"+data.id);break;case UI_ACCEL:if(hasAccel)break;hasAccel=true;if(data.visible){addToHTML(data);requestOrientationPermission();}
 break;case UPDATE_LABEL:$("#l"+data.id).html(data.value);if(data.hasOwnProperty('elementStyle')){$("#l"+data.id).attr("style",data.elementStyle);}
 break;case UPDATE_SWITCHER:switcher(data.id,data.value=="0"?0:1);if(data.hasOwnProperty('elementStyle')){$("#sl"+data.id).attr("style",data.elementStyle);}
 break;case UPDATE_SLIDER:slider_move($("#id"+data.id),data.value,"100",false);if(data.hasOwnProperty('elementStyle')){$("#sl"+data.id).attr("style",data.elementStyle);}
@@ -270,7 +49,41 @@ function buttonclick(number,isdown){if(isdown)websock.send("bdown:"+number);else
 function padclick(type,number,isdown){switch(type){case CENTER:if(isdown)websock.send("pcdown:"+number);else websock.send("pcup:"+number);break;case UP:if(isdown)websock.send("pfdown:"+number);else websock.send("pfup:"+number);break;case DOWN:if(isdown)websock.send("pbdown:"+number);else websock.send("pbup:"+number);break;case LEFT:if(isdown)websock.send("pldown:"+number);else websock.send("plup:"+number);break;case RIGHT:if(isdown)websock.send("prdown:"+number);else websock.send("prup:"+number);break;}}
 function switcher(number,state){if(state==null){if($("#s"+number).is(":checked")){websock.send("sactive:"+number);$("#sl"+number).addClass("checked");}else{websock.send("sinactive:"+number);$("#sl"+number).removeClass("checked");}}else if(state==1){$("#sl"+number).addClass("checked");$("#sl"+number).prop("checked",true);}else if(state==0){$("#sl"+number).removeClass("checked");$("#sl"+number).prop("checked",false);}}
 var rangeSlider=function(isDiscrete){var range=$(".range-slider__range");var slidercb=function(){sliderchange($(this).attr("id").replace(/^\D+/g,""));};range.on({input:function(){$(this).next().html(this.value)}});range.each(function(){$(this).next().html(this.value);if($(this).attr("callbackSet")!="true"){if(!isDiscrete){$(this).on({input:slidercb});}else{$(this).on({change:slidercb});}
-$(this).attr("callbackSet","true");}});};
+$(this).attr("callbackSet","true");}});};var addToHTML=function(data){panelStyle=data.hasOwnProperty('panelStyle')?" style='"+data.panelStyle+"' ":"";elementStyle=data.hasOwnProperty('elementStyle')?" style='"+data.elementStyle+"' ":"";if(!data.hasOwnProperty('parentControl')||$("#tab"+data.parentControl).length>0){var parent=data.hasOwnProperty('parentControl')?$("#tab"+data.parentControl):$("#row");var html="";switch(data.type){case UI_LABEL:case UI_BUTTON:case UI_SWITCHER:case UI_CPAD:case UI_PAD:case UI_SLIDER:case UI_NUMBER:case UI_TEXT_INPUT:case UI_SELECT:case UI_GRAPH:case UI_GAUGE:case UI_ACCEL:html="<div id='id"+data.id+"' "+panelStyle+" class='two columns card tcenter "+
+colorClass(data.color)+"'><h5>"+data.label+"</h5><hr/>"+
+elementHTML(data.type,data.id,data.value,elementStyle)+
+"</div>";break;case UI_SEPARATOR:html="<div id='id"+data.id+"' "+panelStyle+" class='sectionbreak columns'>"+
+"<h5>"+data.label+"</h5><hr/></div>";break;}
+parent.append(html);}else{var parent=$("#id"+data.parentControl);parent.append(elementHTML(data.type,data.id,data.value,elementStyle));}}
+var elementHTML=function(type,id,value,elementStyle){switch(type){case UI_LABEL:return"<span id='l"+id+"' "+elementStyle+
+" class='label label-wrap'>"+value+"</span>";case UI_BUTTON:return"<button id='btn"+id+"' "+elementStyle+
+" onmousedown='buttonclick("+id+", true)'"+
+" onmouseup='buttonclick("+id+", false)'>"+
+value+"</button>";case UI_SWITCHER:return"<label id='sl"+id+"' "+elementStyle+
+" class='switch "+(value=="1"?"checked":"")+"'>"+
+"<div class='in'>"+
+"<input type='checkbox' id='s"+id+"' onClick='switcher("+id+",null)' "+
+(value=="1"?"checked":"")+"/></div></label>";case UI_CPAD:case UI_PAD:return"<nav class='control'><ul>"+
+"<li><a onmousedown='padclick(UP, "+id+", true)' "+
+"onmouseup='padclick(UP, "+id+", false)' id='pf"+id+"'>&#9650;</a></li>"+
+"<li><a onmousedown='padclick(RIGHT, "+id+", true)' "+
+"onmouseup='padclick(RIGHT, "+id+", false)' id='pr"+id+"'>&#9650;</a></li>"+
+"<li><a onmousedown='padclick(LEFT, "+id+", true)' "+
+"onmouseup='padclick(LEFT, "+id+", false)' id='pl"+id+"'>&#9650;</a></li>"+
+"<li><a onmousedown='padclick(DOWN, "+id+", true)' "+
+"onmouseup='padclick(DOWN, "+id+", false)' id='pb"+id+"'>&#9650;</a></li>"+
+"</ul>"+
+(type==UI_CPAD?"<a class='confirm' onmousedown='padclick(CENTER,"+id+", true)' "+
+"onmouseup='padclick(CENTER, "+id+", false)' id='pc"+id+"'>OK</a>":"")+
+"</nav>";case UI_SLIDER:return"<div class='range-slider'>"+
+"<input id='sl"+id+"' type='range' min='0' max='100' value='"+value+"' "+
+elementStyle+" class='range-slider__range'><span class='range-slider__value'>"+
+value+"</span></div>";case UI_NUMBER:return"<input style='color:black;' "+elementStyle+" id='num"+id+
+"' type='number' value='"+value+"' onchange='numberchange("+id+")' />";case UI_TEXT_INPUT:return"<input style='color:black;' "+elementStyle+" id='text"+id+
+"' value='"+value+"' onchange='textchange("+id+")' />";case UI_SELECT:return"<select style='color:black;' "+elementStyle+" id='select"+id+
+"' onchange='selectchange("+id+")' />";case UI_GRAPH:return"<figure id='graph"+id+"'><figcaption>"+label+"</figcaption></figure>";case UI_GAUGE:return"WILL BE A GAUGE <input style='color:black;' id='gauge"+id+
+"' type='number' value='"+value+"' onchange='numberchange("+id+")' />";case UI_ACCEL:return"ACCEL // Not implemented fully!<div class='accelerometer' id='accel"+id+
+"' ><div class='ball"+id+"'></div><pre class='accelerometeroutput"+id+"'></pre>";default:return"";}}
 )=====";
 
-const uint8_t JS_CONTROLS_GZIP[3564] PROGMEM = { 31,139,8,0,182,30,210,97,2,255,237,91,109,115,219,54,18,254,158,95,65,51,157,136,60,43,122,73,226,52,149,76,103,20,89,73,212,42,182,207,150,155,206,165,57,15,68,66,22,199,20,201,146,160,95,234,234,191,223,226,141,4,40,74,86,236,180,157,222,228,139,45,46,22,139,7,187,11,236,2,92,186,81,152,18,227,116,120,54,60,24,142,135,189,209,217,187,211,161,243,172,213,234,186,178,225,120,48,58,236,237,3,173,45,105,71,251,189,241,224,236,240,237,219,147,193,216,105,171,188,131,95,198,131,131,125,46,163,173,208,199,195,241,96,228,40,132,35,144,88,146,199,72,197,32,195,179,62,165,60,211,153,250,156,235,89,193,245,230,116,60,62,60,112,158,235,124,130,218,110,61,47,56,71,189,55,0,226,133,206,200,137,237,214,139,130,239,228,227,112,220,127,63,56,118,118,116,214,156,222,110,237,40,220,163,225,62,208,94,150,120,57,181,221,122,89,112,30,156,126,120,3,180,239,117,78,65,109,183,190,87,212,5,122,4,131,28,157,142,157,87,58,183,210,210,110,189,42,122,188,59,238,29,189,119,126,16,132,222,254,62,167,156,29,29,14,15,40,171,104,232,143,6,189,99,193,220,110,253,160,140,216,123,227,180,75,6,225,52,197,32,39,131,209,160,15,210,74,54,145,228,182,98,149,195,163,241,144,234,191,100,22,73,110,43,102,249,48,4,66,201,42,140,214,86,108,242,161,247,139,211,46,217,131,209,218,170,41,198,131,35,167,93,182,4,35,182,21,59,188,235,157,190,27,56,237,146,29,4,181,173,152,161,215,239,83,223,40,76,48,102,156,130,172,8,200,61,123,255,240,227,65,238,215,163,193,219,113,238,191,199,195,119,239,199,185,151,246,7,7,99,48,186,156,96,255,108,124,122,252,239,211,195,225,201,32,23,213,63,27,124,24,28,247,70,197,58,233,159,29,13,160,215,241,240,103,232,250,44,39,126,28,140,123,39,71,239,123,35,69,252,217,201,233,193,219,209,225,71,109,140,126,239,248,248,112,156,123,117,255,172,55,26,254,167,119,12,170,126,153,147,246,123,199,63,229,30,218,63,59,56,60,24,56,207,118,118,186,151,40,49,206,19,20,207,246,17,65,78,136,175,140,94,146,160,27,203,102,45,51,148,246,92,23,7,206,20,5,41,102,164,52,240,61,156,244,163,144,248,97,22,101,169,104,154,102,161,75,252,40,52,220,40,136,146,126,128,210,212,98,63,135,158,125,43,126,56,7,217,124,130,147,156,222,77,175,124,226,206,20,62,148,98,85,103,157,4,147,44,9,77,248,243,91,22,249,41,54,187,130,69,168,80,50,224,57,78,80,224,229,205,133,62,37,71,140,9,78,18,255,18,39,57,83,161,95,201,116,133,9,74,227,25,10,72,206,148,235,91,242,164,89,56,13,162,43,69,14,87,191,108,119,81,146,68,69,127,105,10,217,140,2,255,119,148,248,97,206,64,45,33,27,61,148,92,152,93,15,79,81,22,16,73,52,187,139,197,35,170,249,43,60,73,35,247,162,171,252,6,51,132,216,37,216,43,91,33,193,191,101,56,37,135,137,143,67,130,40,233,8,39,115,63,77,225,151,101,223,46,30,229,156,41,186,196,239,164,3,64,83,16,185,40,56,33,81,130,206,113,35,197,100,72,240,220,50,113,26,103,62,243,147,212,172,255,120,114,120,208,72,9,204,226,220,159,222,88,185,251,216,118,87,17,156,192,248,81,162,200,246,193,194,204,131,96,68,143,185,155,54,214,121,229,88,133,240,174,63,181,242,174,91,78,152,5,129,125,91,200,98,160,98,148,164,184,224,178,187,92,135,197,144,159,124,239,51,128,228,228,79,159,203,120,81,66,64,5,223,89,94,228,102,115,208,156,221,64,158,103,153,255,50,237,70,52,157,194,162,248,206,50,31,39,209,21,60,207,200,60,176,76,211,238,10,83,52,220,32,130,177,193,169,185,20,85,52,172,186,19,176,66,150,14,192,55,18,24,97,133,249,168,244,156,23,198,72,240,60,186,196,124,49,153,108,149,60,61,79,48,14,77,123,137,21,112,106,124,9,246,42,184,56,104,134,194,104,26,7,145,33,16,80,144,79,30,191,122,249,124,167,91,209,171,152,186,70,13,173,91,55,240,221,139,142,208,92,125,161,77,122,134,66,47,192,63,251,169,63,241,3,159,220,244,129,112,14,10,186,5,59,110,149,21,240,228,201,150,212,121,99,230,123,30,14,237,219,220,32,116,1,20,254,42,140,148,179,195,204,7,151,240,99,228,167,4,135,176,189,152,151,249,152,46,27,211,172,87,99,169,51,173,51,199,186,242,67,47,186,106,80,135,164,163,52,226,40,33,91,142,105,254,241,71,117,203,171,214,170,150,23,47,158,231,246,101,251,233,71,60,57,129,223,152,88,230,85,218,105,54,205,237,114,199,89,148,146,16,205,241,182,217,89,110,164,82,183,205,230,21,168,188,187,192,128,247,222,194,133,140,71,210,97,163,48,138,113,232,72,205,90,248,146,208,173,58,76,163,0,67,255,115,16,201,57,13,202,183,129,207,173,242,77,130,175,1,95,110,235,98,205,20,254,79,146,12,119,23,221,2,26,91,77,155,96,99,140,32,178,188,198,52,105,152,210,214,72,163,132,42,9,60,6,82,223,97,46,118,151,4,202,238,149,54,35,104,104,120,108,47,162,173,216,201,253,118,18,121,55,140,230,194,19,78,192,217,186,49,10,49,236,135,55,1,176,65,151,6,132,223,195,171,240,40,1,253,39,228,198,170,21,237,53,251,181,9,75,129,114,214,204,109,198,92,52,110,155,53,240,36,179,139,3,76,71,90,35,80,229,168,16,169,54,75,161,34,102,179,118,114,19,99,17,181,245,131,70,167,98,159,164,36,130,38,105,136,46,171,200,160,76,88,190,68,109,130,117,201,134,41,167,28,176,237,151,147,144,74,62,240,117,70,167,162,147,40,72,27,211,40,25,32,0,47,230,229,236,177,120,4,209,246,154,155,247,150,178,119,74,225,77,48,219,245,69,87,113,5,43,239,5,126,98,119,39,9,70,23,93,169,137,226,180,212,249,123,0,240,163,93,167,188,23,36,56,136,144,103,149,185,217,33,174,147,59,38,241,137,244,151,0,77,112,192,76,52,71,126,248,30,35,208,175,180,80,193,80,150,199,142,94,29,58,51,88,2,32,49,55,36,127,236,115,109,216,183,252,209,17,30,144,187,177,202,35,182,60,133,147,121,21,88,86,202,100,155,125,128,165,180,6,138,97,179,130,152,189,235,249,151,134,239,57,53,223,51,183,185,31,248,222,246,35,179,102,152,219,234,82,129,13,4,182,48,167,70,174,34,154,187,102,243,48,53,32,135,243,12,194,215,37,176,63,82,114,90,97,79,120,182,169,176,61,104,53,119,103,59,123,114,12,166,16,74,107,2,113,119,150,52,57,71,10,67,50,52,193,18,24,125,145,73,56,76,142,193,254,62,189,130,28,168,150,143,112,137,130,12,179,17,168,80,46,190,9,147,221,99,106,209,45,193,79,203,255,52,83,192,126,253,39,154,98,146,17,18,113,99,76,72,120,151,57,104,151,40,156,195,110,130,97,41,133,208,135,117,103,137,143,165,117,174,27,52,136,217,53,181,75,22,175,237,192,243,143,42,211,242,78,123,185,97,169,186,25,90,209,157,167,95,36,202,220,25,75,136,58,69,100,178,111,113,35,78,48,221,25,246,249,73,130,46,120,5,132,16,81,103,112,187,139,58,147,2,134,186,143,12,145,65,45,120,238,167,59,159,188,86,249,230,126,170,251,241,133,77,225,164,155,238,5,60,228,210,225,173,194,77,28,199,108,155,175,77,176,28,164,127,30,13,205,10,12,58,99,209,217,15,107,123,187,126,24,103,196,160,225,218,169,177,30,147,232,186,198,65,148,48,68,97,159,26,88,14,74,211,105,205,103,217,177,171,182,17,150,166,116,95,166,4,54,111,125,183,202,135,144,222,84,72,92,246,38,122,65,216,145,15,244,247,183,248,162,120,21,36,85,114,32,145,108,136,174,153,208,121,224,239,237,34,67,219,201,98,228,241,197,124,122,84,55,170,183,50,101,27,91,199,45,246,49,166,142,120,170,171,99,239,201,227,31,94,238,180,186,187,77,4,254,0,48,238,132,195,110,212,190,4,81,117,7,13,84,242,80,80,244,206,239,75,48,85,242,107,144,130,135,66,162,119,146,95,2,169,146,95,131,52,217,4,82,147,187,84,113,2,112,28,177,60,95,155,128,181,240,194,169,159,204,107,43,176,243,123,210,250,230,224,69,135,181,240,221,18,252,195,159,40,114,185,29,237,54,97,145,232,27,16,93,239,212,95,239,25,84,213,37,113,223,160,90,37,67,13,170,12,98,240,112,136,204,31,31,12,82,147,178,4,51,121,56,76,190,148,31,140,83,23,179,4,116,242,112,160,108,49,61,24,167,38,101,9,166,251,112,152,98,217,60,24,104,73,206,218,180,143,189,33,251,191,9,207,244,225,41,191,89,248,58,161,90,201,205,18,122,11,41,132,139,254,60,83,171,76,15,121,250,198,250,212,140,185,15,219,105,11,254,163,107,167,214,110,193,47,158,137,213,202,103,137,213,105,165,58,250,217,25,151,171,156,86,43,185,152,212,77,206,162,234,54,203,68,156,48,9,214,214,210,101,206,146,3,241,23,167,223,242,59,213,105,184,91,136,219,57,214,189,51,9,144,123,209,173,48,47,5,29,102,243,74,239,9,217,27,184,53,206,2,7,60,118,55,46,89,249,147,126,8,128,120,219,92,127,239,80,188,205,254,102,198,135,152,145,222,156,151,96,111,96,57,218,235,158,118,235,189,233,44,105,84,191,184,205,21,171,165,166,52,87,3,30,121,203,33,199,164,67,206,18,60,117,106,138,105,41,157,106,76,193,111,22,41,102,213,141,240,146,49,203,194,242,9,209,126,212,63,26,186,0,120,154,96,175,207,159,173,219,32,138,226,14,141,133,11,155,221,205,91,38,138,125,62,50,2,238,169,31,128,197,173,60,54,210,87,81,236,53,226,119,22,153,249,41,224,33,4,206,197,116,98,166,237,192,225,247,49,155,247,83,18,61,229,71,90,179,187,96,17,219,100,116,179,174,70,89,186,30,0,142,19,39,209,60,38,150,57,70,19,131,68,134,56,227,195,47,139,47,60,35,74,96,170,246,107,126,15,190,69,231,211,224,76,208,195,130,71,219,190,69,1,78,168,136,25,34,84,166,225,69,56,53,194,136,24,248,218,79,137,209,249,245,87,102,227,138,192,94,21,183,89,181,199,183,245,170,93,219,194,154,116,191,100,193,242,14,75,119,42,114,101,242,230,251,173,77,94,98,211,89,97,148,194,108,76,221,18,71,149,109,202,26,143,98,246,98,149,194,231,63,55,221,113,36,133,15,134,41,119,133,66,185,204,170,25,125,24,110,58,29,234,12,203,108,84,231,116,67,229,75,68,76,43,245,127,199,150,93,248,21,91,170,144,45,153,250,237,210,18,150,222,47,127,21,22,116,125,7,22,90,217,244,23,129,73,9,142,239,64,195,138,202,190,109,11,234,182,48,245,207,179,4,51,60,172,62,165,116,239,32,121,92,36,92,127,73,154,222,200,9,32,81,223,0,242,210,151,79,66,248,103,103,169,166,70,158,15,187,160,45,72,171,89,195,201,229,185,181,220,183,110,10,168,121,23,205,208,165,202,66,102,111,146,58,31,16,153,53,146,40,3,27,208,114,3,144,8,62,68,75,117,198,254,28,126,53,225,228,209,170,66,218,136,179,116,102,221,94,119,72,90,191,233,20,254,5,113,167,84,112,116,31,228,10,110,165,240,177,83,161,176,79,159,191,242,120,178,204,240,219,130,80,22,196,199,225,104,100,188,25,24,61,131,233,198,88,151,231,178,69,131,178,115,252,119,158,79,88,165,39,221,98,101,129,163,205,219,255,100,163,230,229,148,172,220,229,31,101,98,166,49,163,73,139,198,136,225,207,99,158,250,96,207,152,102,65,112,179,165,222,106,32,58,69,12,233,45,45,185,228,6,103,164,210,36,246,212,62,19,20,148,239,195,185,241,118,33,117,173,20,28,101,132,70,184,114,159,184,188,139,174,175,132,44,121,134,82,58,206,74,88,212,139,215,162,232,65,68,74,105,191,245,69,53,252,252,164,10,146,145,23,154,69,232,85,123,84,67,202,223,165,174,121,103,6,7,145,150,249,186,213,105,127,25,180,244,193,216,248,133,159,184,34,162,21,139,150,150,154,128,92,5,101,221,132,152,97,42,165,119,127,29,80,113,177,68,101,177,251,145,92,24,0,187,183,101,117,73,247,129,165,92,150,176,109,133,157,249,191,10,182,146,168,123,25,151,159,10,151,206,20,15,133,182,36,236,62,224,68,121,139,74,42,222,18,23,223,149,116,150,123,242,24,78,129,136,88,244,85,38,85,150,117,159,57,241,208,196,233,178,18,92,22,26,178,50,70,203,60,13,47,194,232,42,100,33,147,94,19,176,179,189,41,211,148,34,119,160,237,123,142,246,85,207,147,39,121,203,174,94,178,199,143,22,178,48,173,188,128,87,170,65,45,73,228,74,80,187,85,104,160,232,96,151,160,58,142,182,161,216,183,2,140,94,6,205,183,153,167,249,39,1,226,131,132,167,226,19,0,249,88,212,251,75,74,81,220,47,41,121,41,191,36,240,218,125,249,148,151,234,219,178,146,82,169,120,21,60,230,118,117,100,149,73,64,229,20,10,236,18,180,130,86,133,153,227,19,192,214,33,90,137,99,241,136,222,135,85,92,246,155,118,3,211,98,68,229,158,75,92,112,125,106,125,22,33,69,191,241,98,52,118,79,198,169,33,45,236,21,145,177,146,147,95,52,41,133,184,115,156,166,8,178,55,165,144,81,173,25,231,248,68,78,199,19,60,238,151,32,207,145,49,64,208,217,74,45,202,239,83,150,51,165,1,27,185,99,110,195,127,86,79,45,184,213,81,180,204,177,106,20,182,167,175,27,38,220,96,20,229,22,182,106,12,190,55,175,27,132,108,50,136,188,115,173,28,130,38,168,107,71,64,147,13,198,208,46,173,42,141,34,246,242,181,134,217,96,32,181,192,140,55,215,253,148,22,14,176,111,6,196,79,93,236,132,210,20,105,116,209,25,37,150,44,174,30,46,127,185,73,55,159,122,105,64,81,230,172,84,56,243,87,160,157,85,72,98,247,110,40,177,171,97,209,54,255,213,130,167,27,8,158,174,18,76,223,48,175,22,189,129,250,226,201,42,209,180,24,96,181,232,96,3,209,193,42,209,236,253,253,106,217,201,6,178,147,10,217,218,119,36,50,145,22,134,79,225,112,128,153,163,177,95,142,248,192,8,158,153,139,23,222,237,195,14,222,145,165,110,118,254,173,135,244,115,4,226,47,177,50,116,121,219,82,190,154,144,66,244,15,59,164,36,63,188,83,150,254,129,80,33,142,201,51,138,185,180,139,12,122,29,140,50,79,12,97,190,104,151,213,3,37,217,173,101,217,43,96,221,33,94,22,21,240,175,221,148,151,198,197,103,23,126,186,239,167,110,130,137,120,145,194,152,156,149,241,77,249,96,209,157,56,74,156,211,226,140,30,185,32,125,161,19,136,3,228,98,171,249,223,95,247,183,155,231,117,147,133,50,254,34,155,149,98,176,11,142,206,114,228,212,66,34,165,136,52,114,177,16,175,193,87,133,220,85,29,187,204,1,85,128,46,28,149,39,200,189,56,193,144,243,109,57,38,181,138,201,191,170,82,213,35,59,21,104,165,34,22,210,223,84,22,174,11,141,231,209,234,113,235,98,212,238,130,197,247,255,1,115,164,240,143,108,62,0,0 };
+const uint8_t JS_CONTROLS_GZIP[3743] PROGMEM = { 31,139,8,0,160,250,217,97,2,255,197,91,91,119,218,72,18,126,247,175,144,149,57,65,44,132,75,110,147,128,229,28,130,73,194,14,49,94,27,79,230,108,38,235,35,68,99,116,44,36,141,36,124,25,135,255,190,213,213,23,117,11,129,25,156,157,125,137,81,169,186,250,235,170,234,238,186,40,110,24,36,169,113,222,191,232,31,247,71,253,206,224,226,227,121,223,126,222,104,180,93,241,226,180,55,24,118,142,128,214,20,180,147,163,206,168,119,49,252,240,225,172,55,178,155,42,111,239,183,81,239,248,136,201,104,42,244,81,127,212,27,216,10,225,4,36,230,228,33,41,155,164,127,209,165,148,231,58,83,151,113,61,207,184,222,159,143,70,195,99,251,133,206,199,169,205,198,139,140,115,208,121,15,32,94,234,140,140,216,108,188,204,248,206,190,244,71,221,79,189,83,251,149,206,42,233,205,198,43,133,123,208,63,2,218,235,28,47,163,54,27,175,51,206,227,243,207,239,129,246,179,206,201,169,205,198,207,138,186,64,143,96,144,147,243,145,253,70,231,86,222,52,27,111,178,17,31,79,59,39,159,236,183,156,208,57,58,98,148,139,147,97,255,152,178,242,23,221,65,175,115,202,153,155,141,183,202,140,157,247,118,51,103,16,70,83,12,114,214,27,244,186,32,45,103,19,65,110,42,86,25,158,140,250,84,255,57,179,8,114,83,49,203,231,62,16,114,86,65,90,83,177,201,231,206,111,118,51,103,15,164,53,85,83,140,122,39,118,51,111,9,36,54,21,59,124,236,156,127,236,217,205,156,29,56,181,169,152,161,211,237,82,223,200,153,128,83,155,111,84,197,156,116,78,59,163,33,152,241,109,94,55,242,141,242,74,238,132,163,225,151,99,185,15,6,189,15,35,233,239,167,253,143,159,70,210,171,187,189,227,17,56,137,80,72,247,98,116,126,250,175,243,97,255,172,39,69,117,47,122,159,123,167,157,65,182,175,186,23,39,61,24,117,218,255,21,134,62,151,196,47,189,81,231,236,228,83,103,160,136,191,56,59,63,254,48,24,126,209,230,232,118,78,79,135,35,185,11,186,23,157,65,255,223,157,83,48,205,107,73,58,234,156,254,34,61,186,123,113,60,60,238,217,207,95,189,106,95,59,177,113,25,59,209,236,200,73,29,59,32,55,70,39,142,157,59,171,140,111,102,78,210,113,93,226,219,83,199,79,8,146,18,223,155,144,184,27,6,169,23,44,194,69,194,95,77,23,129,155,122,97,96,184,161,31,198,93,223,73,18,11,127,246,39,229,123,254,195,62,94,204,199,36,150,244,118,114,227,165,238,76,225,115,18,162,234,172,21,147,116,17,7,38,252,243,199,34,244,18,98,182,57,11,87,161,96,32,115,18,59,254,68,190,206,244,41,56,34,146,146,56,246,174,73,44,153,50,253,10,166,27,146,58,73,52,115,252,84,50,73,125,11,158,100,17,76,253,240,70,145,195,212,47,222,187,78,28,135,217,120,97,10,241,218,241,189,63,157,216,11,36,3,181,132,120,57,113,226,43,179,61,33,83,103,225,167,130,104,182,151,203,61,170,249,27,50,78,66,247,170,173,252,6,51,4,196,77,201,36,111,133,152,252,177,32,73,58,140,61,18,164,14,37,157,144,120,238,37,9,252,178,202,247,203,61,201,153,56,215,228,163,112,0,120,229,135,174,227,159,165,97,236,92,146,90,66,210,126,74,230,150,73,146,104,225,161,159,36,102,245,159,103,195,227,90,146,194,42,46,189,233,157,37,221,167,92,110,43,130,99,152,63,140,21,217,30,88,24,61,8,102,156,160,187,105,115,93,22,206,149,9,111,123,83,75,14,221,183,131,133,239,151,239,51,89,8,42,114,226,132,100,92,229,54,211,97,54,229,87,111,242,13,64,50,242,215,111,121,188,78,156,130,10,126,178,38,161,187,152,131,230,202,53,103,50,177,204,127,152,229,90,56,157,194,166,248,201,50,159,196,225,13,60,207,210,185,111,153,102,185,205,77,81,115,253,16,230,6,167,102,82,84,209,176,235,206,192,10,139,164,7,190,17,195,12,107,204,71,165,75,94,152,35,38,243,240,154,176,205,100,226,46,121,118,25,19,18,152,229,21,86,192,169,241,197,100,82,192,197,64,35,10,163,110,28,135,6,71,64,65,62,125,242,230,245,139,87,237,130,81,217,210,53,106,96,221,187,190,231,94,181,184,230,170,75,109,209,51,39,152,248,228,87,47,241,198,158,239,165,119,93,32,92,130,130,238,193,142,251,121,5,60,125,186,47,116,94,155,121,147,9,9,202,247,210,32,116,3,100,254,202,141,36,217,97,229,189,107,248,49,240,146,148,4,112,188,152,215,114,78,23,231,52,171,197,88,170,168,117,116,172,27,47,152,132,55,53,234,144,116,150,90,20,198,233,190,109,154,223,191,23,191,121,211,88,247,230,229,203,23,210,190,120,158,126,33,227,51,248,77,82,203,188,73,90,245,186,89,201,15,156,133,73,26,56,115,82,49,91,171,47,169,212,138,89,191,1,149,183,151,4,240,238,44,156,203,216,19,14,27,6,97,68,2,91,104,214,34,215,41,61,170,131,36,244,9,140,191,4,145,140,211,160,124,91,248,220,58,223,76,201,45,224,147,182,206,246,76,230,255,105,188,32,237,101,59,131,134,187,105,27,108,200,8,34,243,123,76,147,70,40,109,131,52,74,40,146,192,238,64,234,59,232,98,15,73,160,236,147,220,97,4,47,106,19,60,139,232,91,98,75,191,29,135,147,59,164,185,240,68,98,112,54,113,31,82,246,90,122,23,17,126,35,234,65,127,171,224,12,162,164,212,25,39,129,115,93,68,6,160,176,53,82,245,21,248,60,78,147,191,206,225,72,205,95,240,133,124,224,71,72,167,162,227,208,79,106,211,48,238,57,0,158,248,132,46,207,62,196,179,30,110,178,91,166,186,123,202,222,202,93,29,156,185,92,93,182,21,53,91,114,20,216,160,220,30,199,196,185,106,11,77,100,153,75,235,255,3,128,165,89,173,252,62,139,137,31,58,19,43,207,141,9,85,75,26,61,245,82,159,48,141,250,206,152,248,104,162,185,227,5,159,136,3,250,21,22,202,24,242,242,48,13,106,137,39,150,147,200,199,44,233,144,36,22,243,203,71,12,158,149,151,60,232,109,9,119,192,163,211,39,101,216,218,163,240,211,232,243,192,98,190,171,131,96,73,219,202,160,251,252,40,186,184,113,26,152,21,100,131,251,31,47,141,52,92,184,51,60,198,91,217,126,42,223,147,90,20,19,170,243,35,22,255,80,85,46,210,148,30,5,112,201,88,92,68,149,158,20,96,149,42,74,33,193,100,23,25,252,220,95,178,27,75,95,155,72,30,31,94,29,219,173,112,225,8,177,140,221,241,17,96,78,44,205,135,165,222,233,239,173,148,23,77,119,214,93,228,76,216,162,207,79,170,187,234,174,72,134,170,59,132,232,63,30,34,77,168,30,15,82,147,178,2,51,126,60,76,76,245,30,143,83,23,179,2,116,252,120,160,52,91,125,60,78,77,202,10,76,247,241,48,89,178,252,120,160,57,57,27,119,55,150,123,30,222,124,49,141,15,207,240,206,179,246,87,238,200,21,177,163,206,251,85,153,250,165,236,68,16,68,65,46,113,224,123,135,7,142,17,6,115,144,68,22,145,93,2,30,182,14,169,209,138,89,46,25,179,152,76,237,18,149,160,208,75,135,252,1,143,153,138,121,80,119,14,15,234,32,178,240,182,151,115,78,188,107,195,155,224,84,154,176,131,58,188,161,99,233,56,27,4,212,116,1,240,52,38,147,46,123,182,32,55,12,163,22,53,211,178,140,49,141,101,58,145,199,102,118,128,123,234,249,16,200,88,210,108,52,132,199,244,235,39,43,157,121,9,224,73,83,8,207,233,194,204,178,109,219,16,37,210,117,63,75,195,103,236,44,133,84,23,157,201,68,186,89,85,29,128,94,230,0,199,142,226,112,30,65,56,57,114,198,70,26,26,108,32,253,101,5,88,93,48,32,181,1,159,124,199,98,156,125,186,158,26,99,130,17,22,60,150,193,218,62,137,169,136,153,147,82,153,198,36,36,137,17,132,169,65,110,33,137,48,90,191,255,142,129,114,129,207,21,184,20,43,149,73,243,67,212,7,35,186,44,42,97,176,25,137,170,247,73,2,1,135,155,114,27,232,172,109,246,152,25,45,140,48,225,161,118,99,63,205,202,158,176,221,158,89,50,208,5,236,146,160,50,143,160,47,4,133,77,70,40,247,161,160,97,80,1,132,131,58,147,121,104,174,174,232,115,127,219,229,120,147,162,165,84,76,195,11,162,69,202,76,192,151,149,120,127,66,242,87,190,23,171,68,87,152,123,129,169,95,155,43,88,58,191,253,93,88,156,219,7,176,208,10,229,223,4,6,82,217,232,1,52,88,28,126,248,36,147,5,148,175,220,119,190,217,43,149,25,113,144,183,1,1,156,116,248,226,236,250,210,90,29,91,53,145,150,157,253,186,243,228,234,217,45,220,180,137,253,217,73,103,181,56,92,128,91,211,164,21,36,194,138,105,193,103,228,205,225,87,189,217,104,52,138,144,214,162,69,50,179,238,111,91,105,82,189,107,101,218,128,93,152,43,91,237,130,92,193,173,148,219,91,5,10,251,250,237,7,207,39,106,214,212,124,162,198,90,102,239,101,201,21,83,226,135,47,170,141,133,190,220,214,86,58,41,152,69,170,161,91,150,119,112,135,19,83,3,160,225,77,112,18,135,17,28,154,119,86,137,167,76,103,233,157,79,74,101,118,205,169,130,132,3,195,107,238,193,234,136,98,72,50,232,222,16,83,195,125,209,48,223,53,90,205,191,6,45,121,52,54,22,50,176,32,224,130,22,228,44,109,135,131,92,5,101,213,4,103,54,149,202,210,223,7,148,39,131,84,22,92,133,138,48,0,182,179,101,117,73,187,192,82,146,82,140,80,200,109,250,131,176,229,68,237,100,92,150,30,175,92,205,143,133,182,34,108,23,112,60,205,86,73,89,22,153,181,89,91,171,35,89,154,79,129,92,58,139,75,242,131,22,149,151,181,203,154,216,177,199,232,162,209,33,234,104,88,165,179,204,243,224,42,8,111,2,131,86,192,104,52,135,33,152,41,206,207,229,158,128,76,223,31,218,90,147,251,233,83,249,230,64,175,154,177,27,90,212,134,242,27,120,173,26,34,39,32,190,166,4,117,88,129,6,178,1,229,28,84,219,214,14,20,72,105,24,24,189,202,207,142,153,103,178,227,197,251,109,207,120,135,75,60,102,237,44,65,201,122,87,130,34,59,85,130,192,90,83,226,73,118,162,202,109,129,36,43,232,114,30,179,162,180,243,120,185,13,158,203,162,20,93,184,132,12,187,0,173,160,85,97,74,124,28,216,38,68,107,113,44,247,104,218,130,249,218,51,126,70,95,224,19,36,36,132,214,3,149,116,132,231,33,95,27,223,248,149,162,39,38,72,195,116,134,81,3,90,183,230,55,99,33,39,203,7,148,58,243,156,36,137,115,73,108,165,150,168,182,68,24,62,214,148,224,233,10,243,75,144,103,139,59,128,211,113,167,102,221,165,4,115,130,196,199,153,91,102,5,254,98,187,128,115,171,179,48,210,134,89,240,76,223,52,77,176,197,44,244,240,221,48,7,59,155,55,77,146,110,51,137,72,141,11,167,160,201,236,198,25,156,241,22,115,176,163,122,147,81,248,89,190,209,48,91,76,164,86,34,217,235,170,151,76,224,164,195,150,24,255,169,139,29,83,154,34,141,110,58,35,199,178,136,138,167,147,229,17,122,248,84,115,19,242,78,131,210,100,96,69,148,214,58,36,145,251,48,148,200,213,176,104,135,255,122,193,211,45,4,79,215,9,166,53,170,245,162,183,80,95,52,94,39,154,150,19,215,139,246,183,16,237,175,19,141,21,192,245,178,227,45,100,199,5,178,181,54,169,8,164,185,225,19,72,14,8,58,26,254,178,121,255,28,158,209,197,51,239,246,224,4,111,193,72,247,138,118,234,100,43,83,248,185,3,226,175,137,50,117,254,216,82,154,130,66,136,222,183,20,146,188,224,65,89,122,255,59,19,135,242,140,108,45,205,44,130,222,4,35,207,19,193,53,159,189,23,245,199,156,236,198,170,236,53,176,30,16,47,202,146,236,99,14,165,192,152,117,21,189,228,200,75,220,152,164,188,222,133,76,246,218,251,77,249,30,199,29,219,202,61,167,221,51,250,205,5,225,11,93,64,228,59,46,177,234,255,249,253,168,82,191,172,154,120,149,177,162,39,22,115,177,74,209,90,189,57,181,43,145,82,120,24,185,92,242,146,233,186,43,119,221,192,54,58,160,10,208,117,124,127,236,184,87,103,4,98,190,125,219,164,86,49,217,71,3,170,122,196,160,12,173,80,196,82,248,155,202,194,116,161,241,236,173,159,183,202,103,109,47,151,162,11,44,243,238,76,207,152,128,223,103,1,159,253,96,4,249,206,52,48,86,164,69,187,92,180,88,161,117,187,150,105,182,213,16,218,222,34,52,95,145,169,190,150,82,169,250,214,192,83,234,83,165,242,247,239,242,102,45,168,114,213,124,18,92,166,179,195,134,86,239,218,70,238,187,77,98,179,142,54,107,184,131,143,108,238,134,235,77,80,45,77,82,26,120,107,91,111,185,102,192,238,205,84,172,23,21,183,86,89,158,195,150,34,203,239,74,238,128,150,169,168,246,55,92,122,160,216,165,244,38,164,31,209,45,230,65,66,3,227,137,145,178,15,4,104,89,183,56,10,198,74,254,236,149,104,13,176,18,175,121,80,7,210,193,44,174,211,218,47,119,10,89,56,66,133,86,87,139,44,85,45,131,195,58,49,118,8,114,197,171,172,113,188,203,10,19,246,197,17,138,20,75,165,141,13,152,109,195,42,116,36,203,61,189,92,78,113,136,141,191,85,45,54,95,111,223,77,67,242,60,87,134,103,39,4,138,128,209,5,3,11,34,48,233,216,252,195,191,131,4,148,135,90,133,75,69,232,83,219,221,123,82,165,168,45,3,255,125,118,19,59,17,85,167,108,17,81,57,135,102,190,123,47,102,97,97,41,206,131,189,250,117,51,241,142,21,141,77,128,83,137,101,217,144,170,129,247,39,109,71,152,106,119,171,136,147,93,133,104,114,9,146,241,41,48,229,62,22,64,217,26,41,206,228,97,133,240,190,144,89,177,68,241,176,105,190,147,151,49,28,137,101,214,76,219,99,190,203,71,121,1,167,225,149,130,21,8,187,132,131,198,225,109,137,205,45,166,14,131,46,93,148,152,138,126,120,198,150,135,145,21,118,97,54,204,45,252,249,160,142,203,82,214,189,114,92,137,245,7,142,196,201,63,122,129,109,191,240,25,96,173,171,200,108,164,118,239,13,221,72,20,156,169,24,169,144,149,91,9,87,77,63,68,96,45,195,167,79,222,190,126,213,104,103,141,199,135,102,103,237,238,109,1,228,184,53,12,241,206,24,240,211,128,109,33,232,204,26,2,127,103,4,216,76,223,22,129,206,172,33,24,111,68,80,103,238,96,241,122,19,115,166,119,38,160,202,28,103,234,197,243,210,26,148,188,147,190,37,76,206,93,12,212,21,64,135,191,80,140,204,237,41,68,112,99,117,151,179,59,88,248,184,178,23,213,144,87,219,149,250,9,192,246,40,50,151,140,185,7,171,105,192,95,231,214,46,53,27,13,165,73,202,15,26,92,141,30,34,21,77,200,99,108,216,96,120,8,23,114,160,68,253,16,195,147,86,92,84,185,184,66,44,145,45,130,199,108,120,129,183,198,16,141,95,181,87,78,51,19,151,138,213,26,222,242,101,139,101,9,70,209,218,224,160,197,64,87,240,240,20,128,233,10,44,83,87,96,41,241,205,174,208,88,145,39,223,142,46,64,163,20,139,10,177,240,192,74,94,124,88,113,249,11,64,68,137,134,67,201,38,214,138,59,133,83,179,32,78,204,60,245,46,23,49,65,153,188,125,199,63,148,128,23,174,195,59,230,21,25,155,40,84,124,128,177,170,104,140,8,185,232,47,253,193,192,120,223,51,58,6,146,141,77,202,198,233,89,177,253,127,96,120,22,154,114,88,248,96,212,233,199,224,176,179,230,17,211,45,153,24,83,184,197,238,246,213,13,233,208,182,36,137,195,57,173,230,50,144,72,146,32,15,85,238,49,228,83,82,123,236,170,139,64,179,69,178,194,69,74,155,226,146,57,66,45,22,252,55,136,255,2,191,111,104,3,4,55,0,0 };

@@ -714,6 +714,10 @@ uint16_t ESPUIClass::gauge(const char* label, ControlColor color, int number, in
     return numberId;
 }
 
+uint16_t ESPUIClass::separator(const char* label) {
+    return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
+}
+
 uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*, int), ControlColor color)
 {
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
