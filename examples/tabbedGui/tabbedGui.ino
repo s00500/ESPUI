@@ -2,7 +2,7 @@
 #include <ESPUI.h>
 
 const byte DNS_PORT = 53;
-IPAddress apIP(192, 168, 1, 1);
+IPAddress apIP(192, 168, 4, 1);
 DNSServer dnsServer;
 
 #if defined(ESP32)
@@ -198,8 +198,20 @@ void setup(void)
             Serial.print("\n\nCreating hotspot");
 
             WiFi.mode(WIFI_AP);
+            delay(100);
             WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-            WiFi.softAP(ssid);
+#if defined(ESP32)
+            uint32_t chipid = 0;
+            for (int i = 0; i < 17; i = i + 8)
+            {
+                chipid |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+            }
+#else
+            uint32_t chipid = ESP.getChipId();
+#endif
+            char ap_ssid[25];
+            snprintf(ap_ssid, 26, "ESPUI-%08X", chipid);
+            WiFi.softAP(ap_ssid);
 
             timeout = 5;
 
