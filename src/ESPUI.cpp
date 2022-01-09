@@ -714,6 +714,10 @@ uint16_t ESPUIClass::gauge(const char* label, ControlColor color, int number, in
     return numberId;
 }
 
+uint16_t ESPUIClass::separator(const char* label) {
+    return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
+}
+
 uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*, int), ControlColor color)
 {
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
@@ -818,6 +822,14 @@ void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId)
     {
         control->elementStyle = style;
         updateControl(control, clientId);
+    }
+}
+
+void ESPUIClass::setPanelWide(uint16_t id, bool wide) {
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->wide = wide;
     }
 }
 
@@ -1034,6 +1046,8 @@ Control* ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* con
             item["panelStyle"] = String(control->panelStyle);
         if (control->elementStyle != 0)
             item["elementStyle"] = String(control->elementStyle);
+        if (control->wide == true)
+            item["wide"] = true;
 
         if (control->parentControl != Control::noParent)
         {

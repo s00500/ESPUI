@@ -33,6 +33,8 @@ The Library runs fine on any kind of **ESP8266** and **ESP32** (NodeMCU Boards, 
 - Public Access to ESPAsyncServer
 - Graph Widget (Persist save graph in local storage #10)
 - Inline CSS styles by @iangray001
+- Separators by @iangray001
+- Grouped and wide controls by @iangray001
 
 ## Further Roadmap
 
@@ -305,6 +307,18 @@ Then all widgets for the tab need to be added to it by specifying the tab as the
 
 `ESPUI.addControl( ControlType::Text, "Text Title:", "a Text Field", ControlColor::Alizarin, tab1, &textCall );`
 
+### Separators
+
+![separators](docs/ui_separators.png)
+
+You can use separators to break up the UI and better organise your controls. Adding a separator will force any following controls onto the subsequent line. Add separators as follows:
+
+```
+ESPUI.separator("Separator name");
+//or
+ESPUI.addControl(ControlType::Separator, "Separator name", "", ControlColor::None, maintab);
+```
+
 ### Initialisation of the UI
 
 After all the elements are configured you can use `ESPUI.begin("Some Title");`
@@ -390,6 +404,50 @@ Note: The images in this example are formed by setting a Label to contain an `<i
  ESPUI.addControl(ControlType::Label, "Label", "<img src='path/to/image'>", ControlColor::Peterriver);
 ```
 
+### Grouped controls
+
+Normally, whenever a control is added to the UI, a new panel is generated with a title. However, you can instead 
+set the "parent" of a new control to be an existing control. This allows you to add multiple widgets into the same 
+panel. For example:
+
+```
+ panel1 = ESPUI.addControl(ControlType::Button, "Button Set", "Button A", ControlColor::Turquoise, Control::noParent, btncallback);
+ ESPUI.addControl(ControlType::Button, "", "Button B", ControlColor::None, panel1, btncallback);
+ ESPUI.addControl(ControlType::Button, "", "Button C", ControlColor::None, panel1, btncallback);
+```
+
+The first call to `addControl` has no parent (or it could be set to a tab if you are using a tabbed UI), so therefore a new panel is added containing one button
+with the value `Button A`. The two subsequent calls have their parent set to the first control we added, so instead of creating
+a new panel, the result is the following:
+
+![Grouped buttons](docs/ui_groupedbuttons.png)
+
+The grouped controls operate entirely independently, and can be assigned different callbacks, or updated separately. The grouping 
+is purely visual.
+
+Most controls can be grouped this way, but the result is not always visually pleasant. This works best with labels, sliders, switchers,
+and buttons.
+
+![Other grouped elements](docs/ui_groupedbuttons2.png)
+
+If you group too many elements it might throw the layout of the rest of the UI out of line. Consider adding separators to correct this.
+
+### Advanced: Wide controls
+
+Controls can be set to be displayed "wide" with the function:
+
+```
+ ESPUI.setPanelWide(controlid, true);
+```
+
+*Important!* This function should be called _before_ `ESPUI.begin` or results will be unreliable.
+
+Setting a control to wide tells ESPUI to lay out that control as if there was only a single column, even on wide displays. 
+This can be applied to every element to force a single column layout, or to individual elements to customise the display.
+
+![Wide controls](docs/ui_widecontrols.png)
+
+Note that this will have no effect on small screens.
 
 # Notes for Development
 
