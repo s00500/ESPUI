@@ -631,7 +631,7 @@ function padclick(type, number, isdown) {
 
 function switcher(number, state) {
   if (state == null) {
-    if ($("#s" + number).is(":checked")) {
+    if (!$("#sl" + number).hasClass("checked")) {
       websock.send("sactive:" + number);
       $("#sl" + number).addClass("checked");
     } else {
