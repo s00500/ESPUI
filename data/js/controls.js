@@ -252,6 +252,13 @@ function start() {
           };
           handleEvent(fauxEvent);
         });
+
+        //If there are more elements in the complete UI, then request them
+        //Note: we subtract 1 from data.controls.length because the controls always
+        //includes the title element
+        if(data.totalcontrols > (data.controls.length - 1)) {
+          websock.send("uiok:" + (data.controls.length - 1));
+        }
         break;
 
       case UI_EXTEND_GUI:
@@ -261,6 +268,11 @@ function start() {
           };
           handleEvent(fauxEvent);
         });
+
+        //Do we need to keep requesting more UI elements?
+        if(data.totalcontrols > data.startindex + (data.controls.length - 1)) {
+          websock.send("uiok:" + (data.startindex + (data.controls.length - 1)));
+        }
         break;
       
       case UI_RELOAD:
