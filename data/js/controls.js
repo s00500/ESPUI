@@ -500,6 +500,7 @@ function start() {
         break;
 
       case UPDATE_SLIDER:
+        $("#sl" + data.id).attr("value", data.value)
         slider_move($("#id" + data.id), data.value, "100", false);
         if(data.hasOwnProperty('elementStyle')) {
           $("#sl" + data.id).attr("style", data.elementStyle);
