@@ -102,6 +102,7 @@ function colorClass(colorId) {
     case C_ALIZARIN:
       return "alizarin";
 
+    case C_DARK:
     case C_NONE:
       return "dark";
     default:
