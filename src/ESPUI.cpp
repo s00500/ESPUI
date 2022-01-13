@@ -763,6 +763,11 @@ void ESPUIClass::updateControl(Control* control, int clientId)
         return;
     }
 
+    if (this->ws == nullptr)
+    {
+        return;
+    }
+
     String json;
     DynamicJsonDocument document(jsonUpdateDocumentSize);
     JsonObject root = document.to<JsonObject>();
