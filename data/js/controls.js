@@ -529,6 +529,12 @@ function start() {
         break;
 
       case UPDATE_BUTTON:
+        $("#btn" + data.id).val(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#btn" + data.id).attr("style", data.elementStyle);
+        }
+        break;
+      
       case UPDATE_PAD:
       case UPDATE_CPAD:
         break;
