@@ -441,7 +441,13 @@ function start() {
         if (data.parentControl) {
           var parent = $("#id" + data.parentControl + " input");
           if (parent.size()) {
-            parent.attr("max", data.value);
+            if(!parent.attr("type")) {
+              //type is not set so therefore it is a text input
+              parent.attr("maxlength", data.value);
+            } else {
+              //type might be range (slider) or number
+              parent.attr("max", data.value);
+            }
           }
         }
         break;

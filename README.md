@@ -267,6 +267,17 @@ The textinput works very similar like the number input but with a string. You
 can enter a String into it and when you are done with your change it is sent to
 the ESP.
 
+If you attach a Max control to the text input then a max length will be applied
+to the control. 
+
+```
+ text = ESPUI.text("Label", callback, ControlColor::Dark, "Initial value");
+ ESPUI.addControl(ControlType::Max, "", "32", ControlColor::None, text);
+```
+
+However even with a set maximum length, user input should still be validated 
+because it is easy to bypass client-side checks.
+
 #### Graph
 
 ![graph](https://github.com/s00500/ESPUI/blob/master/docs/ui_graph.png)
