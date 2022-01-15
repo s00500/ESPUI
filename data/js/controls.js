@@ -730,11 +730,11 @@ var addToHTML = function(data) {
   } else {
     //We are adding to an existing panel so we only need the HTML for the element
     var parent = $("#id" + data.parentControl);
-    parent.append(elementHTML(data.type, data.id, data.value, elementStyle));
+    parent.append(elementHTML(data.type, data.id, data.value, data.label, elementStyle));
   }
 }
 
-var elementHTML = function(type, id, value, elementStyle) {
+var elementHTML = function(type, id, value, label, elementStyle) {
   switch(type) {
     case UI_LABEL:
       return "<span id='l" + id + "' " + elementStyle + 
