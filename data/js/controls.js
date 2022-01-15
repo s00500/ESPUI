@@ -716,7 +716,7 @@ var addToHTML = function(data) {
       case UI_ACCEL:
         html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
         colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
-        elementHTML(data.type, data.id, data.value, elementStyle) +
+        elementHTML(data.type, data.id, data.value, data.label, elementStyle) +
         "</div>";
         break;
       case UI_SEPARATOR:
