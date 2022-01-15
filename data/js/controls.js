@@ -591,6 +591,10 @@ function start() {
 function sliderchange(number) {
   var val = $("#sl" + number).val();
   websock.send("slvalue:" + val + ":" + number);
+
+  $(".range-slider__range").each(function(){ 
+    $(this).attr("value", $(this)[0].value);
+  });
 }
 
 function numberchange(number) {
