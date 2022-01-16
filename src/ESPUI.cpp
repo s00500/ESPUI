@@ -906,6 +906,10 @@ void ESPUIClass::updateLabel(uint16_t id, const String& value)
     updateControlValue(id, value);
 }
 
+void ESPUIClass::updateButton(uint16_t id, const String& value) {
+    updateControlValue(id, value);
+}
+
 void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId)
 {
     updateControlValue(id, String(nValue), clientId);

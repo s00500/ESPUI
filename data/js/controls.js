@@ -537,6 +537,7 @@ function start() {
 
       case UPDATE_BUTTON:
         $("#btn" + data.id).val(data.value);
+        $("#btn" + data.id).text(data.value);
         if(data.hasOwnProperty('elementStyle')) {
           $("#btn" + data.id).attr("style", data.elementStyle);
         }

@@ -279,6 +279,7 @@ public:
 
     void print(uint16_t id, const String& value);
     void updateLabel(uint16_t id, const String& value);
+    void updateButton(uint16_t id, const String& value);
     void updateSwitcher(uint16_t id, bool nValue, int clientId = -1);
     void updateSlider(uint16_t id, int nValue, int clientId = -1);
     void updateNumber(uint16_t id, int nValue, int clientId = -1);
