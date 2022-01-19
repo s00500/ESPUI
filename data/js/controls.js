@@ -102,6 +102,7 @@ function colorClass(colorId) {
     case C_ALIZARIN:
       return "alizarin";
 
+    case C_DARK:
     case C_NONE:
       return "dark";
     default:
@@ -252,6 +253,13 @@ function start() {
           };
           handleEvent(fauxEvent);
         });
+
+        //If there are more elements in the complete UI, then request them
+        //Note: we subtract 1 from data.controls.length because the controls always
+        //includes the title element
+        if(data.totalcontrols > (data.controls.length - 1)) {
+          websock.send("uiok:" + (data.controls.length - 1));
+        }
         break;
 
       case UI_EXTEND_GUI:
@@ -261,6 +269,11 @@ function start() {
           };
           handleEvent(fauxEvent);
         });
+
+        //Do we need to keep requesting more UI elements?
+        if(data.totalcontrols > data.startindex + (data.controls.length - 1)) {
+          websock.send("uiok:" + (data.startindex + (data.controls.length - 1)));
+        }
         break;
       
       case UI_RELOAD:
@@ -428,7 +441,13 @@ function start() {
         if (data.parentControl) {
           var parent = $("#id" + data.parentControl + " input");
           if (parent.size()) {
-            parent.attr("max", data.value);
+            if(!parent.attr("type")) {
+              //type is not set so therefore it is a text input
+              parent.attr("maxlength", data.value);
+            } else {
+              //type might be range (slider) or number
+              parent.attr("max", data.value);
+            }
           }
         }
         break;
@@ -488,6 +507,7 @@ function start() {
         break;
 
       case UPDATE_SLIDER:
+        $("#sl" + data.id).attr("value", data.value)
         slider_move($("#id" + data.id), data.value, "100", false);
         if(data.hasOwnProperty('elementStyle')) {
           $("#sl" + data.id).attr("style", data.elementStyle);
@@ -516,6 +536,12 @@ function start() {
         break;
 
       case UPDATE_BUTTON:
+        $("#btn" + data.id).val(data.value);
+        if(data.hasOwnProperty('elementStyle')) {
+          $("#btn" + data.id).attr("style", data.elementStyle);
+        }
+        break;
+      
       case UPDATE_PAD:
       case UPDATE_CPAD:
         break;
@@ -565,6 +591,10 @@ function start() {
 function sliderchange(number) {
   var val = $("#sl" + number).val();
   websock.send("slvalue:" + val + ":" + number);
+
+  $(".range-slider__range").each(function(){ 
+    $(this).attr("value", $(this)[0].value);
+  });
 }
 
 function numberchange(number) {
@@ -619,7 +649,7 @@ function padclick(type, number, isdown) {
 
 function switcher(number, state) {
   if (state == null) {
-    if ($("#s" + number).is(":checked")) {
+    if (!$("#sl" + number).hasClass("checked")) {
       websock.send("sactive:" + number);
       $("#sl" + number).addClass("checked");
     } else {
@@ -686,7 +716,7 @@ var addToHTML = function(data) {
       case UI_ACCEL:
         html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
         colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
-        elementHTML(data.type, data.id, data.value, elementStyle) +
+        elementHTML(data.type, data.id, data.value, data.label, elementStyle) +
         "</div>";
         break;
       case UI_SEPARATOR:
@@ -700,11 +730,11 @@ var addToHTML = function(data) {
   } else {
     //We are adding to an existing panel so we only need the HTML for the element
     var parent = $("#id" + data.parentControl);
-    parent.append(elementHTML(data.type, data.id, data.value, elementStyle));
+    parent.append(elementHTML(data.type, data.id, data.value, data.label, elementStyle));
   }
 }
 
-var elementHTML = function(type, id, value, elementStyle) {
+var elementHTML = function(type, id, value, label, elementStyle) {
   switch(type) {
     case UI_LABEL:
       return "<span id='l" + id + "' " + elementStyle + 

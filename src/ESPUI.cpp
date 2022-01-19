@@ -422,7 +422,7 @@ void onWsEvent(
         }
 #endif
 
-        ESPUI.jsonDom(client);
+        ESPUI.jsonDom(0, client);
 
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
@@ -442,142 +442,149 @@ void onWsEvent(
             msg += (char)data[i];
         }
 
-        uint16_t id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
-
-#if defined(DEBUG_ESPUI)
-        if (ESPUI.verbosity >= Verbosity::VerboseJSON)
+        if (msg.startsWith(F("uiok:")))
         {
-            Serial.print(F("WS rec: "));
-            Serial.println(msg);
-            Serial.print(F("WS recognised ID: "));
-            Serial.println(id);
-        }
-#endif
-
-        Control* c = ESPUI.getControl(id);
-
-        if (c == nullptr)
+            int idx = msg.substring(msg.indexOf(':') + 1).toInt();
+            ESPUI.jsonDom(idx);
+        } else 
         {
-#if defined(DEBUG_ESPUI)
-            if (ESPUI.verbosity)
+            uint16_t id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
+
+    #if defined(DEBUG_ESPUI)
+            if (ESPUI.verbosity >= Verbosity::VerboseJSON)
             {
-                Serial.print(F("No control found for ID "));
+                Serial.print(F("WS rec: "));
+                Serial.println(msg);
+                Serial.print(F("WS recognised ID: "));
                 Serial.println(id);
             }
-#endif
+    #endif
 
-            return;
-        }
+            Control* c = ESPUI.getControl(id);
 
-        if (c->callback == nullptr)
-        {
-#if defined(DEBUG_ESPUI)
-            if (ESPUI.verbosity)
+            if (c == nullptr)
             {
-                Serial.print(F("No callback found for ID "));
-                Serial.println(id);
+    #if defined(DEBUG_ESPUI)
+                if (ESPUI.verbosity)
+                {
+                    Serial.print(F("No control found for ID "));
+                    Serial.println(id);
+                }
+    #endif
+
+                return;
             }
-#endif
 
-            return;
-        }
-
-        if (msg.startsWith(F("bdown:")))
-        {
-            c->callback(c, B_DOWN);
-        }
-        else if (msg.startsWith(F("bup:")))
-        {
-            c->callback(c, B_UP);
-        }
-        else if (msg.startsWith(F("pfdown:")))
-        {
-            c->callback(c, P_FOR_DOWN);
-        }
-        else if (msg.startsWith(F("pfup:")))
-        {
-            c->callback(c, P_FOR_UP);
-        }
-        else if (msg.startsWith(F("pldown:")))
-        {
-            c->callback(c, P_LEFT_DOWN);
-        }
-        else if (msg.startsWith(F("plup:")))
-        {
-            c->callback(c, P_LEFT_UP);
-        }
-        else if (msg.startsWith(F("prdown:")))
-        {
-            c->callback(c, P_RIGHT_DOWN);
-        }
-        else if (msg.startsWith(F("prup:")))
-        {
-            c->callback(c, P_RIGHT_UP);
-        }
-        else if (msg.startsWith(F("pbdown:")))
-        {
-            c->callback(c, P_BACK_DOWN);
-        }
-        else if (msg.startsWith(F("pbup:")))
-        {
-            c->callback(c, P_BACK_UP);
-        }
-        else if (msg.startsWith(F("pcdown:")))
-        {
-            c->callback(c, P_CENTER_DOWN);
-        }
-        else if (msg.startsWith(F("pcup:")))
-        {
-            c->callback(c, P_CENTER_UP);
-        }
-        else if (msg.startsWith(F("sactive:")))
-        {
-            c->value = "1";
-            ESPUI.updateControl(c, client->id());
-            c->callback(c, S_ACTIVE);
-        }
-        else if (msg.startsWith(F("sinactive:")))
-        {
-            c->value = "0";
-            ESPUI.updateControl(c, client->id());
-            c->callback(c, S_INACTIVE);
-        }
-        else if (msg.startsWith(F("slvalue:")))
-        {
-            c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
-            ESPUI.updateControl(c, client->id());
-            c->callback(c, SL_VALUE);
-        }
-        else if (msg.startsWith(F("nvalue:")))
-        {
-            c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
-            ESPUI.updateControl(c, client->id());
-            c->callback(c, N_VALUE);
-        }
-        else if (msg.startsWith(F("tvalue:")))
-        {
-            c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
-            ESPUI.updateControl(c, client->id());
-            c->callback(c, T_VALUE);
-        }
-        else if (msg.startsWith("tabvalue:"))
-        {
-            c->callback(c, client->id());
-        }
-        else if (msg.startsWith(F("svalue:")))
-        {
-            c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
-            ESPUI.updateControl(c, client->id());
-            c->callback(c, S_VALUE);
-        }
-        else
-        {
-#if defined(DEBUG_ESPUI)
-            if (ESPUI.verbosity)
+            if (c->callback == nullptr)
             {
-                Serial.println(F("Malformated message from the websocket"));
+    #if defined(DEBUG_ESPUI)
+                if (ESPUI.verbosity)
+                {
+                    Serial.print(F("No callback found for ID "));
+                    Serial.println(id);
+                }
+    #endif
+
+                return;
             }
-#endif
+
+            if (msg.startsWith(F("bdown:")))
+            {
+                c->callback(c, B_DOWN);
+            }
+            else if (msg.startsWith(F("bup:")))
+            {
+                c->callback(c, B_UP);
+            }
+            else if (msg.startsWith(F("pfdown:")))
+            {
+                c->callback(c, P_FOR_DOWN);
+            }
+            else if (msg.startsWith(F("pfup:")))
+            {
+                c->callback(c, P_FOR_UP);
+            }
+            else if (msg.startsWith(F("pldown:")))
+            {
+                c->callback(c, P_LEFT_DOWN);
+            }
+            else if (msg.startsWith(F("plup:")))
+            {
+                c->callback(c, P_LEFT_UP);
+            }
+            else if (msg.startsWith(F("prdown:")))
+            {
+                c->callback(c, P_RIGHT_DOWN);
+            }
+            else if (msg.startsWith(F("prup:")))
+            {
+                c->callback(c, P_RIGHT_UP);
+            }
+            else if (msg.startsWith(F("pbdown:")))
+            {
+                c->callback(c, P_BACK_DOWN);
+            }
+            else if (msg.startsWith(F("pbup:")))
+            {
+                c->callback(c, P_BACK_UP);
+            }
+            else if (msg.startsWith(F("pcdown:")))
+            {
+                c->callback(c, P_CENTER_DOWN);
+            }
+            else if (msg.startsWith(F("pcup:")))
+            {
+                c->callback(c, P_CENTER_UP);
+            }
+            else if (msg.startsWith(F("sactive:")))
+            {
+                c->value = "1";
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, S_ACTIVE);
+            }
+            else if (msg.startsWith(F("sinactive:")))
+            {
+                c->value = "0";
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, S_INACTIVE);
+            }
+            else if (msg.startsWith(F("slvalue:")))
+            {
+                c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, SL_VALUE);
+            }
+            else if (msg.startsWith(F("nvalue:")))
+            {
+                c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, N_VALUE);
+            }
+            else if (msg.startsWith(F("tvalue:")))
+            {
+                c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, T_VALUE);
+            }
+            else if (msg.startsWith("tabvalue:"))
+            {
+                c->callback(c, client->id());
+            }
+            else if (msg.startsWith(F("svalue:")))
+            {
+                c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, S_VALUE);
+            }
+            else
+            {
+    #if defined(DEBUG_ESPUI)
+                if (ESPUI.verbosity)
+                {
+                    Serial.println(F("Malformated message from the websocket"));
+                }
+    #endif
+            }
         }
     }
     break;
@@ -608,6 +615,8 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
         iterator->next = control;
     }
 
+    this->controlCount++;
+
     return control->id;
 }
 
@@ -622,13 +631,14 @@ bool ESPUIClass::removeControl(uint16_t id, bool force_reload_ui)
     {
         this->controls = it->next;
         delete it;
+        this->controlCount--;
         if (force_reload_ui)
         {
             jsonReload();
         }
         else
         {
-            jsonDom();
+            jsonDom(0);
         }
         return true;
     }
@@ -644,13 +654,14 @@ bool ESPUIClass::removeControl(uint16_t id, bool force_reload_ui)
     {
         it->next = it_next->next;
         delete it_next;
+        this->controlCount--;
         if (force_reload_ui)
         {
             jsonReload();
         }
         else
         {
-            jsonDom(); // resends to all
+            jsonDom(0); // resends to all
         }
         return true;
     }
@@ -748,6 +759,11 @@ Control* ESPUIClass::getControl(uint16_t id)
 void ESPUIClass::updateControl(Control* control, int clientId)
 {
     if (!control)
+    {
+        return;
+    }
+
+    if (this->ws == nullptr)
     {
         return;
     }
@@ -977,61 +993,79 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
         tryId++;
     }
 }
+
 /*
-Convert & Transfer Arduino elements to JSON elements
-Initially this function used to send the control element data individually.
-Due to a change in the ESPAsyncWebserver library this had top be changed to be
-sent as one blob at the beginning. Therefore a new type is used as well
+Convert & Transfer Arduino elements to JSON elements. This function sends a chunk of 
+JSON describing the controls of the UI, starting from the control at index startidx.
+If startidx is 0 then a UI_INITIAL_GUI message will be sent, else a UI_EXTEND_GUI.
+Both message types contain a list of serialised UI elements. Only a portion of the UI
+will be sent in order to avoid websocket buffer overflows. The client will acknowledge 
+receipt of a partial message by requesting the next chunk of UI.
+
+The protocol is:
+SERVER: jsonDom(0): 
+    "UI_INITIAL_GUI: n serialised UI elements"
+CLIENT: controls.js:handleEvent()
+    "uiok:n"
+SERVER: jsonDom(n):
+    "UI_EXTEND_GUI: n serialised UI elements"
+CLIENT: controls.js:handleEvent()
+    "uiok:2*n"
+etc. 
 */
-void ESPUIClass::jsonDom(AsyncWebSocketClient* client)
+void ESPUIClass::jsonDom(uint16_t startidx, AsyncWebSocketClient* client)
 {
+    if(startidx >= this->controlCount)
+    {
+        return;
+    }
 
     DynamicJsonDocument document(jsonInitialDocumentSize);
-    document["type"] = (int)UI_INITIAL_GUI;
+    document["type"] = startidx ? (int)UI_EXTEND_GUI : (int)UI_INITIAL_GUI;
     document["sliderContinuous"] = sliderContinuous;
+    document["startindex"] = startidx;
+    document["totalcontrols"] = this->controlCount;
     JsonArray items = document.createNestedArray("controls");
-
-    Control* control = this->controls;
-
     JsonObject titleItem = items.createNestedObject();
     titleItem["type"] = (int)UI_TITLE;
     titleItem["label"] = ui_title;
 
-    while (1)
-    {
-        control = prepareJSONChunk(client, control, &items);
+    prepareJSONChunk(client, startidx, &items);
 
-        String json;
-        serializeJson(document, json);
+    String json;
+    serializeJson(document, json);
 #if defined(DEBUG_ESPUI)
-        if (this->verbosity >= Verbosity::VerboseJSON)
-        {
-            Serial.println("Sending elements --------->");
-            Serial.println(json);
-        }
-#endif
-        if (client != nullptr)
-            client->text(json);
-        else
-            this->ws->textAll(json);
-
-        if (control == nullptr)
-            break;
-
-        document.clear();
-        items.clear();
-        document["type"] = (int)UI_EXTEND_GUI;
-        items = document.createNestedArray("controls");
+    if (this->verbosity >= Verbosity::VerboseJSON)
+    {
+        Serial.println("Sending elements --------->");
+        Serial.println(json);
     }
+#endif
+    if (client != nullptr)
+        client->text(json);
+    else
+        this->ws->textAll(json);
 }
 
 /* Prepare a chunk of elements as a single JSON string. If the allowed number of elements is greater than the total
-number this will represent the entire UI and this function will return null. If a control pointer is returned then the
-limit was reached, the currently serialised must be sent, and then processing resumed to send the next chunk. */
-Control* ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* control, JsonArray* items)
+number this will represent the entire UI. More likely, it will represent a small section of the UI to be sent. The client
+will acknoledge receipt by requesting the next chunk. */
+void ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startindex, JsonArray* items)
 {
-    int elementcount = 0;
+    //First check that there will be sufficient nodes in the list
+    if(startindex >= this->controlCount) 
+    {
+        return;
+    }
 
+    //Follow the list until control points to the startindex'th node
+    Control* control = this->controls;
+    for(auto i = 0; i < startindex; i++) {
+        control = control->next;
+    }
+
+    //To prevent overflow, keep track of the number of elements we have serialised into this message
+    int elementcount = 0;
     while (control != nullptr && elementcount < 10)
     {
         JsonObject item = items->createNestedObject();
@@ -1071,7 +1105,7 @@ Control* ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, Control* con
         control = control->next;
         elementcount++;
     }
-    return control;
+    return;
 }
 
 void ESPUIClass::jsonReload()

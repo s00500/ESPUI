@@ -259,6 +259,12 @@ A number box needs to have a min and a max value. To set it up just use:
 
 `ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);`
 
+Note that HTML number boxes will respect their min and max when the user
+clicks the up and down arrows, but it is possible on most clients to simply type 
+any number in. As with all user input, numbers should be validated in callback code
+because all client side checks can be skipped. If any value from the UI might
+cause a problem, validate it.
+
 #### Text Input
 
 ![text](https://github.com/s00500/ESPUI/blob/master/docs/ui_text.png)
@@ -266,6 +272,17 @@ A number box needs to have a min and a max value. To set it up just use:
 The textinput works very similar like the number input but with a string. You
 can enter a String into it and when you are done with your change it is sent to
 the ESP.
+
+If you attach a Max control to the text input then a max length will be applied
+to the control. 
+
+```
+ text = ESPUI.text("Label", callback, ControlColor::Dark, "Initial value");
+ ESPUI.addControl(ControlType::Max, "", "32", ControlColor::None, text);
+```
+
+However even with a set maximum length, user input should still be validated 
+because it is easy to bypass client-side checks. Never trust user input.
 
 #### Graph
 

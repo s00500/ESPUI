@@ -298,7 +298,7 @@ public:
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
     Control* controls = nullptr;
     void jsonReload();
-    void jsonDom(AsyncWebSocketClient* client = nullptr);
+    void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr);
 
     Verbosity verbosity;
 
@@ -310,7 +310,9 @@ private:
     const char* basicAuthPassword = nullptr;
     bool basicAuth = true;
 
-    Control* prepareJSONChunk(AsyncWebSocketClient* client, Control* control, JsonArray* items);
+    uint16_t controlCount = 0;
+
+    void prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startindex, JsonArray* items);
 };
 
 extern ESPUIClass ESPUI;
