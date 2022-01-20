@@ -576,6 +576,12 @@ void onWsEvent(
                 ESPUI.updateControl(c, client->id());
                 c->callback(c, S_VALUE);
             }
+            else if (msg.startsWith(F("time:")))
+            {
+                c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, TM_VALUE);
+            }
             else
             {
     #if defined(DEBUG_ESPUI)
@@ -938,6 +944,11 @@ void ESPUIClass::updateSelect(uint16_t id, const String& text, int clientId)
 void ESPUIClass::updateGauge(uint16_t id, int number, int clientId)
 {
     updateControlValue(id, String(number), clientId);
+}
+
+void ESPUIClass::updateTime(uint16_t id, int clientId) 
+{
+    updateControl(id, clientId);
 }
 
 void ESPUIClass::clearGraph(uint16_t id, int clientId) { }
