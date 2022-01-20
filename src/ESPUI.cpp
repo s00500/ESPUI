@@ -445,7 +445,7 @@ void onWsEvent(
         if (msg.startsWith(F("uiok:")))
         {
             int idx = msg.substring(msg.indexOf(':') + 1).toInt();
-            ESPUI.jsonDom(idx);
+            ESPUI.jsonDom(idx, client);
         } else 
         {
             uint16_t id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
