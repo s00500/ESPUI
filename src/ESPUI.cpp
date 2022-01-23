@@ -445,7 +445,7 @@ void onWsEvent(
         if (msg.startsWith(F("uiok:")))
         {
             int idx = msg.substring(msg.indexOf(':') + 1).toInt();
-            ESPUI.jsonDom(idx);
+            ESPUI.jsonDom(idx, client);
         } else 
         {
             uint16_t id = msg.substring(msg.lastIndexOf(':') + 1).toInt();
@@ -575,6 +575,12 @@ void onWsEvent(
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
                 c->callback(c, S_VALUE);
+            }
+            else if (msg.startsWith(F("time:")))
+            {
+                c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
+                ESPUI.updateControl(c, client->id());
+                c->callback(c, TM_VALUE);
             }
             else
             {
@@ -906,6 +912,10 @@ void ESPUIClass::updateLabel(uint16_t id, const String& value)
     updateControlValue(id, value);
 }
 
+void ESPUIClass::updateButton(uint16_t id, const String& value) {
+    updateControlValue(id, value);
+}
+
 void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId)
 {
     updateControlValue(id, String(nValue), clientId);
@@ -934,6 +944,11 @@ void ESPUIClass::updateSelect(uint16_t id, const String& text, int clientId)
 void ESPUIClass::updateGauge(uint16_t id, int number, int clientId)
 {
     updateControlValue(id, String(number), clientId);
+}
+
+void ESPUIClass::updateTime(uint16_t id, int clientId) 
+{
+    updateControl(id, clientId);
 }
 
 void ESPUIClass::clearGraph(uint16_t id, int clientId) { }

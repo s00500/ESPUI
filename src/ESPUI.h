@@ -56,6 +56,7 @@ enum ControlType : uint8_t
     Gauge,
     Accel,
     Separator,
+    Time,
 
     UpdateOffset = 100,
     UpdatePad = 101,
@@ -76,6 +77,7 @@ enum ControlType : uint8_t
     UpdateGauge,
     UpdateAccel,
     UpdateSeparator,
+    UpdateTime,
 
     InitialGui = 200,
     Reload = 201,
@@ -199,6 +201,7 @@ private:
 #define N_VALUE 9
 #define T_VALUE 10
 #define S_VALUE 11
+#define TM_VALUE 12
 
 enum Verbosity : uint8_t
 {
@@ -279,12 +282,14 @@ public:
 
     void print(uint16_t id, const String& value);
     void updateLabel(uint16_t id, const String& value);
+    void updateButton(uint16_t id, const String& value);
     void updateSwitcher(uint16_t id, bool nValue, int clientId = -1);
     void updateSlider(uint16_t id, int nValue, int clientId = -1);
     void updateNumber(uint16_t id, int nValue, int clientId = -1);
     void updateText(uint16_t id, const String& nValue, int clientId = -1);
     void updateSelect(uint16_t id, const String& nValue, int clientId = -1);
     void updateGauge(uint16_t id, int number, int clientId);
+    void updateTime(uint16_t id, int clientId = -1);
 
     void clearGraph(uint16_t id, int clientId = -1);
     void addGraphPoint(uint16_t id, int nValue, int clientId = -1);

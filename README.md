@@ -466,6 +466,35 @@ This can be applied to every element to force a single column layout, or to indi
 
 Note that this will have no effect on small screens.
 
+### Advanced: Getting the Time
+
+ESPUI can create an invisible control that can be used to fetch the current time from the client when they are connected to the UI. This could be used to intermittently provide an accurate time source to your ESP. Remember that clients cannot be relied upon to be correct or truthful. If this is not a concern, you can do the following:
+
+```
+//Add the invisible "Time" control
+auto timeId = ESPUI.addControl(Time, "", "", None, 0, timeCallback);
+```
+
+After creating the UI, sending an update to the Time control will cause it to fetch the current time from the client and then fire its callback with the result.
+
+```
+//Request an update to the time
+ESPUI.updateTime(timeId);
+//Will trigger timeCallback
+``` 
+
+In `timeCallback` you can then print the control's value as normal:
+
+```
+void timeCallback(Control *sender, int type) {
+  if(type == TM_VALUE) { 
+    Serial.println(sender->value);
+  }
+}
+```
+
+The returned string will be an [ISO string](https://www.w3schools.com/jsref/jsref_toisostring.asp) as returned by the Javascript `new Date().toISOString()`. The format is `YYYY-MM-DDTHH:mm:ss.sssZ` so for example: `2022-01-20T21:44:22.913Z`.
+
 # Notes for Development
 
 If you want to work on the HTML/CSS/JS files, do make changes in the _data_

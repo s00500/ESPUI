@@ -57,6 +57,9 @@ const UPDATE_ACCEL = 118;
 const UI_SEPARATOR = 19;
 const UPDATE_SEPARATOR = 119;
 
+const UI_TIME = 20;
+const UPDATE_TIME = 120;
+
 const UP = 0;
 const DOWN = 1;
 const LEFT = 2;
@@ -537,6 +540,7 @@ function start() {
 
       case UPDATE_BUTTON:
         $("#btn" + data.id).val(data.value);
+        $("#btn" + data.id).text(data.value);
         if(data.hasOwnProperty('elementStyle')) {
           $("#btn" + data.id).attr("style", data.elementStyle);
         }
@@ -552,6 +556,11 @@ function start() {
         }
         break;
       case UPDATE_ACCEL:
+        break;
+
+      case UPDATE_TIME:
+        var rv = new Date().toISOString();
+        websock.send("time:" + rv + ":" + data.id);
         break;
 
       default:
@@ -722,6 +731,9 @@ var addToHTML = function(data) {
       case UI_SEPARATOR:
         html = "<div id='id" + data.id + "' " + panelStyle + " class='sectionbreak columns'>" +
         "<h5>" + data.label + "</h5><hr/></div>";
+        break;
+      case UI_TIME:
+        //Invisible element
         break;
     }
 
