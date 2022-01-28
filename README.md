@@ -453,7 +453,7 @@ You can get quite creative with this.
 
 ![Inline Styles](docs/inlinestyles.gif)
 
-The **completeExample** example includes a range of examples that you can do with inline styles.
+The [completeExample](examples/completeExample/completeExample.cpp) example includes a range of things that you can do with inline styles.
 
 ![More Inline Styles](docs/ui_inlinestyles2.png)
 
@@ -483,9 +483,26 @@ is purely visual.
 Most controls can be grouped this way, but the result is not always visually pleasant. This works best with labels, sliders, switchers,
 and buttons.
 
-![Other grouped elements](docs/ui_groupedbuttons2.png)
+![Other grouped controls](docs/ui_groupedbuttons2.png)
 
-If you group too many elements it might throw the layout of the rest of the UI out of line. Consider adding separators to correct this.
+For sliders and switchers, you can also set the controls to be displayed vertically.
+
+```
+auto vertswitcher = ESPUI.addControl(Switcher, "Vertical Switcher", "0", Dark, tab1);
+ESPUI.setVertical(vertswitcher); 
+```
+
+This must be done before `ESPUI.begin()` is called. Vertical layouts are currently only supported for sliders and switchers, and it 
+is a purely visual change. Behaviour is identical. Mixing horizontal and vertical controls can result in some unpredictable layouts.
+
+When you add multiple buttons to a single panel, the buttons have a title so they can be differentiated. For sliders and switchers this is
+not the case. Therefore you might want to add additional labels so that the controls can be distinguished. There is not yet automatic 
+support for doing this, so the approach is to add labels that have been styled using [inline styles](#inline-styles). By doing this 
+you can acheieve effects such as this:
+
+![Labelling grouped controls](docs/ui_groupedbuttons3.png)
+
+The code to do this is in the [completeExample](examples/completeExample/completeExample.cpp) example.
 
 ### Wide controls
 
