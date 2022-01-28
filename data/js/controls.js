@@ -575,6 +575,13 @@ function start() {
         $("#id" + data.id).attr("style", data.panelStyle);
       }
 
+      if(data.hasOwnProperty('visible')) {
+        if(data['visible']) 
+          $("#id" + data.id).show();
+        else
+          $("#id" + data.id).hide();
+      }
+
       if (data.type == UPDATE_SLIDER) {
         element.removeClass(
           "slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin"

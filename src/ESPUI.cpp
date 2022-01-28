@@ -910,6 +910,15 @@ void ESPUIClass::updateControlValue(uint16_t id, const String& value, int client
     updateControlValue(control, value, clientId);
 }
 
+void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId) {
+    Control* control = getControl(id);
+    if(control)
+    {
+        control->visible = visibility;
+        updateControl(id);
+    }
+}
+
 void ESPUIClass::print(uint16_t id, const String& value)
 {
     updateControlValue(id, value);

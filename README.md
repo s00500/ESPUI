@@ -35,6 +35,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - [Log output](#log-output)
 - [Colours](#colours)
 - [Advanced Features](#advanced-features)
+  * [Dynamic Visibility](#dynamic-visibility)
   * [Inline Styles](#inline-styles)
   * [Grouped controls](#grouped-controls)
   * [Wide controls](#wide-controls)
@@ -421,6 +422,17 @@ If you want more control over the UI design, see the Inline Styles section below
 ## Advanced Features
 
 ESPUI includes a range of advanced features that can customise your UIs.
+
+
+### Dynamic Visibility
+
+Cotrols can be made visible or invisible at runtime with the `updateVisibility()` function.
+
+```
+ESPUI.updateVisibility(controlId, false);
+```
+
+Note that you cannot hide individual controls from a [control group](#grouped-controls), you have to hide the entire group.
 
 
 ### Inline Styles

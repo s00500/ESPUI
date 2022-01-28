@@ -301,6 +301,7 @@ public:
 
     void setPanelWide(uint16_t id, bool wide);
     void setVertical(uint16_t id, bool vert = true);
+    void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
