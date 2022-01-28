@@ -3,7 +3,7 @@
  * @author Ian Gray @iangray1000
  * 
  * This is an example GUI to show off all of the features of ESPUI. 
- * This can be built using the Arduino IDE, or Platform IO.
+ * This can be built using the Arduino IDE, or PlatformIO.
  * 
  * ---------------------------------------------------------------------------------------
  * If you just want to see examples of the ESPUI code, jump down to the setUpUI() function
@@ -56,65 +56,6 @@ uint16_t mainLabel, mainSwitcher, mainSlider, mainText, mainNumber, mainScramble
 uint16_t styleButton, styleLabel, styleSwitcher, styleSlider, styleButton2, styleLabel2, styleSlider2;
 uint16_t graph;
 volatile bool updates = false;
-
-
-
-void setup() {
-	randomSeed(0);
-	Serial.begin(115200);
-	while(!Serial);
-	if(SLOW_BOOT) delay(5000); //Delay booting to give time to connect a serial monitor
-	connectWifi();
-	#if defined(ESP32)
-		WiFi.setSleep(false); //For the ESP32: turn off sleeping to increase UI responsivness (at the cost of power use)
-	#endif
-	setUpUI();
-}
-
-void loop() {
-	static long unsigned lastTime = 0;
-
-	//Send periodic updates if switcher is turned on
-	if(updates && millis() > lastTime + 500) {
-		static uint16_t sliderVal = 10;
-
-		//Flick this switcher on and off
-		ESPUI.updateSwitcher(mainSwitcher, ESPUI.getControl(mainSwitcher)->value.toInt() ? false : true);
-		sliderVal += 10;
-		if(sliderVal > 400) sliderVal = 10;
-
-		//Sliders, numbers, and labels can all be updated at will
-		ESPUI.updateSlider(mainSlider, sliderVal);
-		ESPUI.updateNumber(mainNumber, random(100000));
-		ESPUI.updateLabel(mainLabel, String(sliderVal));
-		lastTime = millis();
-	}
-
-	//Simple debug UART interface
-	if(Serial.available()) {
-		switch(Serial.read()) {
-			case 'w': //Print IP details
-				Serial.println(WiFi.localIP());
-				break;
-			case 'W': //Reconnect wifi
-				connectWifi();
-				break;
-			case 'C': //Force a crash (for testing exception decoder)
-				#if !defined(ESP32)
-					((void (*)())0xf00fdead)();
-				#endif
-			default:
-				Serial.print('#');
-				break;
-		}
-	}
-
-	#if !defined(ESP32)
-		//We don't need to call this explicitly on ESP32 but we do on 8266
-		MDNS.update();
-	#endif
-
-}
 
 
 
@@ -221,7 +162,7 @@ void setUpUI() {
 	/*
 	 * Tab: Grouped controls
 	 * This tab shows how multiple control can be grouped into the same panel through the use of the
-	 * parentControl value.
+	 * parentControl value. This also shows how to add labels to grouped controls, and how to use vertical controls.
 	 *-----------------------------------------------------------------------------------------------------------*/
 	auto grouptab = ESPUI.addControl(Tab, "", "Grouped controls");
 
@@ -232,29 +173,36 @@ void setUpUI() {
 	ESPUI.addControl(Button, "", "Button B", Alizarin, groupbutton, generalCallback);
 	ESPUI.addControl(Button, "", "Button C", Alizarin, groupbutton, generalCallback);
 
+
 	//Sliders can be grouped as well
+	//To label each slider in the group, we are going add additional labels and give them custom CSS styles
+	//We need this CSS style rule, which will remove the label's background and ensure that it takes up the entire width of the panel
 	String clearLabelStyle = "background-color: unset; width: 100%;";
+	//First we add the main slider to create a panel
 	auto groupsliders = ESPUI.addControl(Slider, "Slider Group", "10", Dark, grouptab, generalCallback);
+	//Then we add a label and set its style to the clearLabelStyle. Here we've just given it the name "A"
 	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "A", None, groupsliders), clearLabelStyle);
+	//We can now continue to add additional sliders and labels
 	ESPUI.addControl(Slider, "", "20", None, groupsliders, generalCallback);
 	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "B", None, groupsliders), clearLabelStyle);
 	ESPUI.addControl(Slider, "", "30", None, groupsliders, generalCallback);
 	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "C", None, groupsliders), clearLabelStyle);
 
-	//We can put 4 switchers next to each other, but as they lack labels it can be hard to see
-	//which is which. We can add labels to them with some label controls and styling.
+	//We can also usefully group switchers.
 	auto groupswitcher = ESPUI.addControl(Switcher, "Switcher Group", "0", Dark, grouptab, generalCallback);
 	ESPUI.addControl(Switcher, "", "1", Sunflower, groupswitcher, generalCallback);
 	ESPUI.addControl(Switcher, "", "0", Sunflower, groupswitcher, generalCallback);
 	ESPUI.addControl(Switcher, "", "1", Sunflower, groupswitcher, generalCallback);
-	//This label does nothing apart from put the next 4 onto the next line
+	//To label these switchers we need to first go onto a "new line" below the line of switchers
+	//To do this we add an empty label set to be clear and full width (with our clearLabelStyle)
 	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "", None, groupswitcher), clearLabelStyle);
-	//They are set to the same width as a switcher so appear below them
-	String labelStyle = "width: 60px; margin-left: .3rem; margin-right: .3rem; background-color: unset;";
-	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "A", None, groupswitcher), labelStyle);
-	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "B", None, groupswitcher), labelStyle);
-	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "C", None, groupswitcher), labelStyle);
-	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "D", None, groupswitcher), labelStyle);
+	//We will now need another label style. This one sets its width to the same as a switcher (and turns off the background)
+	String switcherLabelStyle = "width: 60px; margin-left: .3rem; margin-right: .3rem; background-color: unset;";
+	//We can now just add the styled labels.
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "A", None, groupswitcher), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "B", None, groupswitcher), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "C", None, groupswitcher), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "D", None, groupswitcher), switcherLabelStyle);
 
 	//You can mix and match different control types, but the results might sometimes
 	//need additional styling to lay out nicely.
@@ -272,14 +220,26 @@ void setUpUI() {
 	ESPUI.setVertical(ESPUI.addControl(Switcher, "", "0", None, vertgroupswitcher, generalCallback));
 	ESPUI.setVertical(ESPUI.addControl(Switcher, "", "0", None, vertgroupswitcher, generalCallback));
 	ESPUI.setVertical(ESPUI.addControl(Switcher, "", "0", None, vertgroupswitcher, generalCallback));
+	//The mechanism for labelling vertical switchers is the same as we used above for horizontal ones
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "", None, vertgroupswitcher), clearLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "A", None, vertgroupswitcher), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "B", None, vertgroupswitcher), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "C", None, vertgroupswitcher), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "D", None, vertgroupswitcher), switcherLabelStyle);
 
 	auto vertgroupslider = ESPUI.addControl(Slider, "Vertical Slider Group", "15", Dark, grouptab, generalCallback);
 	ESPUI.setVertical(vertgroupslider);
 	ESPUI.setVertical(ESPUI.addControl(Slider, "", "25", None, vertgroupslider, generalCallback));
 	ESPUI.setVertical(ESPUI.addControl(Slider, "", "35", None, vertgroupslider, generalCallback));
 	ESPUI.setVertical(ESPUI.addControl(Slider, "", "45", None, vertgroupslider, generalCallback));
-	//Note that combining vertical and horizontal sliders is going to result in very messy layout!
+	//The mechanism for labelling vertical sliders is the same as we used above for switchers
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "", None, vertgroupslider), clearLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "A", None, vertgroupslider), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "B", None, vertgroupslider), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "C", None, vertgroupslider), switcherLabelStyle);
+	ESPUI.setElementStyle(ESPUI.addControl(Label, "", "D", None, vertgroupslider), switcherLabelStyle);
 
+	//Note that combining vertical and horizontal sliders is going to result in very messy layout!
 
 	/*
 	 * Tab: Example UI
@@ -399,6 +359,67 @@ void generalCallback(Control *sender, int type) {
 	Serial.print("' = ");
 	Serial.println(sender->value);
 }
+
+
+
+void setup() {
+	randomSeed(0);
+	Serial.begin(115200);
+	while(!Serial);
+	if(SLOW_BOOT) delay(5000); //Delay booting to give time to connect a serial monitor
+	connectWifi();
+	#if defined(ESP32)
+		WiFi.setSleep(false); //For the ESP32: turn off sleeping to increase UI responsivness (at the cost of power use)
+	#endif
+	setUpUI();
+}
+
+void loop() {
+	static long unsigned lastTime = 0;
+
+	//Send periodic updates if switcher is turned on
+	if(updates && millis() > lastTime + 500) {
+		static uint16_t sliderVal = 10;
+
+		//Flick this switcher on and off
+		ESPUI.updateSwitcher(mainSwitcher, ESPUI.getControl(mainSwitcher)->value.toInt() ? false : true);
+		sliderVal += 10;
+		if(sliderVal > 400) sliderVal = 10;
+
+		//Sliders, numbers, and labels can all be updated at will
+		ESPUI.updateSlider(mainSlider, sliderVal);
+		ESPUI.updateNumber(mainNumber, random(100000));
+		ESPUI.updateLabel(mainLabel, String(sliderVal));
+		lastTime = millis();
+	}
+
+	//Simple debug UART interface
+	if(Serial.available()) {
+		switch(Serial.read()) {
+			case 'w': //Print IP details
+				Serial.println(WiFi.localIP());
+				break;
+			case 'W': //Reconnect wifi
+				connectWifi();
+				break;
+			case 'C': //Force a crash (for testing exception decoder)
+				#if !defined(ESP32)
+					((void (*)())0xf00fdead)();
+				#endif
+			default:
+				Serial.print('#');
+				break;
+		}
+	}
+
+	#if !defined(ESP32)
+		//We don't need to call this explicitly on ESP32 but we do on 8266
+		MDNS.update();
+	#endif
+
+}
+
+
 
 
 //Utilities
