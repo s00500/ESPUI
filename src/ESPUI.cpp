@@ -855,6 +855,14 @@ void ESPUIClass::setPanelWide(uint16_t id, bool wide) {
     }
 }
 
+void ESPUIClass::setVertical(uint16_t id, bool vert) {
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->vertical = vert;
+    }
+}
+
 void ESPUIClass::updateControl(uint16_t id, int clientId)
 {
     Control* control = getControl(id);
@@ -900,6 +908,15 @@ void ESPUIClass::updateControlValue(uint16_t id, const String& value, int client
     }
 
     updateControlValue(control, value, clientId);
+}
+
+void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId) {
+    Control* control = getControl(id);
+    if(control)
+    {
+        control->visible = visibility;
+        updateControl(id);
+    }
 }
 
 void ESPUIClass::print(uint16_t id, const String& value)
@@ -1097,6 +1114,8 @@ void ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startin
             item["elementStyle"] = String(control->elementStyle);
         if (control->wide == true)
             item["wide"] = true;
+        if (control->vertical == true)
+            item["vertical"] = true;
 
         if (control->parentControl != Control::noParent)
         {

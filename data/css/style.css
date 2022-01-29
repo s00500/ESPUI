@@ -1128,3 +1128,23 @@ svg {
 text {
   text-anchor: end;
 }
+
+
+/* Styles to implement vertical orientations */
+
+.vert-switcher {
+  transform: rotate(270deg);
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+.vert-slider {
+  width: 150px;
+  transform: rotate(270deg);
+  display: inline-block;
+  margin: 50px -42px 70px -42px;
+}
+
+.vert-slider span {
+  transform: rotate(90deg);
+}

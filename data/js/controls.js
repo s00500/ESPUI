@@ -575,6 +575,13 @@ function start() {
         $("#id" + data.id).attr("style", data.panelStyle);
       }
 
+      if(data.hasOwnProperty('visible')) {
+        if(data['visible']) 
+          $("#id" + data.id).show();
+        else
+          $("#id" + data.id).hide();
+      }
+
       if (data.type == UPDATE_SLIDER) {
         element.removeClass(
           "slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin"
@@ -700,7 +707,6 @@ var rangeSlider = function (isDiscrete) {
 
 var addToHTML = function(data) {
   panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "' " : "";
-  elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "' " : "";
   panelwide = data.hasOwnProperty('wide') ? "wide" :  "";
 
   if(!data.hasOwnProperty('parentControl') || $("#tab" + data.parentControl).length > 0) {
@@ -725,7 +731,7 @@ var addToHTML = function(data) {
       case UI_ACCEL:
         html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
         colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
-        elementHTML(data.type, data.id, data.value, data.label, elementStyle) +
+        elementHTML(data) +
         "</div>";
         break;
       case UI_SEPARATOR:
@@ -742,26 +748,30 @@ var addToHTML = function(data) {
   } else {
     //We are adding to an existing panel so we only need the HTML for the element
     var parent = $("#id" + data.parentControl);
-    parent.append(elementHTML(data.type, data.id, data.value, data.label, elementStyle));
+    parent.append(elementHTML(data));
   }
 }
 
-var elementHTML = function(type, id, value, label, elementStyle) {
-  switch(type) {
+var elementHTML = function(data) {
+  var id = data.id
+  var elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "' " : "";
+  switch(data.type) {
     case UI_LABEL:
       return "<span id='l" + id + "' " + elementStyle + 
-        " class='label label-wrap'>" + value + "</span>";
+        " class='label label-wrap'>" + data.value + "</span>";
     case UI_BUTTON:
       return "<button id='btn" + id + "' " + elementStyle + 
         " onmousedown='buttonclick(" + id + ", true)'" +
         " onmouseup='buttonclick(" + id + ", false)'>" +
-        value + "</button>";
+        data.value + "</button>";
     case UI_SWITCHER:
       return "<label id='sl" + id + "' " + elementStyle + 
-      " class='switch " + (value == "1" ? "checked" : "") + "'>" +
+      " class='switch " + (data.value == "1" ? "checked" : "") + 
+      (data.hasOwnProperty('vertical') ? " vert-switcher " : "") + 
+      "'>" +
       "<div class='in'>" + 
       "<input type='checkbox' id='s" + id + "' onClick='switcher(" + id + ",null)' " + 
-      (value == "1" ? "checked" : "") + "/></div></label>";
+      (data.value == "1" ? "checked" : "") + "/></div></label>";
     case UI_CPAD:
     case UI_PAD:
       return "<nav class='control'><ul>" + 
@@ -774,30 +784,32 @@ var elementHTML = function(type, id, value, label, elementStyle) {
         "<li><a onmousedown='padclick(DOWN, " + id + ", true)' " + 
             "onmouseup='padclick(DOWN, " + id + ", false)' id='pb" + id + "'>&#9650;</a></li>" +
         "</ul>" +
-        (type == UI_CPAD
+        (data.type == UI_CPAD
           ? "<a class='confirm' onmousedown='padclick(CENTER," + id + ", true)' " + 
             "onmouseup='padclick(CENTER, " + id + ", false)' id='pc" + id + "'>OK</a>"
           : "") +
         "</nav>";
     case UI_SLIDER:
-      return "<div class='range-slider'>" + 
-        "<input id='sl" + id + "' type='range' min='0' max='100' value='" + value + "' " + 
+      return "<div class='range-slider " + 
+        (data.hasOwnProperty('vertical') ? " vert-slider " : "") + 
+        "'>" + 
+        "<input id='sl" + id + "' type='range' min='0' max='100' value='" + data.value + "' " + 
         elementStyle + " class='range-slider__range'><span class='range-slider__value'>" + 
-        value + "</span></div>";
+        data.value + "</span></div>";
     case UI_NUMBER:
       return "<input style='color:black;' " + elementStyle + " id='num" + id + 
-        "' type='number' value='" + value + "' onchange='numberchange(" + id + ")' />";
+        "' type='number' value='" + data.value + "' onchange='numberchange(" + id + ")' />";
     case UI_TEXT_INPUT:
       return "<input style='color:black;' " + elementStyle + " id='text" + id +
-        "' value='" + value + "' onchange='textchange(" + id + ")' />";
+        "' value='" + data.value + "' onchange='textchange(" + id + ")' />";
     case UI_SELECT:
       return "<select style='color:black;' " + elementStyle + " id='select" + id +
         "' onchange='selectchange(" + id + ")' />";
     case UI_GRAPH:
-      return "<figure id='graph" + id + "'><figcaption>" + label + "</figcaption></figure>";
+      return "<figure id='graph" + id + "'><figcaption>" + data.label + "</figcaption></figure>";
     case UI_GAUGE:
       return "WILL BE A GAUGE <input style='color:black;' id='gauge" + id + 
-        "' type='number' value='" + value + "' onchange='numberchange(" + id + ")' />";
+        "' type='number' value='" + data.value + "' onchange='numberchange(" + id + ")' />";
     case UI_ACCEL:
       return "ACCEL // Not implemented fully!<div class='accelerometer' id='accel" + id +
         "' ><div class='ball" + id + "'></div><pre class='accelerometeroutput" + id + "'></pre>";
