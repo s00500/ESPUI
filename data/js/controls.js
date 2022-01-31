@@ -647,27 +647,29 @@ function buttonclick(number, isdown) {
 }
 
 function padclick(type, number, isdown) {
-  switch (type) {
-    case CENTER:
-      if (isdown) websock.send("pcdown:" + number);
-      else websock.send("pcup:" + number);
-      break;
-    case UP:
-      if (isdown) websock.send("pfdown:" + number);
-      else websock.send("pfup:" + number);
-      break;
-    case DOWN:
-      if (isdown) websock.send("pbdown:" + number);
-      else websock.send("pbup:" + number);
-      break;
-    case LEFT:
-      if (isdown) websock.send("pldown:" + number);
-      else websock.send("plup:" + number);
-      break;
-    case RIGHT:
-      if (isdown) websock.send("prdown:" + number);
-      else websock.send("prup:" + number);
-      break;
+  if(!$("#id" + number + " nav").hasClass("disabled")) {
+    switch (type) {
+      case CENTER:
+        if (isdown) websock.send("pcdown:" + number);
+        else websock.send("pcup:" + number);
+        break;
+      case UP:
+        if (isdown) websock.send("pfdown:" + number);
+        else websock.send("pfup:" + number);
+        break;
+      case DOWN:
+        if (isdown) websock.send("pbdown:" + number);
+        else websock.send("pbup:" + number);
+        break;
+      case LEFT:
+        if (isdown) websock.send("pldown:" + number);
+        else websock.send("plup:" + number);
+        break;
+      case RIGHT:
+        if (isdown) websock.send("prdown:" + number);
+        else websock.send("prup:" + number);
+        break;
+    }
   }
 }
 
@@ -831,7 +833,7 @@ var elementHTML = function(data) {
 var processEnabled = function(data) {
   //Handle the enabling and disabling of controls
   //Most controls can be disabled through the use of $("#<item>").prop("disabled", true) and CSS will style it accordingly
-  //The switcher also requires the addition of the "disabled" class
+  //The switcher and pads also require the addition of the "disabled" class
   switch(data.type) {
     case UI_SWITCHER:
     case UPDATE_SWITCHER:
@@ -867,6 +869,17 @@ var processEnabled = function(data) {
     case UI_BUTTON:
     case UPDATE_BUTTON:
       $("#btn" + data.id).prop("disabled", !data.enabled);
+      break;
+
+    case UI_PAD:
+    case UI_CPAD:
+    case UPDATE_PAD:
+    case UPDATE_CPAD:
+      if(data.enabled) {
+        $("#id" + data.id + " nav").removeClass('disabled');
+      } else {
+        $("#id" + data.id + " nav").addClass('disabled');
+      }
       break;
   }
 }
