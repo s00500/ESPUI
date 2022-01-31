@@ -587,6 +587,14 @@ hr {
   background-color: #eee;
 }
 
+.control a.confirm:active {
+  background-color: #777;
+}
+
+.control li:active {
+    background-color: #777;
+}
+
 /* Switch
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
