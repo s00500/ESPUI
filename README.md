@@ -564,6 +564,17 @@ If you change something in HTML/CSS/JS and want to create a pull request, please
 do include the minified versions and corresponding C header files in your
 commits. (Do **NOT** commit all the minified versions for the non changed files)
 
+# Experimental note for Development:
+
+It is possible to run or debug this library on a unix-like computer (Linux,
+macOS, WSL) without flashing on hardware, and with your favourite debugging
+tools (gdb, valgrind, ...).  This is accomplished through the
+esp8266/Arduino "emulation on host" environment.
+
+A fake AsyncWebserver library is needed because lwIP is not yet ported to
+the emulation environment.  Full instructions can be found in this project's
+[readme page](https://github.com/d-a-v/emuAsync).
+
 ## Changelog for 2.1:
 
  - Adds the ability to have inline styles for widgets and panels
