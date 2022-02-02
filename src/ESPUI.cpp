@@ -783,9 +783,9 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     root["id"] = control->id;
     root["visible"] = control->visible;
     root["color"] = (int)control->color;
-    if (control->panelStyle != 0)
+    if (control->panelStyle.length())
         root["panelStyle"] = control->panelStyle;
-    if (control->elementStyle != 0)
+    if (control->elementStyle.length())
         root["elementStyle"] = control->elementStyle;
     serializeJson(document, json);
 
@@ -811,7 +811,7 @@ void ESPUIClass::updateControl(Control* control, int clientId)
     // function like this and it's clients array is private
     int tryId = 0;
 
-    for (size_t count = 0; count < this->ws->count();)
+    for (size_t count = 0; tryId < (int)this->ws->count() && count < this->ws->count();)
     {
         if (this->ws->hasClient(tryId))
         {
@@ -1003,7 +1003,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     // function like this and it's clients array is private
     int tryId = 0;
 
-    for (size_t count = 0; count < this->ws->count();)
+    for (size_t count = 0; tryId < (int)this->ws->count() && count < this->ws->count();)
     {
         if (this->ws->hasClient(tryId))
         {
@@ -1108,9 +1108,9 @@ void ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startin
         item["value"] = String(control->value);
         item["color"] = (int)control->color;
         item["visible"] = (int)control->visible;
-        if (control->panelStyle != 0)
+        if (control->panelStyle.length())
             item["panelStyle"] = String(control->panelStyle);
-        if (control->elementStyle != 0)
+        if (control->elementStyle.length())
             item["elementStyle"] = String(control->elementStyle);
         if (control->wide == true)
             item["wide"] = true;
