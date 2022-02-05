@@ -564,7 +564,7 @@ If you change something in HTML/CSS/JS and want to create a pull request, please
 do include the minified versions and corresponding C header files in your
 commits. (Do **NOT** commit all the minified versions for the non changed files)
 
-# Experimental note for Development:
+# Experimental debugging environment using emulation on host
 
 It is possible to run or debug this library on a unix-like computer (Linux,
 macOS, WSL) without flashing on hardware, and with your favourite debugging
