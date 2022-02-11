@@ -433,24 +433,27 @@ function start() {
 
       case UI_MIN:
         if (data.parentControl) {
-          var parent = $("#id" + data.parentControl + " input");
-          if (parent.size()) {
-            parent.attr("min", data.value);
+          //Is it applied to a slider?
+          if($('#sl' + data.parentControl).length) {
+            $('#sl' + data.parentControl).attr("min", data.value);
+          } else if($('#num' + data.parentControl).length) {
+            //Or a number
+            $('#num' + data.parentControl).attr("min", data.value);
           }
         }
         break;
 
       case UI_MAX:
         if (data.parentControl) {
-          var parent = $("#id" + data.parentControl + " input");
-          if (parent.size()) {
-            if(!parent.attr("type")) {
-              //type is not set so therefore it is a text input
-              parent.attr("maxlength", data.value);
-            } else {
-              //type might be range (slider) or number
-              parent.attr("max", data.value);
-            }
+          //Is it applied to a slider?
+          if($('#sl' + data.parentControl).length) {
+            $('#sl' + data.parentControl).attr("max", data.value);
+          } else if($('#text' + data.parentControl).length) {
+            //Is it a text element
+            $('#text' + data.parentControl).attr("maxlength", data.value);
+          } else if($('#num' + data.parentControl).length) {
+            //Or a number
+            $('#num' + data.parentControl).attr("max", data.value);
           }
         }
         break;
