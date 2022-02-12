@@ -142,6 +142,7 @@ public:
     bool visible;
     bool wide;
     bool vertical;
+    bool enabled;
     uint16_t parentControl;
     String panelStyle;
     String elementStyle;
@@ -301,6 +302,8 @@ public:
 
     void setPanelWide(uint16_t id, bool wide);
     void setVertical(uint16_t id, bool vert = true);
+    void setEnabled(uint16_t id, bool enabled = true, int clientId = -1);
+
     void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
     // Variables

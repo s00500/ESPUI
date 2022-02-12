@@ -422,7 +422,7 @@ button {
   background-color: #999999;
 }
 
-button:active {
+button:enabled:active {
   background-color: #666666;
   transform: translateX(4px) translateY(4px);
 }
@@ -585,6 +585,13 @@ hr {
 .control .confirm:hover,
 .control .confirm:focus {
   background-color: #eee;
+}
+
+.control:not(.disabled) a.confirm:active {
+  background-color:#777
+}
+.control:not(.disabled) li:active {
+  background-color:#777
 }
 
 /* Switch
@@ -1147,4 +1154,47 @@ text {
 
 .vert-slider span {
   transform: rotate(90deg);
+}
+
+
+/* Styles to implement disabled controls */
+
+button:disabled {
+  color: #333;
+  background-color: #999;
+}
+
+select:disabled {
+  color: #333;
+  background-color: #999;
+}
+
+input:disabled {
+  color: #333;
+  background-color: #999;
+}
+
+.range-slider__range:disabled {
+  background-color: #999;
+}
+
+.range-slider__range:disabled::-webkit-slider-thumb {
+  background-color: #aaa;
+}
+
+.range-slider__range:disabled::-moz-range-thumb {
+  background-color: #aaa;
+}
+
+.switch.disabled .in::before {
+  background:#bbb;
+  border: 1px solid #ddd;
+}
+
+.switch.disabled .in::after {
+  background:#bbb;
+}
+
+.switch.checked.disabled {
+  background: #b1d092;
 }

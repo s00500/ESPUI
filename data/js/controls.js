@@ -433,24 +433,27 @@ function start() {
 
       case UI_MIN:
         if (data.parentControl) {
-          var parent = $("#id" + data.parentControl + " input");
-          if (parent.size()) {
-            parent.attr("min", data.value);
+          //Is it applied to a slider?
+          if($('#sl' + data.parentControl).length) {
+            $('#sl' + data.parentControl).attr("min", data.value);
+          } else if($('#num' + data.parentControl).length) {
+            //Or a number
+            $('#num' + data.parentControl).attr("min", data.value);
           }
         }
         break;
 
       case UI_MAX:
         if (data.parentControl) {
-          var parent = $("#id" + data.parentControl + " input");
-          if (parent.size()) {
-            if(!parent.attr("type")) {
-              //type is not set so therefore it is a text input
-              parent.attr("maxlength", data.value);
-            } else {
-              //type might be range (slider) or number
-              parent.attr("max", data.value);
-            }
+          //Is it applied to a slider?
+          if($('#sl' + data.parentControl).length) {
+            $('#sl' + data.parentControl).attr("max", data.value);
+          } else if($('#text' + data.parentControl).length) {
+            //Is it a text element
+            $('#text' + data.parentControl).attr("maxlength", data.value);
+          } else if($('#num' + data.parentControl).length) {
+            //Or a number
+            $('#num' + data.parentControl).attr("max", data.value);
           }
         }
         break;
@@ -568,7 +571,13 @@ function start() {
         break;
     }
 
+    if (data.type >= UI_TITEL && data.type < UPDATE_OFFSET) {
+      //A UI element was just added to the DOM
+      processEnabled(data);
+    }
+
     if (data.type >= UPDATE_OFFSET && data.type < UI_INITIAL_GUI) {
+      //An "update" message was just recieved and processed
       var element = $("#id" + data.id);
 
       if(data.hasOwnProperty('panelStyle')) {
@@ -593,6 +602,8 @@ function start() {
         );
         element.addClass(colorClass(data.color));
       }
+
+      processEnabled(data);
     }
 
     $(".range-slider__range").each(function(){ 
@@ -639,27 +650,29 @@ function buttonclick(number, isdown) {
 }
 
 function padclick(type, number, isdown) {
-  switch (type) {
-    case CENTER:
-      if (isdown) websock.send("pcdown:" + number);
-      else websock.send("pcup:" + number);
-      break;
-    case UP:
-      if (isdown) websock.send("pfdown:" + number);
-      else websock.send("pfup:" + number);
-      break;
-    case DOWN:
-      if (isdown) websock.send("pbdown:" + number);
-      else websock.send("pbup:" + number);
-      break;
-    case LEFT:
-      if (isdown) websock.send("pldown:" + number);
-      else websock.send("plup:" + number);
-      break;
-    case RIGHT:
-      if (isdown) websock.send("prdown:" + number);
-      else websock.send("prup:" + number);
-      break;
+  if(!$("#id" + number + " nav").hasClass("disabled")) {
+    switch (type) {
+      case CENTER:
+        if (isdown) websock.send("pcdown:" + number);
+        else websock.send("pcup:" + number);
+        break;
+      case UP:
+        if (isdown) websock.send("pfdown:" + number);
+        else websock.send("pfup:" + number);
+        break;
+      case DOWN:
+        if (isdown) websock.send("pbdown:" + number);
+        else websock.send("pbup:" + number);
+        break;
+      case LEFT:
+        if (isdown) websock.send("pldown:" + number);
+        else websock.send("plup:" + number);
+        break;
+      case RIGHT:
+        if (isdown) websock.send("prdown:" + number);
+        else websock.send("prup:" + number);
+        break;
+    }
   }
 }
 
@@ -815,5 +828,61 @@ var elementHTML = function(data) {
         "' ><div class='ball" + id + "'></div><pre class='accelerometeroutput" + id + "'></pre>";
     default:
       return "";
+  }
+}
+
+
+
+var processEnabled = function(data) {
+  //Handle the enabling and disabling of controls
+  //Most controls can be disabled through the use of $("#<item>").prop("disabled", true) and CSS will style it accordingly
+  //The switcher and pads also require the addition of the "disabled" class
+  switch(data.type) {
+    case UI_SWITCHER:
+    case UPDATE_SWITCHER:
+      if(data.enabled) {
+        $("#sl" + data.id).removeClass('disabled');
+        $("#s" + data.id).prop("disabled", false);
+      } else {
+        $("#sl" + data.id).addClass('disabled');
+        $("#s" + data.id).prop("disabled", true);
+      }
+      break;
+      
+    case UI_SLIDER:
+    case UPDATE_SLIDER:
+      $("#sl" + data.id).prop("disabled", !data.enabled);
+      break;
+
+    case UI_NUMBER:
+    case UPDATE_NUMBER:
+      $("#num" + data.id).prop("disabled", !data.enabled);
+      break;
+
+    case UI_TEXT_INPUT:
+    case UPDATE_TEXT_INPUT:
+      $("#text" + data.id).prop("disabled", !data.enabled);
+      break;
+    
+    case UI_SELECT:
+    case UPDATE_SELECT:
+      $("#select" + data.id).prop("disabled", !data.enabled);
+      break;
+
+    case UI_BUTTON:
+    case UPDATE_BUTTON:
+      $("#btn" + data.id).prop("disabled", !data.enabled);
+      break;
+
+    case UI_PAD:
+    case UI_CPAD:
+    case UPDATE_PAD:
+    case UPDATE_CPAD:
+      if(data.enabled) {
+        $("#id" + data.id + " nav").removeClass('disabled');
+      } else {
+        $("#id" + data.id + " nav").addClass('disabled');
+      }
+      break;
   }
 }

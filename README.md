@@ -37,6 +37,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - [Advanced Features](#advanced-features)
   * [Dynamic Visibility](#dynamic-visibility)
   * [Inline Styles](#inline-styles)
+  * [Disabling Controls](#disabling-controls)
   * [Grouped controls](#grouped-controls)
   * [Wide controls](#wide-controls)
   * [Graph (Experimental)](#graph--experimental-)
@@ -470,6 +471,36 @@ The [completeExample](examples/completeExample/completeExample.cpp) example incl
 ![More Inline Styles](docs/ui_inlinestyles2.png)
 
 
+### Disabling Controls
+
+It is possible to dynamically enable and disable controls to, for example, provide feedback to the user that a particular feature is 
+temporarily unavailable. To do this use the following function call:
+
+```
+ESPUI.setEnabled(controlId, enabled);
+```
+
+Setting `enabled` to false will make the control noninteractive and it will visually change to illustrate this to the user. The control
+will stop firing any events. Note that whilst the widget will change appearance, the panel of the control will remain whatever colour 
+it was set to. If you wish to also change the colour of the panel then you should use inline styles to show the noninteractive state. For example:
+
+```
+ESPUI.setEnabled(mainButton, false);
+const String disabledstyle = "background-color: #bbb; border-bottom: #999 3px solid;";
+ESPUI.setPanelStyle(mainButton, disabledstyle);
+```
+
+This CSS style sets the panel background and its border to grey. To put the control back to enabled use the following:
+
+```
+ESPUI.setEnabled(mainButton, true);
+ESPUI.setPanelStyle(mainButton, ";");
+```
+
+Note that we have to set the inline style to `";"` (i.e. an empty CSS rule) because if we just try to set it to `""` this will be 
+interpreted as "do not change the style".
+
+Controls can also be set to disabled before the UI is started.
 
 ### Grouped controls
 
