@@ -160,6 +160,7 @@ public:
           visible(visible),
           wide(false),
           vertical(false),
+          enabled(true),
           parentControl(parentControl),
           next(nullptr)
     {
