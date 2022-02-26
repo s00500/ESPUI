@@ -650,29 +650,30 @@ function buttonclick(number, isdown) {
 }
 
 function padclick(type, number, isdown) {
-  if(!$("#id" + number + " nav").hasClass("disabled")) {
-    switch (type) {
-      case CENTER:
-        if (isdown) websock.send("pcdown:" + number);
-        else websock.send("pcup:" + number);
-        break;
-      case UP:
-        if (isdown) websock.send("pfdown:" + number);
-        else websock.send("pfup:" + number);
-        break;
-      case DOWN:
-        if (isdown) websock.send("pbdown:" + number);
-        else websock.send("pbup:" + number);
-        break;
-      case LEFT:
-        if (isdown) websock.send("pldown:" + number);
-        else websock.send("plup:" + number);
-        break;
-      case RIGHT:
-        if (isdown) websock.send("prdown:" + number);
-        else websock.send("prup:" + number);
-        break;
-    }
+  if($("#id" + number + " nav").hasClass("disabled")) {
+    return;
+  }
+  switch (type) {
+    case CENTER:
+      if (isdown) websock.send("pcdown:" + number);
+      else websock.send("pcup:" + number);
+      break;
+    case UP:
+      if (isdown) websock.send("pfdown:" + number);
+      else websock.send("pfup:" + number);
+      break;
+    case DOWN:
+      if (isdown) websock.send("pbdown:" + number);
+      else websock.send("pbup:" + number);
+      break;
+    case LEFT:
+      if (isdown) websock.send("pldown:" + number);
+      else websock.send("plup:" + number);
+      break;
+    case RIGHT:
+      if (isdown) websock.send("prdown:" + number);
+      else websock.send("prup:" + number);
+      break;
   }
 }
 
