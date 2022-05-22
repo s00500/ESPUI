@@ -788,6 +788,8 @@ void ESPUIClass::updateControl(Control* control, int clientId)
         root["panelStyle"] = control->panelStyle;
     if (control->elementStyle.length())
         root["elementStyle"] = control->elementStyle;
+    if (control->inputType.length())
+        root["inputType"] = control->inputType;
     serializeJson(document, json);
 
 #if defined(DEBUG_ESPUI)
