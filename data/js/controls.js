@@ -212,7 +212,7 @@ function start() {
     window.location.port != 443
   ) {
     websock = new WebSocket(
-      "ws://" + window.location.hostname + ":" + window.location.port + "/ws"
+				"ws://" + window.location.hostname + ":" + window.location.port + "/ws"
     );
   } else {
     websock = new WebSocket("ws://" + window.location.hostname + "/ws");
@@ -769,6 +769,7 @@ var addToHTML = function(data) {
 var elementHTML = function(data) {
   var id = data.id
   var elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "' " : "";
+	var inputType = data.hasOwnProperty('inputType') ? " type='" + data.inputType + "' " : "";
   switch(data.type) {
     case UI_LABEL:
       return "<span id='l" + id + "' " + elementStyle + 
@@ -814,7 +815,7 @@ var elementHTML = function(data) {
       return "<input style='color:black;' " + elementStyle + " id='num" + id + 
         "' type='number' value='" + data.value + "' onchange='numberchange(" + id + ")' />";
     case UI_TEXT_INPUT:
-      return "<input style='color:black;' " + elementStyle + " id='text" + id +
+      return "<input " + inputType + "style='color:black;' " + elementStyle + " id='text" + id +
         "' value='" + data.value + "' onchange='textchange(" + id + ")' />";
     case UI_SELECT:
       return "<select style='color:black;' " + elementStyle + " id='select" + id +
