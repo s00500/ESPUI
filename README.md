@@ -4,7 +4,8 @@
 
 ESPUI is a simple library to make a web-based user interface for your projects using
 the **ESP8266** or the **ESP32** It uses web sockets and lets you create,
-control, and update elements on your GUI through multiple devices like phones
+
+ol, and update elements on your GUI through multiple devices like phones
 and tablets.
 
 ESPUI uses simple Arduino-style syntax for creating a solid, functioning user
@@ -58,6 +59,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - Transport layer rework by @iangray001
 - Time control by @iangray001
 - Vertical controls by @iangray001
+- Time/date/password/color input types by @pcbbc
 
 ## Roadmap
 
