@@ -532,6 +532,9 @@ function start() {
         if(data.hasOwnProperty('elementStyle')) {
           $("#text" + data.id).attr("style", data.elementStyle);
         }
+        if(data.hasOwnProperty('inputType')) {
+          $("#text" + data.id).attr("type", data.inputType);
+        }
         break;
 
       case UPDATE_SELECT:

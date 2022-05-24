@@ -58,6 +58,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - Transport layer rework by @iangray001
 - Time control by @iangray001
 - Vertical controls by @iangray001
+- Time/date/password/color input types by @pcbbc
 
 ## Roadmap
 
@@ -287,6 +288,34 @@ because it is easy to bypass client-side checks. Never trust user input.
 
 Events:
  - `T_VALUE` - Fired when a text value changes.
+
+
+#### Date, Time, Colour and Password Input
+
+![text](docs/ui_inputtypes.png)
+
+As an extension to the text input control, you can also specify the type attribute to be used for the HTML input element.
+This allows you to easily create input controls for Date, Time, Colour and Passwords, or indeed any other
+[HTML Input Types](https://www.w3schools.com/html/html_form_input_types.asp) supported by your browser. 
+
+```
+text_date = ESPUI.text("Date", callback, ControlColor::Dark, "2022-05-24");
+ESPUI.setInputType(text_date, "date");
+
+text_time = ESPUI.text("Time", callback, ControlColor::Dark, "13:00");
+ESPUI.setInputType(text_time, "time");
+
+text_colour = ESPUI.text("Colour", callback, ControlColor::Dark, "#FF0000");
+ESPUI.setInputType(text_colour, "color");
+
+text_password = ESPUI.text("Password", callback, ControlColor::Dark, "tiddles123");
+ESPUI.setInputType(text_password, "password");
+```
+
+Note that not all browsers support all input types, and that the control displayed to edit the input is browser dependent.
+
+However even with a type set, user input should still be validated 
+because it is easy to bypass client-side checks. Never trust user input.
 
 
 #### Select control
