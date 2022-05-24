@@ -28,6 +28,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
   * [Slider](#slider)
   * [Number Input](#number-input)
   * [Text Input](#text-input)
+  * [Date, Time, Colour and Password Input](#date-time-colour-and-password-input)
   * [Select control](#select-control)
   * [Getting the Time](#getting-the-time)
   * [Separators](#separators)
@@ -135,6 +136,7 @@ more program memory to work with.
 - Control pad
 - Slider
 - Text Input
+- Date, Time, Colour and Password Input
 - Numberinput
 - Option select
 - Separator
@@ -312,6 +314,8 @@ ESPUI.setInputType(text_colour, "color");
 text_password = ESPUI.text("Password", callback, ControlColor::Dark, "tiddles123");
 ESPUI.setInputType(text_password, "password");
 ```
+
+*Important!* This function should be called _before_ `ESPUI.begin` or results will be unreliable.
 
 Note that not all browsers support all input types, and that the control displayed to edit the input is browser dependent.
 
