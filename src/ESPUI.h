@@ -146,6 +146,7 @@ public:
     uint16_t parentControl;
     String panelStyle;
     String elementStyle;
+    String inputType;
     Control* next;
 
     static constexpr uint16_t noParent = 0xffff;
@@ -300,6 +301,7 @@ public:
 
     void setPanelStyle(uint16_t id, String style, int clientId = -1);
     void setElementStyle(uint16_t id, String style, int clientId = -1);
+    void setInputType(uint16_t id, String type, int clientId = -1);
 
     void setPanelWide(uint16_t id, bool wide);
     void setVertical(uint16_t id, bool vert = true);
