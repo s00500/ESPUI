@@ -788,6 +788,8 @@ void ESPUIClass::updateControl(Control* control, int clientId)
         root["panelStyle"] = control->panelStyle;
     if (control->elementStyle.length())
         root["elementStyle"] = control->elementStyle;
+    if (control->inputType.length())
+        root["inputType"] = control->inputType;
     serializeJson(document, json);
 
 #if defined(DEBUG_ESPUI)
@@ -848,7 +850,18 @@ void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId)
     }
 }
 
-void ESPUIClass::setPanelWide(uint16_t id, bool wide) {
+void ESPUIClass::setInputType(uint16_t id, String type, int clientId)
+{
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->inputType = type;
+        updateControl(control, clientId);
+    }
+}
+
+void ESPUIClass::setPanelWide(uint16_t id, bool wide)
+{
     Control* control = getControl(id);
     if (control)
     {
@@ -1124,6 +1137,8 @@ void ESPUIClass::prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startin
             item["panelStyle"] = String(control->panelStyle);
         if (control->elementStyle.length())
             item["elementStyle"] = String(control->elementStyle);
+        if (control->inputType.length())
+            item["inputType"] = String(control->inputType);
         if (control->wide == true)
             item["wide"] = true;
         if (control->vertical == true)
