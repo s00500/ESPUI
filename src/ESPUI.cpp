@@ -628,38 +628,30 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
 
 bool ESPUIClass::removeControl(uint16_t id, bool force_reload_ui)
 {
-    if (nullptr == this->controls)
-        return false;
+    Control* PreviousControl = nullptr;
+    Control* CurrentControl  = this->controls;
 
-    Control* it = this->controls;
-
-    if (id == it->id)
+    while(nullptr != CurrentControl)
     {
-        this->controls = it->next;
-        delete it;
-        this->controlCount--;
-        if (force_reload_ui)
+        if (id == CurrentControl->id)
         {
-            jsonReload();
+            break;
+        }
+        PreviousControl = CurrentControl;
+        CurrentControl = CurrentControl->next;
+    }
+
+    if (nullptr != CurrentControl)
+    {
+        if(nullptr == PreviousControl)
+        {
+            this->controls = CurrentControl->next;
         }
         else
         {
-            jsonDom(0);
+            PreviousControl->next = CurrentControl->next;
         }
-        return true;
-    }
-
-    Control* it_next = it->next;
-    while (nullptr != it_next && id != it_next->id)
-    {
-        it = it_next;
-        it_next = it_next->next;
-    }
-
-    if (nullptr != it_next)
-    {
-        it->next = it_next->next;
-        delete it_next;
+        delete CurrentControl;
         this->controlCount--;
         if (force_reload_ui)
         {
