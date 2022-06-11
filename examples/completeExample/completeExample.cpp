@@ -49,6 +49,7 @@ void getTimeCallback(Control *sender, int type);
 void graphAddCallback(Control *sender, int type);
 void graphClearCallback(Control *sender, int type);
 void randomString(char *buf, int len);
+void extendedCallback(Control* sender, int type, void* param);
 
 //UI handles
 uint16_t wifi_ssid_text, wifi_pass_text;
@@ -81,7 +82,7 @@ void setUpUI() {
 	auto maintab = ESPUI.addControl(Tab, "", "Basic controls");
 
 	ESPUI.addControl(Separator, "General controls", "", None, maintab);
-	ESPUI.addControl(Button, "Button", "Button 1", Alizarin, maintab, generalCallback);
+	ESPUI.addControl(Button, "Button", "Button 1", Alizarin, maintab, extendedCallback, (void*)19);
 	mainLabel = ESPUI.addControl(Label, "Label", "Label text", Emerald, maintab, generalCallback);
 	mainSwitcher = ESPUI.addControl(Switcher, "Switcher", "", Sunflower, maintab, generalCallback);
 
@@ -360,7 +361,23 @@ void generalCallback(Control *sender, int type) {
 	Serial.println(sender->value);
 }
 
-
+// Most elements in this test UI are assigned this generic callback which prints some
+// basic information. Event types are defined in ESPUI.h
+// The extended param can be used to hold a pointer to additional information
+// or for C++ it can be used to return a this pointer for quick access
+// using a lambda function
+void extendedCallback(Control* sender, int type, void* param)
+{
+    Serial.print("CB: id(");
+    Serial.print(sender->id);
+    Serial.print(") Type(");
+    Serial.print(type);
+    Serial.print(") '");
+    Serial.print(sender->label);
+    Serial.print("' = ");
+    Serial.println(sender->value);
+    Serial.println(String("param = ") + String((int)param));
+}
 
 void setup() {
 	randomSeed(0);
