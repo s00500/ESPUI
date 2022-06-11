@@ -153,11 +153,8 @@ public:
 
     static constexpr uint16_t noParent = 0xffff;
 
-    Control(
-        ControlType type, 
-        const char* label, 
-        void (*callback)(Control*, int, void*), 
-        void* UserData, const String& value, ControlColor color, bool visible, uint16_t parentControl)
+    Control(ControlType type, const char* label, void (*callback)(Control*, int, void*), void* UserData,
+        const String& value, ControlColor color, bool visible, uint16_t parentControl)
         : type(type),
           label(label),
           callback(nullptr),
@@ -262,21 +259,27 @@ public:
     bool removeControl(uint16_t id, bool force_reload_ui = false);
 
     // create Elements
-    uint16_t button(const char* label, void (*callback)(Control*, int), ControlColor color,
-        const String& value = ""); // Create Event Button
-    uint16_t switcher(const char* label, void (*callback)(Control*, int), ControlColor color,
-        bool startState = false); // Create Toggle Button
-    uint16_t pad(const char* label, void (*callback)(Control*, int),
-        ControlColor color); // Create Pad Control
-    uint16_t padWithCenter(const char* label, void (*callback)(Control*, int),
-        ControlColor color); // Create Pad Control with Centerbutton
+    // Create Event Button
+    uint16_t button(const char* label, void (*callback)(Control*, int), ControlColor color, const String& value = "");
+    uint16_t button(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData);
 
-    uint16_t slider(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min = 0,
-        int max = 100); // Create Slider Control
-    uint16_t number(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min = 0,
-        int max = 100); // Create a Number Input Control
-    uint16_t text(const char* label, void (*callback)(Control*, int), ControlColor color,
-        const String& value = ""); // Create a Text Input Control
+    uint16_t switcher(const char* label, void (*callback)(Control*, int), ControlColor color, bool startState = false); // Create Toggle Button
+    uint16_t switcher(const char* label, void (*callback)(Control*, int, void*), ControlColor color, bool startState, void* UserData); // Create Toggle Button
+
+    uint16_t pad(const char* label, void (*callback)(Control*, int), ControlColor color); // Create Pad Control
+    uint16_t pad(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData); // Create Pad Control
+
+    uint16_t padWithCenter(const char* label, void (*callback)(Control*, int), ControlColor color); // Create Pad Control with Centerbutton
+    uint16_t padWithCenter(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData); // Create Pad Control with Centerbutton
+
+    uint16_t slider(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min = 0, int max = 100); // Create Slider Control
+    uint16_t slider(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int value, int min, int max, void* UserData); // Create Slider Control
+
+    uint16_t number(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min = 0, int max = 100); // Create a Number Input Control
+    uint16_t number(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int value, int min, int max, void* UserData); // Create a Number Input Control
+
+    uint16_t text(const char* label, void (*callback)(Control*, int), ControlColor color, const String& value = ""); // Create a Text Input Control
+    uint16_t text(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData); // Create a Text Input Control
 
     // Output only
     uint16_t label(const char* label, ControlColor color,
@@ -288,6 +291,7 @@ public:
 
     // Input only
     uint16_t accelerometer(const char* label, void (*callback)(Control*, int), ControlColor color);
+    uint16_t accelerometer(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData);
 
     // Update Elements
 

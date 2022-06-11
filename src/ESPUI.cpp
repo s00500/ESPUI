@@ -704,10 +704,16 @@ uint16_t ESPUIClass::graph(const char* label, ControlColor color)
     return addControl(ControlType::Graph, label, "", color);
 }
 
-uint16_t ESPUIClass::slider(
-    const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min, int max)
+uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min, int max)
 {
-    uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback);
+    uint16_t id = slider(label, nullptr, color, value, min, max, nullptr);
+    getControl(id)->callback = callback;
+    return id;
+}
+
+uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int value, int min, int max, void* userData)
+{
+    uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback, userData);
     addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
     addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
 
@@ -719,24 +725,52 @@ uint16_t ESPUIClass::button(const char* label, void (*callback)(Control*, int), 
     return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
 }
 
+uint16_t ESPUIClass::button(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
+{
+    return addControl(ControlType::Button, label, value, color, Control::noParent, callback, UserData);
+}
+
 uint16_t ESPUIClass::switcher(const char* label, void (*callback)(Control*, int), ControlColor color, bool startState)
 {
     return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::switcher(const char* label, void (*callback)(Control*, int, void*), ControlColor color, bool startState, void* UserData)
+{
+    return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback, UserData);
 }
 
 uint16_t ESPUIClass::pad(const char* label, void (*callback)(Control*, int), ControlColor color)
 {
     return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
 }
+
+uint16_t ESPUIClass::pad(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+{
+    return addControl(ControlType::Pad, label, "", color, Control::noParent, callback, UserData);
+}
+
 uint16_t ESPUIClass::padWithCenter(const char* label, void (*callback)(Control*, int), ControlColor color)
 {
     return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::number(
-    const char* label, void (*callback)(Control*, int), ControlColor color, int number, int min, int max)
+uint16_t ESPUIClass::padWithCenter(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+{
+    return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback, UserData);
+}
+
+uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int), ControlColor color, int number, int min, int max)
 {
     uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
+    addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
+    addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+    return numberId;
+}
+
+uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int number, int min, int max, void* UserData)
+{
+    uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback, UserData);
     addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
     addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
     return numberId;
@@ -759,9 +793,19 @@ uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*,
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
 }
 
+uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+{
+    return addControl(ControlType::Accel, label, "", color, Control::noParent, callback, UserData);
+}
+
 uint16_t ESPUIClass::text(const char* label, void (*callback)(Control*, int), ControlColor color, const String& value)
 {
     return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::text(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
+{
+    return addControl(ControlType::Text, label, value, color, Control::noParent, callback, UserData);
 }
 
 Control* ESPUIClass::getControl(uint16_t id)
@@ -896,7 +940,6 @@ void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId) {
         updateControl(control, clientId);
     }
 }
-
 
 void ESPUIClass::setVertical(uint16_t id, bool vert) {
     Control* control = getControl(id);
