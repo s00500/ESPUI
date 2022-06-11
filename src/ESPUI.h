@@ -137,6 +137,8 @@ public:
     uint16_t id; // just mirroring the id here for practical reasons
     const char* label;
     void (*callback)(Control*, int);
+    void (*extendedCallback)(Control*, int, void*);
+    void* user;
     String value;
     ControlColor color;
     bool visible;
@@ -151,11 +153,16 @@ public:
 
     static constexpr uint16_t noParent = 0xffff;
 
-    Control(ControlType type, const char* label, void (*callback)(Control*, int), const String& value,
-        ControlColor color, bool visible = true, uint16_t parentControl = Control::noParent)
+    Control(
+        ControlType type, 
+        const char* label, 
+        void (*callback)(Control*, int, void*), 
+        void* UserData, const String& value, ControlColor color, bool visible, uint16_t parentControl)
         : type(type),
           label(label),
-          callback(callback),
+          callback(nullptr),
+          extendedCallback(callback),
+          user(UserData),
           value(value),
           color(color),
           visible(visible),
@@ -173,12 +180,16 @@ public:
           id(control.id),
           label(control.label),
           callback(control.callback),
+          extendedCallback(control.extendedCallback),
+          user(control.user),
           value(control.value),
           color(control.color),
           visible(control.visible),
           parentControl(control.parentControl),
           next(control.next)
     { }
+    void SendCallback(int type);
+    bool HasCallback() { return ((nullptr != callback) || (nullptr != extendedCallback)); }
 
 private:
     static uint16_t idCounter;
@@ -241,9 +252,13 @@ public:
                               // stuff into LITTLEFS
     void list(); // Lists LITTLEFS directory
 
-    uint16_t addControl(ControlType type, const char* label, const String& value = String(""),
-        ControlColor color = ControlColor::Turquoise, uint16_t parentControl = Control::noParent,
-        void (*callback)(Control*, int) = nullptr);
+    uint16_t addControl(ControlType type, const char* label);
+    uint16_t addControl(ControlType type, const char* label, const String& value);
+    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color);
+    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl);
+    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int));
+    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int, void *), void* UserData);
+
     bool removeControl(uint16_t id, bool force_reload_ui = false);
 
     // create Elements

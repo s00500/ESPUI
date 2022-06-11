@@ -475,9 +475,9 @@ void onWsEvent(
                 return;
             }
 
-            if (c->callback == nullptr)
+            if (false == c->HasCallback())
             {
-    #if defined(DEBUG_ESPUI)
+#if defined(DEBUG_ESPUI)
                 if (ESPUI.verbosity)
                 {
                     Serial.print(F("No callback found for ID "));
@@ -490,97 +490,97 @@ void onWsEvent(
 
             if (msg.startsWith(F("bdown:")))
             {
-                c->callback(c, B_DOWN);
+                c->SendCallback(B_DOWN);
             }
             else if (msg.startsWith(F("bup:")))
             {
-                c->callback(c, B_UP);
+                c->SendCallback(B_UP);
             }
             else if (msg.startsWith(F("pfdown:")))
             {
-                c->callback(c, P_FOR_DOWN);
+                c->SendCallback(P_FOR_DOWN);
             }
             else if (msg.startsWith(F("pfup:")))
             {
-                c->callback(c, P_FOR_UP);
+                c->SendCallback(P_FOR_UP);
             }
             else if (msg.startsWith(F("pldown:")))
             {
-                c->callback(c, P_LEFT_DOWN);
+                c->SendCallback(P_LEFT_DOWN);
             }
             else if (msg.startsWith(F("plup:")))
             {
-                c->callback(c, P_LEFT_UP);
+                c->SendCallback(P_LEFT_UP);
             }
             else if (msg.startsWith(F("prdown:")))
             {
-                c->callback(c, P_RIGHT_DOWN);
+                c->SendCallback(P_RIGHT_DOWN);
             }
             else if (msg.startsWith(F("prup:")))
             {
-                c->callback(c, P_RIGHT_UP);
+                c->SendCallback(P_RIGHT_UP);
             }
             else if (msg.startsWith(F("pbdown:")))
             {
-                c->callback(c, P_BACK_DOWN);
+                c->SendCallback(P_BACK_DOWN);
             }
             else if (msg.startsWith(F("pbup:")))
             {
-                c->callback(c, P_BACK_UP);
+                c->SendCallback(P_BACK_UP);
             }
             else if (msg.startsWith(F("pcdown:")))
             {
-                c->callback(c, P_CENTER_DOWN);
+                c->SendCallback(P_CENTER_DOWN);
             }
             else if (msg.startsWith(F("pcup:")))
             {
-                c->callback(c, P_CENTER_UP);
+                c->SendCallback(P_CENTER_UP);
             }
             else if (msg.startsWith(F("sactive:")))
             {
                 c->value = "1";
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, S_ACTIVE);
+                c->SendCallback(S_ACTIVE);
             }
             else if (msg.startsWith(F("sinactive:")))
             {
                 c->value = "0";
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, S_INACTIVE);
+                c->SendCallback(S_INACTIVE);
             }
             else if (msg.startsWith(F("slvalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, SL_VALUE);
+                c->SendCallback(SL_VALUE);
             }
             else if (msg.startsWith(F("nvalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, N_VALUE);
+                c->SendCallback(N_VALUE);
             }
             else if (msg.startsWith(F("tvalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, T_VALUE);
+                c->SendCallback(T_VALUE);
             }
             else if (msg.startsWith("tabvalue:"))
             {
-                c->callback(c, client->id());
+                c->SendCallback(client->id());
             }
             else if (msg.startsWith(F("svalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, S_VALUE);
+                c->SendCallback(S_VALUE);
             }
             else if (msg.startsWith(F("time:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, TM_VALUE);
+                c->SendCallback(TM_VALUE);
             }
             else
             {
@@ -600,10 +600,37 @@ void onWsEvent(
     }
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
-    uint16_t parentControl, void (*callback)(Control*, int))
+uint16_t ESPUIClass::addControl(ControlType type, const char* label)
 {
-    Control* control = new Control(type, label, callback, value, color, true, parentControl);
+    return addControl(type, label, String(""));
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value)
+{
+    return addControl(type, label, value, ControlColor::Turquoise);
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color)
+{
+    return addControl(type, label, value, color, Control::noParent);
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
+{
+    return addControl(type, label, value, color, parentControl, nullptr);
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int))
+{
+    uint16_t id = addControl(type, label, value, color, parentControl, nullptr, nullptr);
+    // set the original style callback
+    getControl(id)->callback = callback;
+    return id;
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int, void *), void * UserData)
+{
+    Control* control = new Control(type, label, callback, UserData, value, color, true, parentControl);
 
     if (this->controls == nullptr)
     {
@@ -1441,6 +1468,19 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
 void ESPUIClass::setVerbosity(Verbosity v)
 {
     this->verbosity = v;
+}
+
+void Control::SendCallback(int type)
+{
+    if(callback)
+    {
+        callback(this, type);
+    }
+
+    if (extendedCallback)
+    {
+        extendedCallback(this, type, user);
+    }
 }
 
 ESPUIClass ESPUI;
