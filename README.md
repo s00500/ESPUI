@@ -147,10 +147,14 @@ more program memory to work with.
 ## Documentation
 
 The heart of ESPUI is [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for handling events. The communication between the ESP and the client browser works using web sockets. ESPUI does not need network access and can be used in standalone access point mode, all resources are loaded directly from the ESPs memory.
-
-This section will explain in detail how the Library is to be used from the Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object `ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the interface that calls the `myCallback(Control *sender, int eventname)` function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events an integer number with the event name is passed to the callback function that can be handled in a `switch(){}case{}` statement.
+<br>
+This section will explain in detail how the Library is to be used from the Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object `ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the interface that calls the `myCallback(Control *sender, int eventname)` function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events, an integer number with the event name is passed to the callback function that can be handled in a `switch(){}case{}` statement.
+<br>
 Alternativly you may use the extended callback funtion which provides three parameters to the callback function `myCallback(Control *sender, int eventname, void * UserParameter)`. The `UserParameter` is provided as part of the `ESPUI.addControl` and allows the user to define contextual information that is to be presented to the callback function in an unmodified form.
-Here is an example of using the UserParameter to hold the `this` pointer to an object instance, providing a mechanism for sending the event to a specific object without the need for a switch / map translation of the Sender Id tp object reference. Defining an extended callback is only supported via the `ESPUI.addContol` method. The below example creates a button and uses a lambda function to implicitly define `MyExtendedCallback` which then invokes a more specialized button callback handler.
+<br>
+Defining an extended callback is only supported via the `ESPUI.addContol` method. 
+<br>
+The below example creates a button and defines a lambda function to implicitly create an `ExtendedCallback` which then invokes a more specialized button callback handler. The example uses the `UserParameter` to hold the `this` pointer to an object instance, providing a mechanism for sending the event to a specific object without the need for a switch / map / lookup translation of the Sender Id to an object reference. 
 ```
 ButtonElementId = ESPUI.addControl(
   ControlType::Button,
@@ -165,7 +169,7 @@ ButtonElementId = ESPUI.addControl(
       reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
     }
   },
-  this);
+  this); // <-Third parameter for the extended callback
 ```
 ```
 void YourClassName::myButtonCallback(Control* sender, int eventname)
@@ -180,8 +184,8 @@ void YourClassName::myButtonCallback(Control* sender, int eventname)
   }
 }
 ```
-
-
+<br>
+<br>
 #### Button
 
 ![Buttons](docs/ui_button.png)
