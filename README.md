@@ -154,7 +154,9 @@ Alternativly you may use the extended callback funtion which provides three para
 <br><br>
 The below example creates a button and defines a lambda function to implicitly create an `ExtendedCallback` which then invokes a more specialized button callback handler. The example uses the `UserParameter` to hold the `this` pointer to an object instance, providing a mechanism for sending the event to a specific object without the need for a switch / map / lookup translation of the Sender Id to an object reference. 
 ```
-ButtonElementId = ESPUI.addControl(
+void YourClassName::setup()
+{
+  ButtonElementId = ESPUI.addControl(
   ControlType::Button,
   ButtonLabel.c_str(),
   " Button Face Text ",
@@ -168,6 +170,7 @@ ButtonElementId = ESPUI.addControl(
     }
   },
   this); // <-Third parameter for the extended callback
+}
 ```
 ```
 void YourClassName::myButtonCallback(Control* sender, int eventname)
