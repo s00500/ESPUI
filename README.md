@@ -146,26 +146,59 @@ more program memory to work with.
 
 ## Documentation
 
-The heart of ESPUI is
-[ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's
-frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like
-lightweight [zepto.js](https://zeptojs.com/) for handling events. The
-communication between the ESP and the client browser works using web
-sockets. ESPUI does not need network access and can be used in standalone access
-point mode, all resources are loaded directly from the ESPs memory.
+The heart of ESPUI is [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for handling events. The communication between the ESP and the client browser works using web sockets. ESPUI does not need network access and can be used in standalone access point mode, all resources are loaded directly from the ESPs memory.
+<br><br>
+This section will explain in detail how the Library is to be used from the Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object `ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the interface that calls the `myCallback(Control *sender, int eventname)` function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events, an integer number with the event name is passed to the callback function that can be handled in a `switch(){}case{}` statement.
+<br><br>
+Alternativly you may use the extended callback funtion which provides three parameters to the callback function `myCallback(Control *sender, int eventname, void * UserParameter)`. The `UserParameter` is provided as part of the `ESPUI.addControl` method set and allows the user to define contextual information that is to be presented to the callback function in an unmodified form. 
+<br><br>
+The below example creates a button and defines a lambda function to implicitly create an `ExtendedCallback` which then invokes a more specialized button callback handler. The example uses the `UserParameter` to hold the `this` pointer to an object instance, providing a mechanism for sending the event to a specific object without the need for a switch / map / lookup translation of the Sender Id to an object reference. 
+```
+void YourClassName::setup()
+{
+  ButtonElementId = ESPUI.addControl(
+  ControlType::Button,
+  ButtonLabel.c_str(),
+  " Button Face Text ",
+  ControlColor::None,
+  ParentElementId,
+  [](Control *sender, int eventname, void* param)
+  {
+    if(param)
+    {
+      reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
+    }
+  },
+  this); // <-Third parameter for the extended callback
 
-This section will explain in detail how the Library is to be used from the
-Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements.
-This is done by calling the corresponding library methods on the Library object
-`ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the
-interface that calls the `myCallback(Control *sender, int value)` function when changed. All buttons and
-items call their callback whenever there is a state change from them. This means
-the button will call the callback when it is pressed and also again when it is
-released. To separate different events an integer number with the event name is
-passed to the callback function that can be handled in a `switch(){}case{}`
-statement.
-
-
+  // or
+  ButtonElementId = ESPUI.button(
+  " Button Face Text ",
+  [](Control *sender, int eventname, void* param)
+  {
+    if(param)
+    {
+      reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
+    }
+  },
+  this); // <-Third parameter for the extended callback
+}
+```
+```
+void YourClassName::myButtonCallback(Control* sender, int eventname)
+{
+  if (eventname == B_DOWN)
+  {
+    // Handle the button down event
+  }
+  else if (eventname == B_UP)
+  {
+    // Handle the button up event
+  }
+}
+```
+<br>
+<br>
 #### Button
 
 ![Buttons](docs/ui_button.png)

@@ -475,9 +475,9 @@ void onWsEvent(
                 return;
             }
 
-            if (c->callback == nullptr)
+            if (false == c->HasCallback())
             {
-    #if defined(DEBUG_ESPUI)
+#if defined(DEBUG_ESPUI)
                 if (ESPUI.verbosity)
                 {
                     Serial.print(F("No callback found for ID "));
@@ -490,97 +490,97 @@ void onWsEvent(
 
             if (msg.startsWith(F("bdown:")))
             {
-                c->callback(c, B_DOWN);
+                c->SendCallback(B_DOWN);
             }
             else if (msg.startsWith(F("bup:")))
             {
-                c->callback(c, B_UP);
+                c->SendCallback(B_UP);
             }
             else if (msg.startsWith(F("pfdown:")))
             {
-                c->callback(c, P_FOR_DOWN);
+                c->SendCallback(P_FOR_DOWN);
             }
             else if (msg.startsWith(F("pfup:")))
             {
-                c->callback(c, P_FOR_UP);
+                c->SendCallback(P_FOR_UP);
             }
             else if (msg.startsWith(F("pldown:")))
             {
-                c->callback(c, P_LEFT_DOWN);
+                c->SendCallback(P_LEFT_DOWN);
             }
             else if (msg.startsWith(F("plup:")))
             {
-                c->callback(c, P_LEFT_UP);
+                c->SendCallback(P_LEFT_UP);
             }
             else if (msg.startsWith(F("prdown:")))
             {
-                c->callback(c, P_RIGHT_DOWN);
+                c->SendCallback(P_RIGHT_DOWN);
             }
             else if (msg.startsWith(F("prup:")))
             {
-                c->callback(c, P_RIGHT_UP);
+                c->SendCallback(P_RIGHT_UP);
             }
             else if (msg.startsWith(F("pbdown:")))
             {
-                c->callback(c, P_BACK_DOWN);
+                c->SendCallback(P_BACK_DOWN);
             }
             else if (msg.startsWith(F("pbup:")))
             {
-                c->callback(c, P_BACK_UP);
+                c->SendCallback(P_BACK_UP);
             }
             else if (msg.startsWith(F("pcdown:")))
             {
-                c->callback(c, P_CENTER_DOWN);
+                c->SendCallback(P_CENTER_DOWN);
             }
             else if (msg.startsWith(F("pcup:")))
             {
-                c->callback(c, P_CENTER_UP);
+                c->SendCallback(P_CENTER_UP);
             }
             else if (msg.startsWith(F("sactive:")))
             {
                 c->value = "1";
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, S_ACTIVE);
+                c->SendCallback(S_ACTIVE);
             }
             else if (msg.startsWith(F("sinactive:")))
             {
                 c->value = "0";
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, S_INACTIVE);
+                c->SendCallback(S_INACTIVE);
             }
             else if (msg.startsWith(F("slvalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, SL_VALUE);
+                c->SendCallback(SL_VALUE);
             }
             else if (msg.startsWith(F("nvalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, N_VALUE);
+                c->SendCallback(N_VALUE);
             }
             else if (msg.startsWith(F("tvalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, T_VALUE);
+                c->SendCallback(T_VALUE);
             }
             else if (msg.startsWith("tabvalue:"))
             {
-                c->callback(c, client->id());
+                c->SendCallback(client->id());
             }
             else if (msg.startsWith(F("svalue:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, S_VALUE);
+                c->SendCallback(S_VALUE);
             }
             else if (msg.startsWith(F("time:")))
             {
                 c->value = msg.substring(msg.indexOf(':') + 1, msg.lastIndexOf(':'));
                 ESPUI.updateControl(c, client->id());
-                c->callback(c, TM_VALUE);
+                c->SendCallback(TM_VALUE);
             }
             else
             {
@@ -600,10 +600,37 @@ void onWsEvent(
     }
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
-    uint16_t parentControl, void (*callback)(Control*, int))
+uint16_t ESPUIClass::addControl(ControlType type, const char* label)
 {
-    Control* control = new Control(type, label, callback, value, color, true, parentControl);
+    return addControl(type, label, String(""));
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value)
+{
+    return addControl(type, label, value, ControlColor::Turquoise);
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color)
+{
+    return addControl(type, label, value, color, Control::noParent);
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
+{
+    return addControl(type, label, value, color, parentControl, nullptr);
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int))
+{
+    uint16_t id = addControl(type, label, value, color, parentControl, nullptr, nullptr);
+    // set the original style callback
+    getControl(id)->callback = callback;
+    return id;
+}
+
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int, void *), void * UserData)
+{
+    Control* control = new Control(type, label, callback, UserData, value, color, true, parentControl);
 
     if (this->controls == nullptr)
     {
@@ -628,38 +655,30 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
 
 bool ESPUIClass::removeControl(uint16_t id, bool force_reload_ui)
 {
-    if (nullptr == this->controls)
-        return false;
+    Control* PreviousControl = nullptr;
+    Control* CurrentControl  = this->controls;
 
-    Control* it = this->controls;
-
-    if (id == it->id)
+    while(nullptr != CurrentControl)
     {
-        this->controls = it->next;
-        delete it;
-        this->controlCount--;
-        if (force_reload_ui)
+        if (id == CurrentControl->id)
         {
-            jsonReload();
+            break;
+        }
+        PreviousControl = CurrentControl;
+        CurrentControl = CurrentControl->next;
+    }
+
+    if (nullptr != CurrentControl)
+    {
+        if(nullptr == PreviousControl)
+        {
+            this->controls = CurrentControl->next;
         }
         else
         {
-            jsonDom(0);
+            PreviousControl->next = CurrentControl->next;
         }
-        return true;
-    }
-
-    Control* it_next = it->next;
-    while (nullptr != it_next && id != it_next->id)
-    {
-        it = it_next;
-        it_next = it_next->next;
-    }
-
-    if (nullptr != it_next)
-    {
-        it->next = it_next->next;
-        delete it_next;
+        delete CurrentControl;
         this->controlCount--;
         if (force_reload_ui)
         {
@@ -685,10 +704,16 @@ uint16_t ESPUIClass::graph(const char* label, ControlColor color)
     return addControl(ControlType::Graph, label, "", color);
 }
 
-uint16_t ESPUIClass::slider(
-    const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min, int max)
+uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min, int max)
 {
-    uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback);
+    uint16_t id = slider(label, nullptr, color, value, min, max, nullptr);
+    getControl(id)->callback = callback;
+    return id;
+}
+
+uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int value, int min, int max, void* userData)
+{
+    uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback, userData);
     addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
     addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
 
@@ -700,24 +725,52 @@ uint16_t ESPUIClass::button(const char* label, void (*callback)(Control*, int), 
     return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
 }
 
+uint16_t ESPUIClass::button(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
+{
+    return addControl(ControlType::Button, label, value, color, Control::noParent, callback, UserData);
+}
+
 uint16_t ESPUIClass::switcher(const char* label, void (*callback)(Control*, int), ControlColor color, bool startState)
 {
     return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::switcher(const char* label, void (*callback)(Control*, int, void*), ControlColor color, bool startState, void* UserData)
+{
+    return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback, UserData);
 }
 
 uint16_t ESPUIClass::pad(const char* label, void (*callback)(Control*, int), ControlColor color)
 {
     return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
 }
+
+uint16_t ESPUIClass::pad(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+{
+    return addControl(ControlType::Pad, label, "", color, Control::noParent, callback, UserData);
+}
+
 uint16_t ESPUIClass::padWithCenter(const char* label, void (*callback)(Control*, int), ControlColor color)
 {
     return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::number(
-    const char* label, void (*callback)(Control*, int), ControlColor color, int number, int min, int max)
+uint16_t ESPUIClass::padWithCenter(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+{
+    return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback, UserData);
+}
+
+uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int), ControlColor color, int number, int min, int max)
 {
     uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
+    addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
+    addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+    return numberId;
+}
+
+uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int number, int min, int max, void* UserData)
+{
+    uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback, UserData);
     addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
     addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
     return numberId;
@@ -740,9 +793,19 @@ uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*,
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
 }
 
+uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+{
+    return addControl(ControlType::Accel, label, "", color, Control::noParent, callback, UserData);
+}
+
 uint16_t ESPUIClass::text(const char* label, void (*callback)(Control*, int), ControlColor color, const String& value)
 {
     return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
+}
+
+uint16_t ESPUIClass::text(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
+{
+    return addControl(ControlType::Text, label, value, color, Control::noParent, callback, UserData);
 }
 
 Control* ESPUIClass::getControl(uint16_t id)
@@ -877,7 +940,6 @@ void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId) {
         updateControl(control, clientId);
     }
 }
-
 
 void ESPUIClass::setVertical(uint16_t id, bool vert) {
     Control* control = getControl(id);
@@ -1449,6 +1511,19 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
 void ESPUIClass::setVerbosity(Verbosity v)
 {
     this->verbosity = v;
+}
+
+void Control::SendCallback(int type)
+{
+    if(callback)
+    {
+        callback(this, type);
+    }
+
+    if (extendedCallback)
+    {
+        extendedCallback(this, type, user);
+    }
 }
 
 ESPUIClass ESPUI;
