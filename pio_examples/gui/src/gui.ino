@@ -60,8 +60,9 @@ void buttonCallback(Control* sender, int type)
     }
 }
 
-void buttonExample(Control* sender, int type)
+void buttonExample(Control* sender, int type, void* param)
 {
+    Serial.println(String("param: ") + String(int(param)));
     switch (type)
     {
     case B_DOWN:
@@ -228,7 +229,7 @@ void setup(void)
     statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
     millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
     ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
-    ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press");
+    ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press", (void*)19);
     ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
     ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
     testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);

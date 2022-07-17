@@ -55,8 +55,9 @@ void buttonCallback(Control* sender, int type)
     }
 }
 
-void buttonExample(Control* sender, int type)
+void buttonExample(Control* sender, int type, void* param)
 {
+    Serial.println(String("param: ") + String(int(param)));
     switch (type)
     {
     case B_DOWN:
@@ -210,7 +211,8 @@ void setup(void)
             }
 #else
             uint32_t chipid = ESP.getChipId();
-#endif char ap_ssid[25];
+#endif 
+            char ap_ssid[25];
             snprintf(ap_ssid, 26, "ESPUI-%08X", chipid);
             WiFi.softAP(ap_ssid);
 
@@ -249,7 +251,7 @@ void setup(void)
     button1 = ESPUI.addControl(
         ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, Control::noParent, &buttonCallback);
     ESPUI.addControl(
-        ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, Control::noParent, &buttonExample);
+        ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, Control::noParent, &buttonExample, (void*)19);
     ESPUI.addControl(
         ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, Control::noParent, &padExample);
     ESPUI.addControl(ControlType::Pad, "Pad without center", "", ControlColor::Carrot, Control::noParent, &padExample);

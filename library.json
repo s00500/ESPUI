@@ -1,6 +1,6 @@
 {
   "name": "ESPUI",
-  "keywords": "espressif web interface iot control simple easy ui userinterface",
+  "keywords": "espressif web interface iot easy ui",
   "description": "ESP32 and ESP8266 Web Interface Library",
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
       "frameworks": "arduino"
     }
   ],
-  "version": "2.1.0",
+  "version": "2.1.1",
   "frameworks": "arduino",
   "platforms": "*"
 }
