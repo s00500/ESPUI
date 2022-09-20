@@ -236,7 +236,7 @@ public:
     unsigned int jsonUpdateDocumentSize;
     unsigned int jsonInitialDocumentSize;
     bool sliderContinuous;
-	bool captivePortal = false;
+	bool captivePortal = true;
 
     void setVerbosity(Verbosity verbosity);
     void begin(const char* _title, const char* username = nullptr, const char* password = nullptr,
