@@ -815,13 +815,13 @@ var elementHTML = function(data) {
         elementStyle + " class='range-slider__range'><span class='range-slider__value'>" + 
         data.value + "</span></div>";
     case UI_NUMBER:
-      return "<input style='color:black;' " + elementStyle + " id='num" + id + 
+      return "<input style='color:black; " + data.elementStyle + "' id='num" + id + 
         "' type='number' value='" + data.value + "' onchange='numberchange(" + id + ")' />";
     case UI_TEXT_INPUT:
-      return "<input " + inputType + "style='color:black;' " + elementStyle + " id='text" + id +
+      return "<input " + inputType + "style='color:black; " + data.elementStyle + "' id='text" + id +
         "' value='" + data.value + "' onchange='textchange(" + id + ")' />";
     case UI_SELECT:
-      return "<select style='color:black;' " + elementStyle + " id='select" + id +
+      return "<select style='color:black; " + data.elementStyle + "' id='select" + id +
         "' onchange='selectchange(" + id + ")' />";
     case UI_GRAPH:
       return "<figure id='graph" + id + "'><figcaption>" + data.label + "</figcaption></figure>";
