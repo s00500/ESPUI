@@ -230,13 +230,24 @@ function start() {
   };
 
   websock.onerror = function (evt) {
+    console.log("websock Error");
     console.log(evt);
     conStatusError();
   };
 
   var handleEvent = function (evt) {
     console.log(evt);
-    var data = JSON.parse(evt.data);
+    try
+    {
+      var data = JSON.parse(evt.data);
+    }
+    catch (Event)
+    {
+      console.error(Event);
+      // start the update over again
+      websock.send("uiok:" + 0);
+      return;
+    }
     var e = document.body;
     var center = "";
 
