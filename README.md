@@ -43,6 +43,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
   * [Grouped controls](#grouped-controls)
   * [Wide controls](#wide-controls)
   * [Graph (Experimental)](#graph--experimental-)
+  * [Captive Portal](#captive-portal)
 - [Notes for Development](#notes-for-development)
 - [Contribute](#contribute)
 
@@ -642,6 +643,17 @@ Use `ESPUI.addGraphPoint(graphId, random(1, 50));` to add a new value at the cur
 Graph points are saved in the browser in **localstorage** to be persistant, clear local storageto remove the points or use clearGraph() from a bbutton callback to provide a clear button.
 
 _There are many issues with the graph component currently and work is ongoing. Consider helping us out with development!_
+
+### Captive Portal
+
+ESPUI will redirect all unknown URLs it is asked for to the 'root' of the local HTTP server instead of responding with an HTTP code 404. This makes it act as a simple 'captive portal'. Note you must also set up the ESP to be a DNS server that responds to all DNS requests with the IP address of the ESP. This only effective when the ESP is acting as a WiFi hotspot in AP mode and assigning itself as the DNS server to connected clients. 
+
+All the example sketches include the DNS related code and will work as captive portals when used as a hotspot. In the event you wish to disable this feature you can do so by removing the DNS server code and adding the code below.
+
+```
+ESPUI.captivePortal = false;
+```
+
 
 # Notes for Development
 

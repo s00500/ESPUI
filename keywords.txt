@@ -25,6 +25,7 @@ beginLITTLEFS	KEYWORD2
 print	KEYWORD2
 updateSwitcher	KEYWORD2
 updateSlider	KEYWORD2
+captivePortal	LITERAL1
 
 #######################################
 # Instances (KEYWORD2)

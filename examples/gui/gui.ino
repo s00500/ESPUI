@@ -256,7 +256,6 @@ void setup(void)
      * since it is transmitted in cleartext. Just add a string as username and
      * password, for example begin("ESPUI Control", "username", "password")
      */
-
     ESPUI.begin("ESPUI Control");
 }
 

@@ -1351,7 +1351,16 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
         request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In LITTLEFS mode");
     });
 
-    server->onNotFound([](AsyncWebServerRequest* request) { request->send(404); });
+    server->onNotFound([this](AsyncWebServerRequest* request) {
+		if(captivePortal)
+		{
+			request->redirect("/");
+		}
+		else
+		{
+			request->send(404); 
+		}
+	});
 
     server->begin();
 
@@ -1496,7 +1505,16 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In Memorymode");
     });
 
-    server->onNotFound([](AsyncWebServerRequest* request) { request->send(404); });
+    server->onNotFound([this](AsyncWebServerRequest* request) {
+		if(captivePortal)
+		{
+			request->redirect("/");
+		}
+		else
+		{
+			request->send(404); 
+		}
+	});
 
     server->begin();
 
