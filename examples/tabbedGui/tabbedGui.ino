@@ -197,7 +197,7 @@ void setup(void)
         if (WiFi.status() != WL_CONNECTED)
         {
             Serial.print("\n\nCreating hotspot");
-            ESPUI.captivePortal = true; //Configure ESPUI to be a captive portal only if the ESP is acting as a hotspot
+
             WiFi.mode(WIFI_AP);
             delay(100);
             WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));

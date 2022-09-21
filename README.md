@@ -646,10 +646,12 @@ _There are many issues with the graph component currently and work is ongoing. C
 
 ### Captive Portal
 
-You can set ESPUI to redirect all unknown URLs it is asked for to the 'root' the local HTTP server instead of responding with an HTTP code 404. This turns it into a simple 'captive portal'. Note you must also set up the ESP to be a DNS server that responds to all DNS requests with the IP address of the ESP for this to be effective and this is only useful when the ESP is acting as a WiFi hotspot in AP mode. All the example sketches will work as captive portals if not connected to a local WiFi network as a station.
+ESPUI will redirect all unknown URLs it is asked for to the 'root' of the local HTTP server instead of responding with an HTTP code 404. This makes it act as a simple 'captive portal'. Note you must also set up the ESP to be a DNS server that responds to all DNS requests with the IP address of the ESP. This only effective when the ESP is acting as a WiFi hotspot in AP mode and assigning itself as the DNS server to connected clients. 
+
+All the example sketches include the DNS related code and will work as captive portals when used as a hotspot. In the event you wish to disable this feature you can do so by removing the DNS server code and adding the code below.
 
 ```
-ESPUI.captivePortal == true;
+ESPUI.captivePortal = false;
 ```
 
 

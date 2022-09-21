@@ -1352,7 +1352,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     });
 
     server->onNotFound([this](AsyncWebServerRequest* request) {
-		if(captivePortal == true)
+		if(captivePortal)
 		{
 			request->redirect("/");
 		}
@@ -1506,7 +1506,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
     });
 
     server->onNotFound([this](AsyncWebServerRequest* request) {
-		if(captivePortal == true)
+		if(captivePortal)
 		{
 			request->redirect("/");
 		}
