@@ -7,15 +7,15 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <stdlib_noniso.h>
+#include <LittleFS.h>
 #include <map>
+#include <ESPAsyncWebServer.h>
+
 #include "ESPUIcontrol.h"
 #include "ESPUIclient.h"
 
 #if defined(ESP32)
 #include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <LITTLEFS.h>
-
 #include "WiFi.h"
 
 #else
@@ -24,9 +24,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
 #include <Hash.h>
-#include <LittleFS.h>
 
 #define FILE_WRITE "w"
 
