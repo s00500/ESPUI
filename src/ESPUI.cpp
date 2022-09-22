@@ -857,19 +857,24 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId) { }
 
 void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
 {
-    Control* control = getControl(id);
-    if (!control)
+    do // once
     {
-        return;
-    }
+        Control* control = getControl(id);
+        if (!control)
+        {
+            break;
+        }
 
-    DynamicJsonDocument document(jsonUpdateDocumentSize);
-    JsonObject root = document.to<JsonObject>();
+        DynamicJsonDocument document(jsonUpdateDocumentSize);
+        JsonObject root = document.to<JsonObject>();
 
-    root[F("type")] = (int)ControlType::GraphPoint;
-    root[F("value")] = nValue;
-    root[F("id")] = control->id;
-    SendJsonDocToWebSocket(document, clientId);
+        root[F("type")] = (int)ControlType::GraphPoint;
+        root[F("value")] = nValue;
+        root[F("id")] = control->id;
+
+        SendJsonDocToWebSocket(document, clientId);
+
+    } while(false);
 }
 
 bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId)
@@ -885,9 +890,9 @@ bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& docume
     }
     else
     {
-        for(auto& CurrentClient : MapOfClients)
+        for(auto CurrentClient : MapOfClients)
         {
-            Response |= MapOfClients[clientId]->SendJsonDocToWebSocket(document);
+            Response |= CurrentClient.second->SendJsonDocToWebSocket(document);
         }
     }
 
