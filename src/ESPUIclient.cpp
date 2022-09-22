@@ -128,7 +128,7 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
 
     switch (type)
     {
-        case WS_EVT_PONG: 
+        case WS_EVT_PONG:
         {
             #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity)
@@ -139,7 +139,7 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
             break;
         }
 
-        case WS_EVT_ERROR: 
+        case WS_EVT_ERROR:
         {
             #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity)
@@ -165,7 +165,7 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
             break;
         }
 
-        case WS_EVT_DATA: 
+        case WS_EVT_DATA:
         {
             // Serial.println(F("ESPUIclient::OnWsEvent:WS_EVT_DATA"));
             String msg = "";
@@ -226,13 +226,13 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
     } // end switch
 }
 
-/* 
+/*
 Prepare a chunk of elements as a single JSON string. If the allowed number of elements is greater than the total
-number this will represent the entire UI. More likely, it will represent a small section of the UI to be sent. The 
+number this will represent the entire UI. More likely, it will represent a small section of the UI to be sent. The
 client will acknowledge receipt by requesting the next chunk.
  */
-uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex, 
-                                      DynamicJsonDocument & rootDoc, 
+uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
+                                      DynamicJsonDocument & rootDoc,
                                       bool InUpdateMode)
 {
 #ifdef ESP32
@@ -278,8 +278,8 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
             break;
         }
 
-        // keep track of the number of elements we have serialised into this 
-        // message. Overflow is detected and handled later in this loop 
+        // keep track of the number of elements we have serialised into this
+        // message. Overflow is detected and handled later in this loop
         // and needs an index to the last item added.
         while (nullptr != control)
         {
@@ -303,7 +303,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                     control = control->next;
                     continue;
                 }
-            } 
+            }
 
             JsonObject item = items.createNestedObject();
             elementcount++;
@@ -349,15 +349,15 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 }
 
 /*
-Convert & Transfer Arduino elements to JSON elements. This function sends a chunk of 
+Convert & Transfer Arduino elements to JSON elements. This function sends a chunk of
 JSON describing the controls of the UI, starting from the control at index startidx.
 If startidx is 0 then a UI_INITIAL_GUI message will be sent, else a UI_EXTEND_GUI.
 Both message types contain a list of serialised UI elements. Only a portion of the UI
-will be sent in order to avoid websocket buffer overflows. The client will acknowledge 
+will be sent in order to avoid websocket buffer overflows. The client will acknowledge
 receipt of a partial message by requesting the next chunk of UI.
 
 The protocol is:
-SERVER: SendControlsToClient(0): 
+SERVER: SendControlsToClient(0):
     "UI_INITIAL_GUI: n serialised UI elements"
 CLIENT: controls.js:handleEvent()
     "uiok:n"
@@ -365,10 +365,10 @@ SERVER: SendControlsToClient(n):
     "UI_EXTEND_GUI: n serialised UI elements"
 CLIENT: controls.js:handleEvent()
     "uiok:2*n"
-etc. 
+etc.
     Returns true if all controls have been sent (aka: Done)
 */
-bool ESPUIclient::SendControlsToClient(uint16_t startidx, 
+bool ESPUIclient::SendControlsToClient(uint16_t startidx,
                                        ClientUpdateType_t TransferMode)
 {
     bool Response = false;
@@ -446,10 +446,10 @@ bool ESPUIclient::SendJsonDocToWebSocket(DynamicJsonDocument& document)
             #if defined(DEBUG_ESPUI)
                 if (ESPUI.verbosity >= Verbosity::VerboseJSON)
                 {
-                    Serial.println("SendJsonDocToWebSocket: Cannot Send to client. Not sending websocket message");
+                    Serial.println(F("ESPUIclient::SendJsonDocToWebSocket: Cannot Send to client. Not sending websocket message"));
                 }
             #endif
-            // Serial.println("SendJsonDocToWebSocket: Cannot Send to client. Not sending websocket message");
+            // Serial.println("ESPUIclient::SendJsonDocToWebSocket: Cannot Send to client. Not sending websocket message");
             Response = false;
             break;
         }
@@ -462,17 +462,17 @@ bool ESPUIclient::SendJsonDocToWebSocket(DynamicJsonDocument& document)
         #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity >= Verbosity::VerboseJSON)
             {
-                Serial.println(String("SendJsonDocToWebSocket: json: '") + json + "'");
+                Serial.println(String(F("ESPUIclient::SendJsonDocToWebSocket: json: '")) + json + "'");
             }
         #endif
 
         #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity >= Verbosity::VerboseJSON)
             {
-                Serial.println(F("SendJsonDocToWebSocket: client.text"));
+                Serial.println(F("ESPUIclient::SendJsonDocToWebSocket: client.text"));
             }
         #endif
-        // Serial.println(F("SendJsonDocToWebSocket: client.text"));
+        // Serial.println(F("ESPUIclient::SendJsonDocToWebSocket: client.text"));
         client->text(json);
 
     } while (false);
