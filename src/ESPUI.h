@@ -11,7 +11,11 @@
 #if defined(ESP32)
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <LITTLEFS.h>
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+	#include <LittleFS.h>
+#else
+	#include <LITTLEFS.h>
+#endif
 
 #include "WiFi.h"
 
@@ -246,8 +250,7 @@ public:
     void beginLITTLEFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
         uint16_t port = 80); // Setup server and page in LITTLEFS mode
 
-    void prepareFileSystem(); // Initially preps the filesystem and loads a lot of
-                              // stuff into LITTLEFS
+    void prepareFileSystem(bool format = true); // Initially preps the filesystem and loads a lot of stuff into LITTLEFS
     void list(); // Lists LITTLEFS directory
 
     uint16_t addControl(ControlType type, const char* label);
