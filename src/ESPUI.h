@@ -1,18 +1,21 @@
-#ifndef ESPUI_h
-#define ESPUI_h
+#pragma once
 
+// comment out to turn off debug output
 #define DEBUG_ESPUI true
 #define WS_AUTHENTICATION false
 
-#include "Arduino.h"
-#include "ArduinoJson.h"
-#include "stdlib_noniso.h"
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include <stdlib_noniso.h>
+#include <LittleFS.h>
+#include <map>
+#include <ESPAsyncWebServer.h>
+
+#include "ESPUIcontrol.h"
+#include "ESPUIclient.h"
 
 #if defined(ESP32)
 #include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <LITTLEFS.h>
-
 #include "WiFi.h"
 
 #else
@@ -21,9 +24,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
 #include <Hash.h>
-#include <LittleFS.h>
 
 #define FILE_WRITE "w"
 
@@ -31,166 +32,18 @@
 
 // Message Types (and control types)
 
-enum ControlType : uint8_t
+enum MessageTypes : uint8_t
 {
-    // fixed controls
-    Title = 0,
-
-    // updatable controls
-    Pad,
-    PadWithCenter,
-    Button,
-    Label,
-    Switcher,
-    Slider,
-    Number,
-    Text,
-    Graph,
-    GraphPoint,
-    Tab,
-    Select,
-    Option,
-    Min,
-    Max,
-    Step,
-    Gauge,
-    Accel,
-    Separator,
-    Time,
-
-    UpdateOffset = 100,
-    UpdatePad = 101,
-    UpdatePadWithCenter,
-    ButtonButton,
-    UpdateLabel,
-    UpdateSwitcher,
-    UpdateSlider,
-    UpdateNumber,
-    UpdateText,
-    ClearGraph,
-    UpdateTab,
-    UpdateSelection,
-    UpdateOption,
-    UpdateMin,
-    UpdateMax,
-    UpdateStep,
-    UpdateGauge,
-    UpdateAccel,
-    UpdateSeparator,
-    UpdateTime,
-
     InitialGui = 200,
     Reload = 201,
-    ExtendGUI = 210
+    ExtendGUI = 210,
+    UpdateGui = 220,
+    ExtendedUpdateGui = 230,
 };
 
-#define UI_INITIAL_GUI ControlType::InitialGui
-#define UI_RELOAD ControlType::Reload
-#define UI_EXTEND_GUI ControlType::ExtendGUI
-
-#define UI_TITLE ControlType::Title
-#define UI_LABEL ControlType::Label
-#define UI_BUTTON ControlType::Button
-#define UI_SWITCHER ControlType::Switcher
-#define UI_PAD ControlType::Pad
-#define UI_CPAD ControlType::Cpad
-#define UI_SLIDER ControlType::Slider
-#define UI_NUMBER ControlType::Number
-#define UI_TEXT_INPUT ControlType::Text
-#define UI_GRAPH ControlType::Graph
-#define UI_ADD_GRAPH_POINT ControlType::GraphPoint
-
-#define UPDATE_LABEL ControlType::UpdateLabel
-#define UPDATE_SWITCHER ControlType::UpdateSwitcher
-#define UPDATE_SLIDER ControlType::UpdateSlider
-#define UPDATE_NUMBER ControlType::UpdateNumber
-#define UPDATE_TEXT_INPUT ControlType::UpdateText
-#define CLEAR_GRAPH ControlType::ClearGraph
-
-// Colors
-enum ControlColor : uint8_t
-{
-    Turquoise,
-    Emerald,
-    Peterriver,
-    Wetasphalt,
-    Sunflower,
-    Carrot,
-    Alizarin,
-    Dark,
-    None = 0xFF
-};
-#define COLOR_TURQUOISE ControlColor::Turquoise
-#define COLOR_EMERALD ControlColor::Emerald
-#define COLOR_PETERRIVER ControlColor::Peterriver
-#define COLOR_WETASPHALT ControlColor::Wetasphalt
-#define COLOR_SUNFLOWER ControlColor::Sunflower
-#define COLOR_CARROT ControlColor::Carrot
-#define COLOR_ALIZARIN ControlColor::Alizarin
-#define COLOR_DARK ControlColor::Dark
-#define COLOR_NONE ControlColor::None
-
-class Control
-{
-public:
-    ControlType type;
-    uint16_t id; // just mirroring the id here for practical reasons
-    const char* label;
-    void (*callback)(Control*, int);
-    void (*extendedCallback)(Control*, int, void*);
-    void* user;
-    String value;
-    ControlColor color;
-    bool visible;
-    bool wide;
-    bool vertical;
-    bool enabled;
-    uint16_t parentControl;
-    String panelStyle;
-    String elementStyle;
-    String inputType;
-    Control* next;
-
-    static constexpr uint16_t noParent = 0xffff;
-
-    Control(ControlType type, const char* label, void (*callback)(Control*, int, void*), void* UserData,
-        const String& value, ControlColor color, bool visible, uint16_t parentControl)
-        : type(type),
-          label(label),
-          callback(nullptr),
-          extendedCallback(callback),
-          user(UserData),
-          value(value),
-          color(color),
-          visible(visible),
-          wide(false),
-          vertical(false),
-          enabled(true),
-          parentControl(parentControl),
-          next(nullptr)
-    {
-        id = idCounter++;
-    }
-
-    Control(const Control& control)
-        : type(control.type),
-          id(control.id),
-          label(control.label),
-          callback(control.callback),
-          extendedCallback(control.extendedCallback),
-          user(control.user),
-          value(control.value),
-          color(control.color),
-          visible(control.visible),
-          parentControl(control.parentControl),
-          next(control.next)
-    { }
-    void SendCallback(int type);
-    bool HasCallback() { return ((nullptr != callback) || (nullptr != extendedCallback)); }
-
-private:
-    static uint16_t idCounter;
-};
+#define UI_INITIAL_GUI  MessageTypes::InitialGui
+#define UI_EXTEND_GUI   MessageTypes::ExtendGUI
+#define UI_RELOAD       MessageTypes::Reload
 
 // Values
 #define B_DOWN -1
@@ -232,10 +85,15 @@ public:
         jsonUpdateDocumentSize = 2000;
         jsonInitialDocumentSize = 8000;
         sliderContinuous = false;
+#ifdef ESP32
+        ControlsSemaphore = xSemaphoreCreateMutex();
+        xSemaphoreGive(ControlsSemaphore);
+#endif // def ESP32
     }
     unsigned int jsonUpdateDocumentSize;
     unsigned int jsonInitialDocumentSize;
     bool sliderContinuous;
+    void onWsEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 	bool captivePortal = true;
 
     void setVerbosity(Verbosity verbosity);
@@ -257,7 +115,7 @@ public:
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int));
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int, void *), void* UserData);
 
-    bool removeControl(uint16_t id, bool force_reload_ui = false);
+    bool removeControl(uint16_t id, bool force_rebuild_ui = false);
 
     // create Elements
     // Create Event Button
@@ -297,10 +155,14 @@ public:
     // Update Elements
 
     Control* getControl(uint16_t id);
+    Control* getControlNoLock(uint16_t id);
 
     // Update Elements
     void updateControlValue(uint16_t id, const String& value, int clientId = -1);
     void updateControlValue(Control* control, const String& value, int clientId = -1);
+
+    void updateControlLabel(uint16_t control, const char * value, int clientId = -1);
+    void updateControlLabel(Control* control, const char * value, int clientId = -1);
 
     void updateControl(uint16_t id, int clientId = -1);
     void updateControl(Control* control, int clientId = -1);
@@ -333,22 +195,37 @@ public:
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
     Control* controls = nullptr;
     void jsonReload();
-    void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr);
+    void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);
 
     Verbosity verbosity;
+
+protected:
+    friend class ESPUIclient;
+    friend class ESPUIcontrol;
+
+#ifdef ESP32
+    SemaphoreHandle_t ControlsSemaphore = NULL;
+#endif // def ESP32
+
+    void        RemoveToBeDeletedControls();
 
     AsyncWebServer* server;
     AsyncWebSocket* ws;
 
-private:
     const char* basicAuthUsername = nullptr;
     const char* basicAuthPassword = nullptr;
     bool basicAuth = true;
-
     uint16_t controlCount = 0;
 
-    void prepareJSONChunk(AsyncWebSocketClient* client, uint16_t startindex, JsonArray* items);
+#define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
+    void NotifyClients(ClientUpdateType_t newState);
+    void NotifyClient(uint32_t WsClientId, ClientUpdateType_t newState);
+    void ClearControlUpdateFlags();
+
+    bool SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId);
+
+    std::map<uint32_t, ESPUIclient*> MapOfClients;
+
 };
 
 extern ESPUIClass ESPUI;
-#endif
