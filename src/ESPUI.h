@@ -104,7 +104,7 @@ public:
     void beginLITTLEFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
         uint16_t port = 80); // Setup server and page in LITTLEFS mode
 
-    void prepareFileSystem(); // Initially preps the filesystem and loads a lot of
+    void prepareFileSystem(bool format = true); // Initially preps the filesystem and loads a lot of
                               // stuff into LITTLEFS
     void list(); // Lists LITTLEFS directory
 
