@@ -7,7 +7,11 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <stdlib_noniso.h>
-#include <LittleFS.h>
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+	#include <LittleFS.h>
+#else
+	#include <LITTLEFS.h>
+#endif
 #include <map>
 #include <ESPAsyncWebServer.h>
 
