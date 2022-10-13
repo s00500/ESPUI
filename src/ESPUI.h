@@ -7,10 +7,14 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <stdlib_noniso.h>
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-	#include <LittleFS.h>
+#ifdef ESP32
+	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+		#include <LittleFS.h>
+	#else
+		#include <LITTLEFS.h>
+	#endif
 #else
-	#include <LITTLEFS.h>
+	#include <LittleFS.h>
 #endif
 #include <map>
 #include <ESPAsyncWebServer.h>
