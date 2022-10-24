@@ -7,7 +7,15 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <stdlib_noniso.h>
-#include <LittleFS.h>
+#ifdef ESP32
+	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+		#include <LittleFS.h>
+	#else
+		#include <LITTLEFS.h>
+	#endif
+#else
+	#include <LittleFS.h>
+#endif
 #include <map>
 #include <ESPAsyncWebServer.h>
 
@@ -104,7 +112,7 @@ public:
     void beginLITTLEFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
         uint16_t port = 80); // Setup server and page in LITTLEFS mode
 
-    void prepareFileSystem(); // Initially preps the filesystem and loads a lot of
+    void prepareFileSystem(bool format = true); // Initially preps the filesystem and loads a lot of
                               // stuff into LITTLEFS
     void list(); // Lists LITTLEFS directory
 
