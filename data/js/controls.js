@@ -176,7 +176,8 @@ function restoreGraphData(id) {
     var savedData = localStorage.getItem("espuigraphs", graphData);
     if (savedData != null) {
         savedData = JSON.parse(savedData);
-        return savedData[id];
+        let idData = savedData[id];
+        return Array.isArray(idData) ? idData : [];
     }
     return [];
 }
