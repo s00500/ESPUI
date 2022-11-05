@@ -1043,7 +1043,7 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId) {
         DynamicJsonDocument document(jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
-        root[F("type")] = 109;
+        root[F("type")] = (int)ControlType::Graph + UpdateOffset;
         root[F("value")] = 0;
         root[F("id")] = control->id;
 
