@@ -1031,7 +1031,26 @@ void ESPUIClass::updateTime(uint16_t id, int clientId)
     updateControl(id, clientId);
 }
 
-void ESPUIClass::clearGraph(uint16_t id, int clientId) { }
+void ESPUIClass::clearGraph(uint16_t id, int clientId) { 
+    do // once
+    {
+        Control* control = getControl(id);
+        if (!control)
+        {
+            break;
+        }
+
+        DynamicJsonDocument document(jsonUpdateDocumentSize);
+        JsonObject root = document.to<JsonObject>();
+
+        root[F("type")] = (int)ControlType::Graph + UpdateOffset;
+        root[F("value")] = 0;
+        root[F("id")] = control->id;
+
+        SendJsonDocToWebSocket(document, clientId);
+
+    } while(false);
+ }
 
 void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
 {
