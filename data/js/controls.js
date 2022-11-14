@@ -489,9 +489,12 @@ function start() {
 
             case UI_STEP:
                 if (data.parentControl) {
-                    var parent = $("#id" + data.parentControl + " input");
-                    if (parent.size()) {
-                        parent.attr("step", data.value);
+                    //Is it applied to a slider?
+                    if ($('#sl' + data.parentControl).length) {
+                        $('#sl' + data.parentControl).attr("step", data.value);
+                    } else if ($('#num' + data.parentControl).length) {
+                        //Or a number
+                        $('#num' + data.parentControl).attr("step", data.value);
                     }
                 }
                 break;
