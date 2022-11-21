@@ -111,7 +111,7 @@
   }
 
   svg:not(:root) {
-    overflow: hidden;
+    overflow: visible;
   }
 
   /* Grouping content
