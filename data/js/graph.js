@@ -55,13 +55,13 @@ function lineGraph(parent, xAccessor, yAccessor) {
 
       // generate labels
       for (var i = xMin; i <= xMax; i++) {
-        if ((i - xMin) % pixelsPerTick === 0 && i !== xMin) {
+        if ((i - xMin) % (pixelsPerTick*3) === 0 && i !== xMin) {
           var text = document.createElementNS(
             "http://www.w3.org/2000/svg",
             "text"
           );
           // primitive formatting
-          text.innerHTML = Math.floor(transform(i));
+          text.innerHTML = new Date(Math.floor(transform(i))).toLocaleTimeString();
           text.setAttribute("x", i);
           text.setAttribute("y", yMin);
           // offset the text by 1 em
