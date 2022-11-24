@@ -507,7 +507,7 @@ function start() {
                 }
                 break;
             case ADD_GRAPH_POINT:
-                var ts = Math.round(new Date().getTime() / 1000);
+                var ts = new Date().getTime();
                 graphData[data.id].push({ x: ts, y: data.value });
                 saveGraphData();
                 renderGraphSvg(graphData[data.id], "graph" + data.id);
