@@ -30,6 +30,7 @@ enum ControlType : uint8_t
     Separator,
     Time,
 
+    Password = 99,
     UpdateOffset = 100,
 };
 

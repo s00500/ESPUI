@@ -59,16 +59,17 @@ void Control::DeleteControl()
 void Control::MarshalControl(JsonObject & item, bool refresh)
 {
     item[F("id")]      = id;
+    ControlType TempType = (ControlType::Password == type) ? ControlType::Text : type;
     if(refresh)
     {
-        item[F("type")] = uint32_t(type) + uint32_t(ControlType::UpdateOffset);
+        item[F("type")] = uint32_t(TempType) + uint32_t(ControlType::UpdateOffset);
     }
     else
     {
-        item[F("type")] = uint32_t(type);
+        item[F("type")] = uint32_t(TempType);
     }
     item[F("label")]   = label;
-    item[F("value")]   = value;
+    item[F ("value")]   = (ControlType::Password == type) ? F ("--------") : value;
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
     item[F("enabled")] = enabled;
