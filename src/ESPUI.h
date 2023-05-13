@@ -206,6 +206,7 @@ public:
     void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);
 
     Verbosity verbosity;
+    AsyncWebServer* server;
 
 protected:
     friend class ESPUIclient;
@@ -217,7 +218,6 @@ protected:
 
     void        RemoveToBeDeletedControls();
 
-    AsyncWebServer* server;
     AsyncWebSocket* ws;
 
     const char* basicAuthUsername = nullptr;
