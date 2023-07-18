@@ -13,6 +13,61 @@
 #include "dataTabbedcontentJS.h"
 #include "dataZeptoJS.h"
 
+#if ESP8266
+#include <umm_malloc/umm_heap_select.h>
+#endif
+
+static String heapInfo (const __FlashStringHelper* mode)
+{
+#if ESP8266
+
+    uint32_t hfree;
+    uint32_t hmax;
+    uint8_t hfrag;
+    String result;
+    result.reserve(128);
+
+#ifdef UMM_HEAP_IRAM
+    // here esp8266 is configurerd to use an extra 16KB (i)ram
+    {
+        HeapSelectIram useInstructionRamHere;
+        ESP.getHeapStats(&hfree, &hmax, &hfrag);
+    }
+    result += F("IRAM: free: ");
+    result += hfree;
+    result += F(" max: ");
+    result += hmax;
+    result += F(" frag: ");
+    result += hfrag;
+    result += "%\n";
+#endif // !UMM_HEAP_IRAM
+    {
+        HeapSelectDram useRegularRamHere;
+        ESP.getHeapStats(&hfree, &hmax, &hfrag);
+    }
+    result += F("DRAM: free: ");
+    result += hfree;
+    result += F(" max: ");
+    result += hmax;
+    result += F(" frag: ");
+    result += hfrag;
+    result += "%\n";
+
+#else // !ESP8266
+
+    result += ESP.getFreeHeap();
+    result += ' ';
+
+#endif // !ESP8266
+
+    result += mode;
+
+    return result;
+}
+
+
+
+
 // ################# LITTLEFS functions
 #if defined(ESP32)
 void listDir(const char* dirname, uint8_t levels)
@@ -1260,7 +1315,8 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
             return request->requestAuthentication();
         }
 
-        request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In LITTLEFS mode");
+        request->send(200, "text/plain", heapInfo(F("In LITTLEFS mode")));
+
     });
 
     server->onNotFound([this](AsyncWebServerRequest* request) {
@@ -1418,7 +1474,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             return request->requestAuthentication();
         }
 
-        request->send(200, "text/plain", String(ESP.getFreeHeap()) + " In Memorymode");
+        request->send(200, "text/plain", heapInfo(F("In Memorymode")));
     });
 
     server->onNotFound([this](AsyncWebServerRequest* request) {

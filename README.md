@@ -495,7 +495,7 @@ ESPUI includes a range of advanced features that can customise your UIs.
 
 ### Dynamic Visibility
 
-Cotrols can be made visible or invisible at runtime with the `updateVisibility()` function.
+Controls can be made visible or invisible at runtime with the `updateVisibility()` function.
 
 ```
 ESPUI.updateVisibility(controlId, false);
