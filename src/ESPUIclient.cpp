@@ -2,6 +2,42 @@
 #include "ESPUIclient.h"
 #include "ESPUIcontrol.h"
 
+// JSONSlave:
+// helper to process exact JSON serialization size
+// it takes ~2ms on esp8266 and avoid large String reallocation which is really worth the cost
+class JSONSlave: public Print
+{
+public:
+    size_t write (uint8_t c) override { counter++; return 1; }
+    size_t write (const uint8_t* buf, size_t count) override { counter += count; return count; }
+    size_t get_counter () { return counter; }
+
+    static size_t serializedSize (JsonDocument& doc)
+    {
+        JSONSlave counter;
+        serializeJson(doc, counter);
+        return counter.get_counter();
+    }
+
+    static size_t serialize (JsonDocument& doc, String& str)
+    {
+        size_t s = serializedSize(doc) + 10; // 10 is paranoid
+        str.reserve(s);
+        serializeJson(doc, str);
+        return s;
+    }
+
+    static String toString (JsonDocument& doc)
+    {
+        String str;
+        serialize(doc, str);
+        return str;
+    }
+
+protected:
+    size_t counter = 0;
+};
+
 ESPUIclient::ESPUIclient(AsyncWebSocketClient * _client):
     client(_client)
 {
@@ -309,7 +345,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
             elementcount++;
             control->MarshalControl(item, InUpdateMode);
             
-            if (rootDoc.overflowed())
+            if (rootDoc.overflowed() || (ESPUI.jsonChunkNumberMax > 0 && (elementcount % ESPUI.jsonChunkNumberMax) == 0))
             {
                 // String("prepareJSONChunk: too much data in the message. Remove the last entry");
                 if (1 == elementcount)
@@ -407,9 +443,8 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx,
                 if (ESPUI.verbosity >= Verbosity::VerboseJSON)
                 {
                     Serial.println(F("ESPUIclient:SendControlsToClient: Sending elements --------->"));
-                    String json;
-                    serializeJson(document, json);
-                    Serial.println(json);
+                    serializeJson(document, Serial);
+                    Serial.println();
                 }
             #endif
 
@@ -454,10 +489,7 @@ bool ESPUIclient::SendJsonDocToWebSocket(DynamicJsonDocument& document)
             break;
         }
 
-        String json;
-        json.reserve(document.size() / 2);
-        json.clear();
-        serializeJson(document, json);
+        String json = JSONSlave::toString(document);
 
         #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity >= Verbosity::VerboseJSON)

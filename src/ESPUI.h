@@ -87,20 +87,25 @@ enum Verbosity : uint8_t
 class ESPUIClass
 {
 public:
+
+#ifdef ESP32
     ESPUIClass()
     {
-        verbosity = Verbosity::Quiet;
-        jsonUpdateDocumentSize = 2000;
-        jsonInitialDocumentSize = 8000;
-        sliderContinuous = false;
-#ifdef ESP32
         ControlsSemaphore = xSemaphoreCreateMutex();
         xSemaphoreGive(ControlsSemaphore);
-#endif // def ESP32
     }
-    unsigned int jsonUpdateDocumentSize;
-    unsigned int jsonInitialDocumentSize;
-    bool sliderContinuous;
+    SemaphoreHandle_t ControlsSemaphore = NULL;
+#endif // def ESP32
+
+    unsigned int jsonUpdateDocumentSize = 2000;
+#ifdef ESP8266
+    unsigned int jsonInitialDocumentSize = 2000;
+    unsigned int jsonChunkNumberMax = 5;
+#else
+    unsigned int jsonInitialDocumentSize = 8000;
+    unsigned int jsonChunkNumberMax = 0;
+#endif
+    bool sliderContinuous = false;
     void onWsEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 	bool captivePortal = true;
 
@@ -205,16 +210,12 @@ public:
     void jsonReload();
     void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);
 
-    Verbosity verbosity;
+    Verbosity verbosity = Verbosity::Quiet;
     AsyncWebServer* server;
 
 protected:
     friend class ESPUIclient;
     friend class ESPUIcontrol;
-
-#ifdef ESP32
-    SemaphoreHandle_t ControlsSemaphore = NULL;
-#endif // def ESP32
 
     void        RemoveToBeDeletedControls();
 
