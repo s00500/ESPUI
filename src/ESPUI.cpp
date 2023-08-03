@@ -17,14 +17,14 @@
 #include <umm_malloc/umm_heap_select.h>
 #endif
 
-static String heapInfo (const __FlashStringHelper* mode)
+static String heapInfo(const __FlashStringHelper* mode)
 {
+    String result;
 #if ESP8266
 
     uint32_t hfree;
-    uint32_t hmax;
+    uint16_t hmax;
     uint8_t hfrag;
-    String result;
     result.reserve(128);
 
 #ifdef UMM_HEAP_IRAM
@@ -65,9 +65,6 @@ static String heapInfo (const __FlashStringHelper* mode)
     return result;
 }
 
-
-
-
 // ################# LITTLEFS functions
 #if defined(ESP32)
 void listDir(const char* dirname, uint8_t levels)
@@ -80,11 +77,11 @@ void listDir(const char* dirname, uint8_t levels)
 #endif
 
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		File root = LittleFS.open(dirname);
-	#else
-		File root = LITTLEFS.open(dirname);
-	#endif
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    File root = LittleFS.open(dirname);
+#else
+    File root = LITTLEFS.open(dirname);
+#endif
 #else
     File root = LittleFS.open(dirname);
 #endif
@@ -129,11 +126,11 @@ void listDir(const char* dirname, uint8_t levels)
 
             if (levels)
             {
-				#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-					listDir(file.path(), levels - 1);
-				#else
-					listDir(file.name(), levels - 1);
-				#endif
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+                listDir(file.path(), levels - 1);
+#else
+                listDir(file.name(), levels - 1);
+#endif
             }
         }
         else
@@ -178,13 +175,13 @@ void listDir(const char* dirname, uint8_t levels)
 #endif
             if (levels)
             {
-				File file = dir.openFile("r");
-				listDir(file.fullName(), levels - 1);
-				file.close();
-			}
-		}
-		else
-		{
+                File file = dir.openFile("r");
+                listDir(file.fullName(), levels - 1);
+                file.close();
+            }
+        }
+        else
+        {
 #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity)
             {
@@ -194,7 +191,7 @@ void listDir(const char* dirname, uint8_t levels)
                 Serial.println(dir.fileSize());
             }
 #endif
-		}
+        }
     }
 }
 
@@ -203,11 +200,11 @@ void listDir(const char* dirname, uint8_t levels)
 void ESPUIClass::list()
 {
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-	if (!LittleFS.begin())
-	#else
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    if (!LittleFS.begin())
+#else
     if (!LITTLEFS.begin())
-	#endif
+#endif
     {
         Serial.println(F("LITTLEFS Mount Failed"));
         return;
@@ -223,27 +220,27 @@ void ESPUIClass::list()
     listDir("/", 1);
 #if defined(ESP32)
 
-	Serial.print(F("Total KB: "));
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		Serial.println(LittleFS.totalBytes()/1024);
-	#else
-		Serial.println(LITTLEFS.totalBytes()/1024);
-	#endif
-	Serial.print(F("Used KB: "));
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		Serial.println(LittleFS.usedBytes()/1024);
-	#else
-		Serial.println(LITTLEFS.usedBytes()/1024);
-	#endif
+    Serial.print(F("Total KB: "));
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    Serial.println(LittleFS.totalBytes() / 1024);
+#else
+    Serial.println(LITTLEFS.totalBytes() / 1024);
+#endif
+    Serial.print(F("Used KB: "));
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    Serial.println(LittleFS.usedBytes() / 1024);
+#else
+    Serial.println(LITTLEFS.usedBytes() / 1024);
+#endif
 
 #else
     FSInfo fs_info;
     LittleFS.info(fs_info);
 
-	Serial.print(F("Total KB: "));
-    Serial.println(fs_info.totalBytes/1024);
-	Serial.print(F("Used KB: "));
-    Serial.println(fs_info.usedBytes/1024);
+    Serial.print(F("Total KB: "));
+    Serial.println(fs_info.totalBytes / 1024);
+    Serial.print(F("Used KB: "));
+    Serial.println(fs_info.usedBytes / 1024);
 
 #endif
 }
@@ -251,11 +248,11 @@ void ESPUIClass::list()
 void deleteFile(const char* path)
 {
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		bool exists = LittleFS.exists(path);
-	#else
-		bool exists = LITTLEFS.exists(path);
-	#endif
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    bool exists = LittleFS.exists(path);
+#else
+    bool exists = LITTLEFS.exists(path);
+#endif
 #else
     bool exists = LittleFS.exists(path);
 #endif
@@ -279,11 +276,11 @@ void deleteFile(const char* path)
 #endif
 
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		bool didRemove = LittleFS.remove(path);
-	#else
-		bool didRemove = LITTLEFS.remove(path);
-	#endif
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    bool didRemove = LittleFS.remove(path);
+#else
+    bool didRemove = LITTLEFS.remove(path);
+#endif
 #else
     bool didRemove = LittleFS.remove(path);
 #endif
@@ -317,11 +314,11 @@ void writeFile(const char* path, const char* data)
 #endif
 
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		File file = LittleFS.open(path, FILE_WRITE);
-	#else
-		File file = LITTLEFS.open(path, FILE_WRITE);
-	#endif
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    File file = LittleFS.open(path, FILE_WRITE);
+#else
+    File file = LITTLEFS.open(path, FILE_WRITE);
+#endif
 #else
     File file = LittleFS.open(path, FILE_WRITE);
 #endif
@@ -398,40 +395,40 @@ void ESPUIClass::prepareFileSystem(bool format)
 
 #if defined(ESP32)
 #if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    if(!LittleFS.begin(false))	//Test for an already formatted LittleFS by a mount failure
+    if (!LittleFS.begin(false)) // Test for an already formatted LittleFS by a mount failure
 #else
-	if(!LITTLEFS.begin(false))	//Test for an already formatted LittleFS by a mount failure
+    if (!LITTLEFS.begin(false)) // Test for an already formatted LittleFS by a mount failure
 #endif
     {
 #if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		if(!LittleFS.begin(true))	//Attempt to format LittleFS
+        if (!LittleFS.begin(true)) // Attempt to format LittleFS
 #else
-		if(!LITTLEFS.begin(true))	//Attempt to format LittleFS
+        if (!LITTLEFS.begin(true)) // Attempt to format LittleFS
 #endif
-		{
+        {
 #if defined(DEBUG_ESPUI)
-			if (verbosity)
-			{
-				Serial.println(F("LittleFS Format Failed"));
-			}
+            if (verbosity)
+            {
+                Serial.println(F("LittleFS Format Failed"));
+            }
 #endif
-        return;
-		}
+            return;
+        }
     }
-	else if(format)
-	{
+    else if (format)
+    {
 #if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		LittleFS.format();
+        LittleFS.format();
 #else
-		LITTLEFS.format();
+        LITTLEFS.format();
 #endif
 #if defined(DEBUG_ESPUI)
-		if (verbosity)
-		{
-			Serial.println(F("LittleFS Formatted"));
-		}
+        if (verbosity)
+        {
+            Serial.println(F("LittleFS Formatted"));
+        }
 #endif
-	}
+    }
 
 #if defined(DEBUG_ESPUI)
     if (verbosity)
@@ -443,38 +440,38 @@ void ESPUIClass::prepareFileSystem(bool format)
 
 #else
 
-    if (!LittleFS.begin())	//Test for an already formatted LittleFS by a mount failure
+    if (!LittleFS.begin()) // Test for an already formatted LittleFS by a mount failure
     {
-		if(LittleFS.format())	//Attempt to format LittleFS
-		{
+        if (LittleFS.format()) // Attempt to format LittleFS
+        {
 #if defined(DEBUG_ESPUI)
-			if (verbosity)
-			{
-				Serial.println(F("LittleFS Formatted"));
-			}
+            if (verbosity)
+            {
+                Serial.println(F("LittleFS Formatted"));
+            }
 #endif
-		}
-		else
-		{
+        }
+        else
+        {
 #if defined(DEBUG_ESPUI)
-			if (verbosity)
-			{
-				Serial.println(F("LittleFS Mount Failed"));
-			}
+            if (verbosity)
+            {
+                Serial.println(F("LittleFS Mount Failed"));
+            }
 #endif
-        return;
-		}
+            return;
+        }
     }
-	else if(format)
-	{
-		LittleFS.format();
+    else if (format)
+    {
+        LittleFS.format();
 #if defined(DEBUG_ESPUI)
-		if (verbosity)
-		{
-			Serial.println(F("LittleFS Formatted"));
-		}
+        if (verbosity)
+        {
+            Serial.println(F("LittleFS Formatted"));
+        }
 #endif
-	}
+    }
 
 #if defined(DEBUG_ESPUI)
     if (verbosity)
@@ -505,33 +502,33 @@ void ESPUIClass::prepareFileSystem(bool format)
 #endif
 
     // Now write
-	#ifdef ESP32
-		#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		writeFile("/index.htm", HTML_INDEX);
-		LittleFS.mkdir("/css");
-		writeFile("/css/style.css", CSS_STYLE);
-		writeFile("/css/normalize.css", CSS_NORMALIZE);
-		LittleFS.mkdir("/js");
-		writeFile("/js/zepto.min.js", JS_ZEPTO);
-		writeFile("/js/controls.js", JS_CONTROLS);
-		writeFile("/js/slider.js", JS_SLIDER);
-		writeFile("/js/graph.js", JS_GRAPH);
+#ifdef ESP32
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    writeFile("/index.htm", HTML_INDEX);
+    LittleFS.mkdir("/css");
+    writeFile("/css/style.css", CSS_STYLE);
+    writeFile("/css/normalize.css", CSS_NORMALIZE);
+    LittleFS.mkdir("/js");
+    writeFile("/js/zepto.min.js", JS_ZEPTO);
+    writeFile("/js/controls.js", JS_CONTROLS);
+    writeFile("/js/slider.js", JS_SLIDER);
+    writeFile("/js/graph.js", JS_GRAPH);
 
-		writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
-		#else
-		writeFile("/index.htm", HTML_INDEX);
-		LITTLEFS.mkdir("/css");
-		writeFile("/css/style.css", CSS_STYLE);
-		writeFile("/css/normalize.css", CSS_NORMALIZE);
-		LITTLEFS.mkdir("/js");
-		writeFile("/js/zepto.min.js", JS_ZEPTO);
-		writeFile("/js/controls.js", JS_CONTROLS);
-		writeFile("/js/slider.js", JS_SLIDER);
-		writeFile("/js/graph.js", JS_GRAPH);
+    writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
+#else
+    writeFile("/index.htm", HTML_INDEX);
+    LITTLEFS.mkdir("/css");
+    writeFile("/css/style.css", CSS_STYLE);
+    writeFile("/css/normalize.css", CSS_NORMALIZE);
+    LITTLEFS.mkdir("/js");
+    writeFile("/js/zepto.min.js", JS_ZEPTO);
+    writeFile("/js/controls.js", JS_CONTROLS);
+    writeFile("/js/slider.js", JS_SLIDER);
+    writeFile("/js/graph.js", JS_GRAPH);
 
-		writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
-		#endif
-	#else
+    writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
+#endif
+#else
     writeFile("/index.htm", HTML_INDEX);
 
     writeFile("/css/style.css", CSS_STYLE);
@@ -543,7 +540,7 @@ void ESPUIClass::prepareFileSystem(bool format)
     writeFile("/js/graph.js", JS_GRAPH);
 
     writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
-	#endif
+#endif
 
 #if defined(DEBUG_ESPUI)
     if (verbosity)
@@ -564,33 +561,33 @@ void ESPUIClass::prepareFileSystem(bool format)
 #endif
 
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-	LittleFS.end();
-	#else
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    LittleFS.end();
+#else
     LITTLEFS.end();
-	#endif
+#endif
 #else
     LittleFS.end();
 #endif
-
 }
 
 // Handle Websockets Communication
-void ESPUIClass::onWsEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
+void ESPUIClass::onWsEvent(
+    AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
 {
     // Serial.println(String("ESPUIClass::OnWsEvent: type: ") + String(type));
     RemoveToBeDeletedControls();
 
-    if(WS_EVT_DISCONNECT == type)
+    if (WS_EVT_DISCONNECT == type)
     {
-        #if defined(DEBUG_ESPUI)
-            if (verbosity)
-            {
-                Serial.println(F("WS_EVT_DISCONNECT"));
-            }
-        #endif
+#if defined(DEBUG_ESPUI)
+        if (verbosity)
+        {
+            Serial.println(F("WS_EVT_DISCONNECT"));
+        }
+#endif
 
-        if(MapOfClients.end() != MapOfClients.find(client->id()))
+        if (MapOfClients.end() != MapOfClients.find(client->id()))
         {
             // Serial.println("Delete client.");
             delete MapOfClients[client->id()];
@@ -599,7 +596,7 @@ void ESPUIClass::onWsEvent(AsyncWebSocket* server, AsyncWebSocketClient* client,
     }
     else
     {
-        if(MapOfClients.end() == MapOfClients.find(client->id()))
+        if (MapOfClients.end() == MapOfClients.find(client->id()))
         {
             // Serial.println("ESPUIClass::OnWsEvent:Create new client.");
             MapOfClients[client->id()] = new ESPUIclient(client);
@@ -627,12 +624,14 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
     return addControl(type, label, value, color, Control::noParent);
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
+uint16_t ESPUIClass::addControl(
+    ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
 {
     return addControl(type, label, value, color, parentControl, nullptr);
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int))
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
+    uint16_t parentControl, void (*callback)(Control*, int))
 {
     uint16_t id = addControl(type, label, value, color, parentControl, nullptr, nullptr);
     // set the original style callback
@@ -640,7 +639,8 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
     return id;
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, void (*callback)(Control*, int, void *), void * UserData)
+uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
+    uint16_t parentControl, void (*callback)(Control*, int, void*), void* UserData)
 {
 #ifdef ESP32
     xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
@@ -686,7 +686,7 @@ bool ESPUIClass::removeControl(uint16_t id, bool force_rebuild_ui)
         control->DeleteControl();
         controlCount--;
 
-        if(force_rebuild_ui)
+        if (force_rebuild_ui)
         {
             jsonReload();
         }
@@ -707,9 +707,9 @@ bool ESPUIClass::removeControl(uint16_t id, bool force_rebuild_ui)
 
 void ESPUIClass::RemoveToBeDeletedControls()
 {
-    #ifdef ESP32
+#ifdef ESP32
     xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
-    #endif // def ESP32
+#endif // def ESP32
 
     Control* PreviousControl = nullptr;
     Control* CurrentControl = controls;
@@ -737,9 +737,9 @@ void ESPUIClass::RemoveToBeDeletedControls()
             CurrentControl = NextControl;
         }
     }
-    #ifdef ESP32
+#ifdef ESP32
     xSemaphoreGive(ControlsSemaphore);
-    #endif // def ESP32
+#endif // def ESP32
 }
 
 uint16_t ESPUIClass::label(const char* label, ControlColor color, const String& value)
@@ -752,16 +752,19 @@ uint16_t ESPUIClass::graph(const char* label, ControlColor color)
     return addControl(ControlType::Graph, label, "", color);
 }
 
-uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min, int max)
+uint16_t ESPUIClass::slider(
+    const char* label, void (*callback)(Control*, int), ControlColor color, int value, int min, int max)
 {
     uint16_t id = slider(label, nullptr, color, value, min, max, nullptr);
     getControl(id)->callback = callback;
     return id;
 }
 
-uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int value, int min, int max, void* userData)
+uint16_t ESPUIClass::slider(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int value,
+    int min, int max, void* userData)
 {
-    uint16_t sliderId = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback, userData);
+    uint16_t sliderId
+        = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback, userData);
     addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
     addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
 
@@ -773,7 +776,8 @@ uint16_t ESPUIClass::button(const char* label, void (*callback)(Control*, int), 
     return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::button(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
+uint16_t ESPUIClass::button(
+    const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
 {
     return addControl(ControlType::Button, label, value, color, Control::noParent, callback, UserData);
 }
@@ -783,9 +787,11 @@ uint16_t ESPUIClass::switcher(const char* label, void (*callback)(Control*, int)
     return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::switcher(const char* label, void (*callback)(Control*, int, void*), ControlColor color, bool startState, void* UserData)
+uint16_t ESPUIClass::switcher(
+    const char* label, void (*callback)(Control*, int, void*), ControlColor color, bool startState, void* UserData)
 {
-    return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback, UserData);
+    return addControl(
+        ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback, UserData);
 }
 
 uint16_t ESPUIClass::pad(const char* label, void (*callback)(Control*, int), ControlColor color)
@@ -803,12 +809,14 @@ uint16_t ESPUIClass::padWithCenter(const char* label, void (*callback)(Control*,
     return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::padWithCenter(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+uint16_t ESPUIClass::padWithCenter(
+    const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
 {
     return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback, UserData);
 }
 
-uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int), ControlColor color, int number, int min, int max)
+uint16_t ESPUIClass::number(
+    const char* label, void (*callback)(Control*, int), ControlColor color, int number, int min, int max)
 {
     uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
     addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
@@ -816,9 +824,11 @@ uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int), 
     return numberId;
 }
 
-uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int number, int min, int max, void* UserData)
+uint16_t ESPUIClass::number(const char* label, void (*callback)(Control*, int, void*), ControlColor color, int number,
+    int min, int max, void* UserData)
 {
-    uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback, UserData);
+    uint16_t numberId
+        = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback, UserData);
     addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
     addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
     return numberId;
@@ -832,7 +842,8 @@ uint16_t ESPUIClass::gauge(const char* label, ControlColor color, int number, in
     return numberId;
 }
 
-uint16_t ESPUIClass::separator(const char* label) {
+uint16_t ESPUIClass::separator(const char* label)
+{
     return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
 }
 
@@ -841,7 +852,8 @@ uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*,
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::accelerometer(const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
+uint16_t ESPUIClass::accelerometer(
+    const char* label, void (*callback)(Control*, int, void*), ControlColor color, void* UserData)
 {
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback, UserData);
 }
@@ -851,7 +863,8 @@ uint16_t ESPUIClass::text(const char* label, void (*callback)(Control*, int), Co
     return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::text(const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
+uint16_t ESPUIClass::text(
+    const char* label, void (*callback)(Control*, int, void*), ControlColor color, const String& value, void* UserData)
 {
     return addControl(ControlType::Text, label, value, color, Control::noParent, callback, UserData);
 }
@@ -880,7 +893,7 @@ Control* ESPUIClass::getControlNoLock(uint16_t id)
     {
         if (control->id == id)
         {
-            if(!control->ToBeDeleted())
+            if (!control->ToBeDeleted())
             {
                 Response = control;
             }
@@ -942,7 +955,8 @@ void ESPUIClass::setPanelWide(uint16_t id, bool wide)
     }
 }
 
-void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId) {
+void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId)
+{
     Control* control = getControl(id);
     if (control)
     {
@@ -952,7 +966,8 @@ void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId) {
     }
 }
 
-void ESPUIClass::setVertical(uint16_t id, bool vert) {
+void ESPUIClass::setVertical(uint16_t id, bool vert)
+{
     Control* control = getControl(id);
     if (control)
     {
@@ -1007,12 +1022,12 @@ void ESPUIClass::updateControlValue(uint16_t id, const String& value, int client
     updateControlValue(control, value, clientId);
 }
 
-void ESPUIClass::updateControlLabel(uint16_t id, const char * value, int clientId)
+void ESPUIClass::updateControlLabel(uint16_t id, const char* value, int clientId)
 {
     updateControlLabel(getControl(id), value, clientId);
 }
 
-void ESPUIClass::updateControlLabel(Control* control, const char * value, int clientId)
+void ESPUIClass::updateControlLabel(Control* control, const char* value, int clientId)
 {
     if (!control)
     {
@@ -1028,9 +1043,10 @@ void ESPUIClass::updateControlLabel(Control* control, const char * value, int cl
     updateControl(control, clientId);
 }
 
-void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId) {
+void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId)
+{
     Control* control = getControl(id);
-    if(control)
+    if (control)
     {
         control->visible = visibility;
         updateControl(control, clientId);
@@ -1047,7 +1063,8 @@ void ESPUIClass::updateLabel(uint16_t id, const String& value)
     updateControlValue(id, value);
 }
 
-void ESPUIClass::updateButton(uint16_t id, const String& value) {
+void ESPUIClass::updateButton(uint16_t id, const String& value)
+{
     updateControlValue(id, value);
 }
 
@@ -1086,7 +1103,8 @@ void ESPUIClass::updateTime(uint16_t id, int clientId)
     updateControl(id, clientId);
 }
 
-void ESPUIClass::clearGraph(uint16_t id, int clientId) { 
+void ESPUIClass::clearGraph(uint16_t id, int clientId)
+{
     do // once
     {
         Control* control = getControl(id);
@@ -1104,8 +1122,8 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId) {
 
         SendJsonDocToWebSocket(document, clientId);
 
-    } while(false);
- }
+    } while (false);
+}
 
 void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
 {
@@ -1126,23 +1144,23 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
 
         SendJsonDocToWebSocket(document, clientId);
 
-    } while(false);
+    } while (false);
 }
 
 bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId)
 {
     bool Response = false;
 
-    if(0 > clientId)
+    if (0 > clientId)
     {
-        if(MapOfClients.end() != MapOfClients.find(clientId))
+        if (MapOfClients.end() != MapOfClients.find(clientId))
         {
             Response = MapOfClients[clientId]->SendJsonDocToWebSocket(document);
         }
     }
     else
     {
-        for(auto CurrentClient : MapOfClients)
+        for (auto CurrentClient : MapOfClients)
         {
             Response |= CurrentClient.second->SendJsonDocToWebSocket(document);
         }
@@ -1169,19 +1187,19 @@ void ESPUIClass::ClearControlUpdateFlags()
 {
     bool CanClearUpdateFlags = true;
 
-    for(auto& CurrentClient : MapOfClients)
+    for (auto& CurrentClient : MapOfClients)
     {
-        if(!CurrentClient.second->IsSyncronized())
+        if (!CurrentClient.second->IsSyncronized())
         {
             CanClearUpdateFlags = false;
             break;
         }
     }
 
-    if(CanClearUpdateFlags)
+    if (CanClearUpdateFlags)
     {
         Control* control = controls;
-        while(nullptr != control)
+        while (nullptr != control)
         {
             control->HasBeenSynchronized();
             control = control->next;
@@ -1191,7 +1209,7 @@ void ESPUIClass::ClearControlUpdateFlags()
 
 void ESPUIClass::jsonReload()
 {
-    for(auto& CurrentClient : MapOfClients)
+    for (auto& CurrentClient : MapOfClients)
     {
         // Serial.println("Requesting Reload");
         CurrentClient.second->NotifyClient(ClientUpdateType_t::ReloadNeeded);
@@ -1223,11 +1241,11 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     ws = new AsyncWebSocket("/ws");
 
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-	bool fsBegin = LittleFS.begin();
-	#else
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    bool fsBegin = LittleFS.begin();
+#else
     bool fsBegin = LITTLEFS.begin();
-	#endif
+#endif
 #else
     bool fsBegin = LittleFS.begin();
 #endif
@@ -1252,11 +1270,11 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
 #endif
 
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-	bool indexExists = LittleFS.exists("/index.htm");
-	#else
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    bool indexExists = LittleFS.exists("/index.htm");
+#else
     bool indexExists = LITTLEFS.exists("/index.htm");
-	#endif
+#endif
 #else
     bool indexExists = LittleFS.exists("/index.htm");
 #endif
@@ -1273,10 +1291,8 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
         return;
     }
 
-    ws->onEvent([](AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data,      size_t len)
-    {
-        ESPUI.onWsEvent(server, client, type, arg, data, len);
-    });
+    ws->onEvent([](AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data,
+                    size_t len) { ESPUI.onWsEvent(server, client, type, arg, data, len); });
     server->addHandler(ws);
 
     if (basicAuth)
@@ -1286,11 +1302,11 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
             ws->setAuthentication(basicAuthUsername, basicAuthPassword);
         }
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
-	#else
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
+#else
         server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
-	#endif
+#endif
 #else
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
 #endif
@@ -1298,11 +1314,11 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     else
     {
 #if defined(ESP32)
-	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-		server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
-	#else
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
+#else
         server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm");
-	#endif
+#endif
 #else
         server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
 #endif
@@ -1316,19 +1332,18 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
         }
 
         request->send(200, "text/plain", heapInfo(F("In LITTLEFS mode")));
-
     });
 
     server->onNotFound([this](AsyncWebServerRequest* request) {
-		if(captivePortal)
-		{
-			request->redirect("/");
-		}
-		else
-		{
-			request->send(404);
-		}
-	});
+        if (captivePortal)
+        {
+            request->redirect("/");
+        }
+        else
+        {
+            request->send(404);
+        }
+    });
 
     server->begin();
 
@@ -1359,10 +1374,8 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
     server = new AsyncWebServer(port);
     ws = new AsyncWebSocket("/ws");
 
-    ws->onEvent([](AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data,      size_t len)
-    {
-        ESPUI.onWsEvent(server, client, type, arg, data, len);
-    });
+    ws->onEvent([](AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data,
+                    size_t len) { ESPUI.onWsEvent(server, client, type, arg, data, len); });
 
     server->addHandler(ws);
 
@@ -1478,15 +1491,15 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
     });
 
     server->onNotFound([this](AsyncWebServerRequest* request) {
-		if(captivePortal)
-		{
-			request->redirect("/");
-		}
-		else
-		{
-			request->send(404);
-		}
-	});
+        if (captivePortal)
+        {
+            request->redirect("/");
+        }
+        else
+        {
+            request->send(404);
+        }
+    });
 
     server->begin();
 
