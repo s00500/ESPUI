@@ -1,7 +1,7 @@
 #pragma once
 
 // comment out to turn off debug output
-#define DEBUG_ESPUI true
+// #define DEBUG_ESPUI true
 #define WS_AUTHENTICATION false
 
 #include <Arduino.h>
