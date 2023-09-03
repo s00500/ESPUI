@@ -307,7 +307,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 
             JsonObject item = items.createNestedObject();
             elementcount++;
-            control->MarshalControl(item, InUpdateMode);
+            control->MarshalControl(item, InUpdateMode, ClientTransferContext);
             
             if (rootDoc.overflowed())
             {
@@ -315,6 +315,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 if (1 == elementcount)
                 {
                     Serial.println(String(F("ERROR: prepareJSONChunk: Control ")) + String(control->id) + F(" is too large to be sent to the browser."));
+                    // Serial.println(String(F("ERROR: prepareJSONChunk: value: ")) + control->value);
                     rootDoc.clear();
                     item = items.createNestedObject();
                     control->MarshalErrorMessage(item);
@@ -330,7 +331,6 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 }
                 // exit the loop
                 control = nullptr;
-
             }
             else
             {
