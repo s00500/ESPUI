@@ -396,7 +396,8 @@ void extendedCallback(Control* sender, int type, void* param)
     Serial.print(sender->label);
     Serial.print("' = ");
     Serial.println(sender->value);
-    Serial.println(String("param = ") + String((long)param));
+    Serial.print("param = ");
+    Serial.println((long)param);
 }
 
 void setup() {

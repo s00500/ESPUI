@@ -66,7 +66,8 @@ void buttonCallback(Control* sender, int type)
 
 void buttonExample(Control* sender, int type, void* param)
 {
-    Serial.println(String("param: ") + String(long(param)));
+    Serial.print("param: ");
+    Serial.println(long(param));
     switch (type)
     {
     case B_DOWN:
