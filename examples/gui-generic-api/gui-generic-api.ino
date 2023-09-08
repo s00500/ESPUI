@@ -16,7 +16,7 @@ DNSServer dnsServer;
 #warning use decorators: { HeapSelectIram doAllocationsInIRAM; ESPUI.addControl(...) ... } (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#how-to-select-heap)
 #warning then check http://<ip>/heap
 #endif // MMU_IRAM_HEAP
-#ifndef DEBUG_ESP_OOM
+#if !defined(DEBUG_ESP_OOM) && !defined(CORE_MOCK)
 #error on ESP8266 and ESPUI, you must define OOM debug option when developping
 #endif
 #endif
@@ -67,7 +67,8 @@ void buttonCallback(Control* sender, int type)
 
 void buttonExample(Control* sender, int type, void* param)
 {
-    Serial.println(String("param: ") + String(long(param)));
+    Serial.print("param: ");
+    Serial.println(long(param));
     switch (type)
     {
     case B_DOWN:

@@ -35,7 +35,7 @@
 #warning use decorators: { HeapSelectIram doAllocationsInIRAM; ESPUI.addControl(...) ... } (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#how-to-select-heap)
 #warning then check http://<ip>/heap
 #endif // MMU_IRAM_HEAP
-#ifndef DEBUG_ESP_OOM
+#if !defined(DEBUG_ESP_OOM) && !defined(CORE_MOCK)
 #error on ESP8266 and ESPUI, you must define OOM debug option when developping
 #endif
 #endif
@@ -396,7 +396,8 @@ void extendedCallback(Control* sender, int type, void* param)
     Serial.print(sender->label);
     Serial.print("' = ");
     Serial.println(sender->value);
-    Serial.println(String("param = ") + String((int)param));
+    Serial.print("param = ");
+    Serial.println((long)param);
 }
 
 void setup() {
@@ -443,6 +444,7 @@ void loop() {
 				#if !defined(ESP32)
 					((void (*)())0xf00fdead)();
 				#endif
+				break;
 			default:
 				Serial.print('#');
 				break;
