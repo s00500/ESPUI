@@ -39,7 +39,7 @@ protected:
     fsm_EspuiClient_state* pCurrentFsmState = &fsm_EspuiClient_state_Idle_imp;
 
     time_t      EspuiClientEndTime = 0;
-    
+
     // bool        NeedsNotification() { return pCurrentFsmState != &fsm_EspuiClient_state_Idle_imp; }
 
     bool        CanSend();

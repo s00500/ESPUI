@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <ESPUIClient.h>
 
 enum ControlType : uint8_t
 {
@@ -30,8 +29,9 @@ enum ControlType : uint8_t
     Accel,
     Separator,
     Time,
-    Fragment,
 
+    Fragment,
+    Password = 99,
     UpdateOffset = 100,
 };
 
@@ -84,7 +84,7 @@ public:
 
     void SendCallback(int type);
     bool HasCallback() { return ((nullptr != callback) || (nullptr != extendedCallback)); }
-    void MarshalControl(ArduinoJson::JsonObject& item, bool refresh, uint32_t StartingOffset);
+    void MarshalControl(ArduinoJson::JsonObject& item, bool refresh);
     void MarshalErrorMessage(ArduinoJson::JsonObject& item);
     bool ToBeDeleted() { return (ControlSyncState_t::deleted == ControlSyncState); }
     void DeleteControl();
