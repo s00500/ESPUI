@@ -8,7 +8,17 @@ DNSServer dnsServer;
 #if defined(ESP32)
 #include <WiFi.h>
 #else
+// esp8266
 #include <ESP8266WiFi.h>
+#include <umm_malloc/umm_heap_select.h>
+#ifndef MMU_IRAM_HEAP
+#warning Try MMU option '2nd heap shared' in 'tools' IDE menu (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#option-summary)
+#warning use decorators: { HeapSelectIram doAllocationsInIRAM; ESPUI.addControl(...) ... } (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#how-to-select-heap)
+#warning then check http://<ip>/heap
+#endif // MMU_IRAM_HEAP
+#if !defined(DEBUG_ESP_OOM) && !defined(CORE_MOCK)
+#error on ESP8266 and ESPUI, you must define OOM debug option when developping
+#endif
 #endif
 
 const char* ssid = "ESPUI";
@@ -56,7 +66,8 @@ void buttonCallback(Control* sender, int type)
 
 void buttonExample(Control* sender, int type, void* param)
 {
-    Serial.println(String("param: ") + String(int(param)));
+    Serial.print("param: ");
+    Serial.println(long(param));
     switch (type)
     {
     case B_DOWN:
@@ -233,6 +244,10 @@ void setup(void)
     Serial.print("IP address: ");
     Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
+#ifdef ESP8266
+    { HeapSelectIram doAllocationsInIRAM;
+#endif
+
     uint16_t tab1 = ESPUI.addControl(ControlType::Tab, "Settings 1", "Settings 1");
     uint16_t tab2 = ESPUI.addControl(ControlType::Tab, "Settings 2", "Settings 2");
     uint16_t tab3 = ESPUI.addControl(ControlType::Tab, "Settings 3", "Settings 3");
@@ -279,6 +294,10 @@ void setup(void)
      */
 
     ESPUI.begin("ESPUI Control");
+
+#ifdef ESP8266
+    } // HeapSelectIram
+#endif
 }
 
 void loop(void)
