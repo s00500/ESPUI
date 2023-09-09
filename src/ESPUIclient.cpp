@@ -339,7 +339,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 break;
             }
             DataOffset = uint16_t(FragmentRequest[F("offset")]);
-            control = ESPUI.getControlNoLock(ControlId, false);
+            control = ESPUI.getControlNoLock(ControlId);
             if(nullptr == control)
             {
                 Serial.println(String(F("ERROR:prepareJSONChunk:Fragmentation:Requested control: ")) + String(ControlId) + F(" does not exist"));

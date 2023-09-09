@@ -69,8 +69,6 @@ void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t Starting
         Serial.println(String("MarshalControl:length:            ") + String(length));
         Serial.println(String("MarshalControl:StartingOffset:    ") + String(StartingOffset));
         Serial.println(String("MarshalControl:maxLength:         ") + String(maxLength));
-		*/
-        // indicate that no additional controls should be sent
 
         if(0 == StartingOffset)
         {
@@ -80,12 +78,14 @@ void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t Starting
         {
             Serial.println(String("MarshalControl: Next fragement. ID: ") + String(id));
         }
+		*/
 
+        // indicate that no additional controls should be sent
         _item[F("type")] = uint32_t(ControlType::Fragment);
         _item[F("id")]   = id;
 
         length = min((length - StartingOffset), maxLength);
-        Serial.println(String("MarshalControl:Final length:      ") + String(length));
+        // Serial.println(String("MarshalControl:Final length:      ") + String(length));
 
         _item[F("offset")] = StartingOffset;
         _item[F("length")] = length;
