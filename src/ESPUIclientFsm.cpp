@@ -58,12 +58,20 @@ bool fsm_EspuiClient_state_Idle::NotifyClient()
     return Response;
 }
 
-void fsm_EspuiClient_state_Idle::ProcessAck(uint16_t)
+void fsm_EspuiClient_state_Idle::ProcessAck(uint16_t ControlIndex, String FragmentRequestString)
 {
-    // This is an unexpected request for control data from the browser
-    // treat it as if it was a rebuild operation
-    // Serial.println(F("fsm_EspuiClient_state_Idle: ProcessAck"));
-    Parent->NotifyClient(ClientUpdateType_t::RebuildNeeded);
+    if(!emptyString.equals(FragmentRequestString))
+    {
+        // Serial.println(F("fsm_EspuiClient_state_Idle::ProcessAck:Fragmentation:Got fragment Header"));
+        Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::UpdateNeeded, FragmentRequestString);
+    }
+    else
+    {
+        // This is an unexpected request for control data from the browser
+        // treat it as if it was a rebuild operation
+        // Serial.println(F("fsm_EspuiClient_state_Idle: ProcessAck"));
+        Parent->NotifyClient(ClientUpdateType_t::RebuildNeeded);
+    }
 }
 
 //----------------------------------------------
@@ -75,10 +83,14 @@ bool fsm_EspuiClient_state_SendingUpdate::NotifyClient()
     return true; /* Ignore request */
 }
 
-void fsm_EspuiClient_state_SendingUpdate::ProcessAck(uint16_t ControlIndex)
+void fsm_EspuiClient_state_SendingUpdate::ProcessAck(uint16_t ControlIndex, String FragmentRequest)
 {
+    if(!emptyString.equals(FragmentRequest))
+    {
+        // Serial.println(F("fsm_EspuiClient_state_SendingUpdate: ProcessAck"));
+    }
     // Serial.println(F("fsm_EspuiClient_state_SendingUpdate: ProcessAck"));
-    if(Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::UpdateNeeded))
+    if(Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::UpdateNeeded, FragmentRequest))
     {
         // No more data to send. Go back to idle or start next request
         Parent->fsm_EspuiClient_state_Idle_imp.Init();
@@ -95,13 +107,29 @@ bool fsm_EspuiClient_state_Rebuilding::NotifyClient()
     return true; /* Ignore request */
 }
 
-void fsm_EspuiClient_state_Rebuilding::ProcessAck(uint16_t ControlIndex)
+void fsm_EspuiClient_state_Rebuilding::ProcessAck(uint16_t ControlIndex, String FragmentRequest)
 {
+    if(!emptyString.equals(FragmentRequest))
+    {
+        // Serial.println(F("fsm_EspuiClient_state_Rebuilding: ProcessAck"));
+    }
     // Serial.println(F("fsm_EspuiClient_state_Rebuilding: ProcessAck"));
-    if(Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::RebuildNeeded))
+    if(Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::RebuildNeeded, FragmentRequest))
     {
         // No more data to send. Go back to idle or start next request
         Parent->fsm_EspuiClient_state_Idle_imp.Init();
         Parent->fsm_EspuiClient_state_Idle_imp.NotifyClient();
+    }
+}
+
+//----------------------------------------------
+//----------------------------------------------
+//----------------------------------------------
+void fsm_EspuiClient_state_Reloading::ProcessAck(uint16_t ControlIndex, String FragmentRequestString)
+{
+    if(!emptyString.equals(FragmentRequestString))
+    {
+        // Serial.println(F("fsm_EspuiClient_state_Reloading::ProcessAck:Fragmentation:Got fragment Header"));
+        Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::UpdateNeeded, FragmentRequestString);
     }
 }

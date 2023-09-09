@@ -17,12 +17,6 @@ public:
         ReloadNeeded    = 3,
     };
 
-    struct ClientTransferContext_t
-    {
-        void       *control = nullptr;
-        uint16_t    Offset = 0;
-    };
-
 protected:
     // bool HasBeenNotified      = false;  // Set when a notification has been sent and we are waiting for a reply
     // bool DelayedNotification  = false;  // set if a delayed notification is needed
@@ -45,14 +39,13 @@ protected:
     fsm_EspuiClient_state* pCurrentFsmState = &fsm_EspuiClient_state_Idle_imp;
 
     time_t      EspuiClientEndTime = 0;
-    ClientTransferContext_t ClientTransferContext;
     
     // bool        NeedsNotification() { return pCurrentFsmState != &fsm_EspuiClient_state_Idle_imp; }
 
     bool        CanSend();
     void        FillInHeader(ArduinoJson::DynamicJsonDocument& document);
-    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode);
-    bool        SendControlsToClient(uint16_t startidx, ClientUpdateType_t TransferMode);
+    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode, String value);
+    bool        SendControlsToClient(uint16_t startidx, ClientUpdateType_t TransferMode, String FragmentRequest);
 
     bool        SendClientNotification(ClientUpdateType_t value);
 

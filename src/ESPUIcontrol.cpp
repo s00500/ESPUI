@@ -56,8 +56,43 @@ void Control::DeleteControl()
     callback = nullptr;
 }
 
-void Control::MarshalControl(JsonObject & item, bool refresh)
+void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t StartingOffset)
 {
+    JsonObject & item = _item;
+    uint32_t length = value.length();
+    uint32_t maxLength = uint32_t(double(ESPUI.jsonInitialDocumentSize) * 0.75);
+    if((length > maxLength) || StartingOffset)
+    {
+    	/*
+        Serial.println(String("MarshalControl:Start Fragment Processing"));
+        Serial.println(String("MarshalControl:id:                ") + String(id));
+        Serial.println(String("MarshalControl:length:            ") + String(length));
+        Serial.println(String("MarshalControl:StartingOffset:    ") + String(StartingOffset));
+        Serial.println(String("MarshalControl:maxLength:         ") + String(maxLength));
+		*/
+        // indicate that no additional controls should be sent
+
+        if(0 == StartingOffset)
+        {
+            Serial.println(String("MarshalControl: New control to fragement. ID: ") + String(id));
+        }
+        else
+        {
+            Serial.println(String("MarshalControl: Next fragement. ID: ") + String(id));
+        }
+
+        _item[F("type")] = uint32_t(ControlType::Fragment);
+        _item[F("id")]   = id;
+
+        length = min((length - StartingOffset), maxLength);
+        Serial.println(String("MarshalControl:Final length:      ") + String(length));
+
+        _item[F("offset")] = StartingOffset;
+        _item[F("length")] = length;
+        _item[F("total")] = value.length();
+        item = _item.createNestedObject(F("control"));
+    }
+
     item[F("id")]      = id;
     ControlType TempType = (ControlType::Password == type) ? ControlType::Text : type;
     if(refresh)
@@ -68,8 +103,9 @@ void Control::MarshalControl(JsonObject & item, bool refresh)
     {
         item[F("type")] = uint32_t(TempType);
     }
+
     item[F("label")]   = label;
-    item[F ("value")]   = (ControlType::Password == type) ? F ("--------") : value;
+    item[F ("value")]   = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, length + StartingOffset);
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
     item[F("enabled")] = enabled;
