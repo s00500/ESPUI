@@ -85,10 +85,6 @@ bool fsm_EspuiClient_state_SendingUpdate::NotifyClient()
 
 void fsm_EspuiClient_state_SendingUpdate::ProcessAck(uint16_t ControlIndex, String FragmentRequest)
 {
-    if(!emptyString.equals(FragmentRequest))
-    {
-        // Serial.println(F("fsm_EspuiClient_state_SendingUpdate: ProcessAck"));
-    }
     // Serial.println(F("fsm_EspuiClient_state_SendingUpdate: ProcessAck"));
     if(Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::UpdateNeeded, FragmentRequest))
     {
@@ -109,10 +105,6 @@ bool fsm_EspuiClient_state_Rebuilding::NotifyClient()
 
 void fsm_EspuiClient_state_Rebuilding::ProcessAck(uint16_t ControlIndex, String FragmentRequest)
 {
-    if(!emptyString.equals(FragmentRequest))
-    {
-        // Serial.println(F("fsm_EspuiClient_state_Rebuilding: ProcessAck"));
-    }
     // Serial.println(F("fsm_EspuiClient_state_Rebuilding: ProcessAck"));
     if(Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::RebuildNeeded, FragmentRequest))
     {
