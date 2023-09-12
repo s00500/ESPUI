@@ -194,6 +194,12 @@ function restart() {
 }
 
 function conStatusError() {
+    FragmentAssemblyTimer.forEach(element => {
+        clearInterval(element);
+    });
+    FragmentAssemblyTimer = new Object();
+    controlAssemblyArray = new Object();
+
     if (true === websockConnected) {
         websockConnected = false;
         websock.close();
@@ -248,6 +254,11 @@ function start() {
         $("#conStatus").addClass("color-green");
         $("#conStatus").text("Connected");
         websockConnected = true;
+        FragmentAssemblyTimer.forEach(element => {
+            clearInterval(element);
+        });
+        FragmentAssemblyTimer = new Object();
+        controlAssemblyArray = new Object();
     };
 
     websock.onclose = function (evt) {
@@ -256,6 +267,11 @@ function start() {
         // console.log("Close code: '" + evt.code + "'");
         console.log("websock close");
         conStatusError();
+        FragmentAssemblyTimer.forEach(element => {
+            clearInterval(element);
+        });
+        FragmentAssemblyTimer = new Object();
+        controlAssemblyArray = new Object();
     };
 
     websock.onerror = function (evt) {
@@ -264,6 +280,11 @@ function start() {
         // console.log("Error data: '" + evt.data + "'");
 
         restart();
+        FragmentAssemblyTimer.forEach(element => {
+            clearInterval(element);
+        });
+        FragmentAssemblyTimer = new Object();
+        controlAssemblyArray = new Object();
     };
 
     var handleEvent = function (evt) {
