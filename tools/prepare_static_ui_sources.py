@@ -47,21 +47,25 @@ def get_context(infile, outfile):
     indir	= os.path.dirname(infile)
     if os.path.isdir(outfile):
         outdir 	= os.path.realpath(outfile)
-        outfilename	= "%s%s%s.h" % (dir, name.capitalize(), type.upper())
+        outfilename = f"{dir}{name.capitalize()}{type.upper()}.h"
         outfile	= os.path.realpath(os.path.sep.join([outdir, outfilename]))
     else:
         outfile	= os.path.realpath(outfile)
         outdir	= os.path.dirname(outfile)
         outfilename	= os.path.basename(outfile)
-    minifile	= re.sub('\.([^.]+)$', '.min.\\1', infile) if not ".min." in infile else infile
-    constant	= '%s_%s' % (type.upper(), name.upper())
+    minifile = (
+        re.sub('\.([^.]+)$', '.min.\\1', infile)
+        if ".min." not in infile
+        else infile
+    )
+    constant = f'{type.upper()}_{name.upper()}'
     return locals()
     
 def perform_gzip(c):
     compressed = gzip.compress(bytes(c['minidata'], 'utf-8'))
     c['gzipdata'] = ','.join([ str(b) for b in compressed ])
     c['gziplen'] = len(compressed)
-    print("  GZIP data length: %s" % c['gziplen'])
+    print(f"  GZIP data length: {c['gziplen']}")
     return c
     
 def perform_minify(c):
@@ -71,24 +75,24 @@ def perform_minify(c):
             'js': jsminify, 
             'html': htmlminify
         }.get(c['type']) or htmlminify
-        print("  Using %s minifier" % c['type'])
+        print(f"  Using {c['type']} minifier")
         c['minidata'] = minifier(infile.read())
     return perform_gzip(c)
 
 def process_file(infile, outdir, storemini=True):
-    print("Processing file %s" % infile)
+    print(f"Processing file {infile}")
     c = get_context(infile, outdir)
     c = perform_minify(c)
     if storemini:
         if c['infile'] == c['minifile']:
             print("  Original file is already minified, refusing to overwrite it")
         else:
-            print("  Writing minified file %s" % c['minifile'])
+            print(f"  Writing minified file {c['minifile']}")
             with open(c['minifile'], 'w+') as minifile:
                 minifile.write(c['minidata'])
     with open(c['outfile'], 'w+') as outfile:
-        print("  Using C constant names %s and %s_GZIP" % (c['constant'], c['constant']))
-        print("  Writing C header file %s" % c['outfile'])
+        print(f"  Using C constant names {c['constant']} and {c['constant']}_GZIP")
+        print(f"  Writing C header file {c['outfile']}")
         outfile.write(TARGET_TEMPLATE.format(**c))
         
 def filenamefilter(pattern, strings):
@@ -96,10 +100,14 @@ def filenamefilter(pattern, strings):
         
 def process_dir(sourcedir, outdir, recursive=True, storemini=True):
     pattern = r'/*\.(css|js|htm|html)$'
-    files = glob(sourcedir + "/**/*", recursive=True)+glob(sourcedir + "/*") if recursive else glob(sourcedir + "/*")
+    files = (
+        glob(f"{sourcedir}/**/*", recursive=True) + glob(f"{sourcedir}/*")
+        if recursive
+        else glob(f"{sourcedir}/*")
+    )
     files = filenamefilter(pattern, files)
     for f in set(files):
-        if not '.min.' in f:
+        if '.min.' not in f:
             process_file(f, outdir, storemini)
         elif not os.path.isfile(f.replace(".min.", ".")):
             process_file(f, outdir, storemini)
@@ -107,13 +115,15 @@ def process_dir(sourcedir, outdir, recursive=True, storemini=True):
 def check_args(args):
     abort = 0
     if not os.path.exists(args.sources):
-        print("ERROR: Source %s does not exist" % args.sources)
+        print(f"ERROR: Source {args.sources} does not exist")
         abort += 2
     if not os.path.isdir(os.path.dirname(args.target)):
-        print("ERROR: Parent directory of target %s does not exist" % args.target)
+        print(f"ERROR: Parent directory of target {args.target} does not exist")
         abort += 4
     if os.path.isdir(args.sources) and not os.path.isdir(args.target):
-        print("ERROR: Source %s is a directory, target %s is not" % (args.sources, args.target))
+        print(
+            f"ERROR: Source {args.sources} is a directory, target {args.target} is not"
+        )
         abort += 8
     if abort > 0:
         print("Aborting.")
@@ -124,10 +134,12 @@ def main(args):
     args.target  = os.path.realpath(args.target  or os.sep.join((os.path.dirname(os.path.realpath(__file__)), "..", "src")))
     check_args(args)
     if os.path.isfile(args.sources):
-        print("Source %s is a file, will process one file only." % args.sources)
+        print(f"Source {args.sources} is a file, will process one file only.")
         process_file(args.sources, args.target, storemini = args.storemini)
     elif os.path.isdir(args.sources):
-        print("Source %s is a directory, searching for files recursively..." % args.sources)
+        print(
+            f"Source {args.sources} is a directory, searching for files recursively..."
+        )
         process_dir(args.sources, args.target, recursive = True, storemini = args.storemini)
 
 if __name__ == "__main__" and "get_ipython" not in dir():
