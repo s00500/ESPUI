@@ -4,7 +4,7 @@
   "description": "ESP32 and ESP8266 Web Interface Library",
   "repository": {
     "type": "git",
-    "url": "https://github.com/s00500/ESPUI.git"
+    "url": "https://github.com/croghostrider/ESPUI.git"
   },
   "authors": [
     {
