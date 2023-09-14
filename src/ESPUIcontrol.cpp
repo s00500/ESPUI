@@ -3,13 +3,11 @@
 static uint16_t idCounter = 0;
 static const String ControlError = "*** ESPUI ERROR: Could not transfer control ***";
 
-Control::Control(ControlType type, const char* label, void (*callback)(Control*, int, void*), void* UserData,
+Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback,
     const String& value, ControlColor color, bool visible, uint16_t parentControl)
     : type(type),
       label(label),
-      callback(nullptr),
-      extendedCallback(callback),
-      user(UserData),
+      callback(callback),
       value(value),
       color(color),
       visible(visible),
@@ -27,8 +25,6 @@ Control::Control(const Control& Control)
         id(Control.id),
         label(Control.label),
         callback(Control.callback),
-        extendedCallback(Control.extendedCallback),
-        user(Control.user),
         value(Control.value),
         color(Control.color),
         visible(Control.visible),
@@ -42,17 +38,11 @@ void Control::SendCallback(int type)
     {
         callback(this, type);
     }
-
-    if (extendedCallback)
-    {
-        extendedCallback(this, type, user);
-    }
 }
 
 void Control::DeleteControl() 
 {
     ControlSyncState = ControlSyncState_t::deleted;
-    extendedCallback = nullptr;
     callback = nullptr;
 }
 

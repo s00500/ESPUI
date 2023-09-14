@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <functional>
 
 enum ControlType : uint8_t
 {
@@ -53,9 +54,7 @@ public:
     ControlType type;
     uint16_t id; // just mirroring the id here for practical reasons
     const char* label;
-    void (*callback)(Control*, int);
-    void (*extendedCallback)(Control*, int, void*);
-    void* user;
+    std::function<void(Control*, int)> callback;
     String value;
     ControlColor color;
     bool visible;
@@ -72,8 +71,7 @@ public:
 
     Control(ControlType type, 
             const char* label, 
-            void (*callback)(Control*, int, void*), 
-            void* UserData,
+            std::function<void(Control*, int)> callback,
             const String& value, 
             ControlColor color, 
             bool visible, 
@@ -82,7 +80,7 @@ public:
     Control(const Control& Control);
 
     void SendCallback(int type);
-    bool HasCallback() { return ((nullptr != callback) || (nullptr != extendedCallback)); }
+    bool HasCallback() { return (nullptr != callback); }
     void MarshalControl(ArduinoJson::JsonObject& item, bool refresh);
     void MarshalErrorMessage(ArduinoJson::JsonObject& item);
     bool ToBeDeleted() { return (ControlSyncState_t::deleted == ControlSyncState); }

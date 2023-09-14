@@ -153,7 +153,9 @@ This section will explain in detail how the Library is to be used from the Ardui
 <br><br>
 Alternativly you may use the extended callback funtion which provides three parameters to the callback function `myCallback(Control *sender, int eventname, void * UserParameter)`. The `UserParameter` is provided as part of the `ESPUI.addControl` method set and allows the user to define contextual information that is to be presented to the callback function in an unmodified form. 
 <br><br>
-The below example creates a button and defines a lambda function to implicitly create an `ExtendedCallback` which then invokes a more specialized button callback handler. The example uses the `UserParameter` to hold the `this` pointer to an object instance, providing a mechanism for sending the event to a specific object without the need for a switch / map / lookup translation of the Sender Id to an object reference. 
+It also possible to use a lambda function in the callback parameter. It also allows the user to define, in a more C++ way, contextual information in any form. This is shown by the [completeLambda](examples/completeLambda/completeLambda.ino) example.
+<br><br>
+The below example creates a button and defines a lambda function to invoke a more specialized button callback handler:
 ```
 void YourClassName::setup()
 {
@@ -163,26 +165,18 @@ void YourClassName::setup()
   " Button Face Text ",
   ControlColor::None,
   ParentElementId,
-  [](Control *sender, int eventname, void* param)
+  [&](Control *sender, int eventname)
   {
-    if(param)
-    {
-      reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
-    }
-  },
-  this); // <-Third parameter for the extended callback
+    myButtonCallback(sender, eventname); // class method
+  });
 
   // or
   ButtonElementId = ESPUI.button(
   " Button Face Text ",
-  [](Control *sender, int eventname, void* param)
+  [&](Control *sender, int eventname)
   {
-    if(param)
-    {
-      reinterpret_cast<YourClassName*>(param)->myButtonCallback(sender, eventname);
-    }
-  },
-  this); // <-Third parameter for the extended callback
+    myButtonCallback(sender, eventname); // class method
+  });
 }
 ```
 ```
