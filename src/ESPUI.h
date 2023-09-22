@@ -194,9 +194,9 @@ public:
     void clearGraph(uint16_t id, int clientId = -1);
     void addGraphPoint(uint16_t id, int nValue, int clientId = -1);
 
-    void setPanelStyle(uint16_t id, String style, int clientId = -1);
-    void setElementStyle(uint16_t id, String style, int clientId = -1);
-    void setInputType(uint16_t id, String type, int clientId = -1);
+    void setPanelStyle(uint16_t id, const String& style, int clientId = -1);
+    void setElementStyle(uint16_t id, const String& style, int clientId = -1);
+    void setInputType(uint16_t id, const String& type, int clientId = -1);
 
     void setPanelWide(uint16_t id, bool wide);
     void setVertical(uint16_t id, bool vert = true);
