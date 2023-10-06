@@ -62,6 +62,9 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - Time control by @iangray001
 - Vertical controls by @iangray001
 - Time/date/password/color input types by @pcbbc
+- Delayed response support @MartinMueller2003
+- Fragmented control transfer @ MartinMueller2003
+- Extended Callback @MartinMueller2003
 
 ## Roadmap
 

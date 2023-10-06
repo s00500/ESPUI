@@ -31,6 +31,7 @@ enum ControlType : uint8_t
     Separator,
     Time,
 
+    Fragment,
     Password = 99,
     UpdateOffset = 100,
 };
@@ -81,7 +82,7 @@ public:
 
     void SendCallback(int type);
     bool HasCallback() { return (nullptr != callback); }
-    void MarshalControl(ArduinoJson::JsonObject& item, bool refresh);
+    void MarshalControl(ArduinoJson::JsonObject& item, bool refresh, uint32_t DataOffset);
     void MarshalErrorMessage(ArduinoJson::JsonObject& item);
     bool ToBeDeleted() { return (ControlSyncState_t::deleted == ControlSyncState); }
     void DeleteControl();
