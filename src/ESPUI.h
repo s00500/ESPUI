@@ -1,7 +1,7 @@
 #pragma once
 
 // comment out to turn off debug output
-#define DEBUG_ESPUI true
+// #define DEBUG_ESPUI true
 #define WS_AUTHENTICATION false
 
 #include <Arduino.h>
@@ -87,16 +87,13 @@ enum Verbosity : uint8_t
 class ESPUIClass
 {
 public:
-
-#ifdef ESP32
     ESPUIClass()
     {
+#ifdef ESP32
         ControlsSemaphore = xSemaphoreCreateMutex();
         xSemaphoreGive(ControlsSemaphore);
-    }
-    SemaphoreHandle_t ControlsSemaphore = NULL;
 #endif // def ESP32
-
+	}
     unsigned int jsonUpdateDocumentSize = 2000;
 #ifdef ESP8266
     unsigned int jsonInitialDocumentSize = 2000;
@@ -211,14 +208,18 @@ public:
     void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);
 
     Verbosity verbosity = Verbosity::Quiet;
-    AsyncWebServer* server;
 
 protected:
     friend class ESPUIclient;
     friend class ESPUIcontrol;
 
+#ifdef ESP32
+    SemaphoreHandle_t ControlsSemaphore = NULL;
+#endif // def ESP32
+
     void        RemoveToBeDeletedControls();
 
+    AsyncWebServer* server;
     AsyncWebSocket* ws;
 
     const char* basicAuthUsername = nullptr;

@@ -44,8 +44,8 @@ protected:
 
     bool        CanSend();
     void        FillInHeader(ArduinoJson::DynamicJsonDocument& document);
-    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode);
-    bool        SendControlsToClient(uint16_t startidx, ClientUpdateType_t TransferMode);
+    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode, String value);
+    bool        SendControlsToClient(uint16_t startidx, ClientUpdateType_t TransferMode, String FragmentRequest);
 
     bool        SendClientNotification(ClientUpdateType_t value);
 

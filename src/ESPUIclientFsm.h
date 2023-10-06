@@ -20,7 +20,7 @@ public:
 
             void Init();
     virtual bool NotifyClient() = 0;
-    virtual void ProcessAck(uint16_t id) = 0;
+    virtual void ProcessAck(uint16_t id, String FragmentRequest) = 0;
     virtual String GetStateName () = 0;
             void SetParent(ESPUIclient * value) { Parent = value; }
 
@@ -36,7 +36,7 @@ public:
     virtual     ~fsm_EspuiClient_state_Idle() {}
 
     virtual bool NotifyClient();
-    virtual void ProcessAck(uint16_t id);
+    virtual void ProcessAck(uint16_t id, String FragmentRequest);
             String GetStateName() { return String(F("Idle")); }
 
 }; // fsm_EspuiClient_state_Idle
@@ -48,7 +48,7 @@ public:
     virtual     ~fsm_EspuiClient_state_SendingUpdate() {}
 
     virtual bool NotifyClient();
-    virtual void ProcessAck(uint16_t id);
+    virtual void ProcessAck(uint16_t id, String FragmentRequest);
             String GetStateName() { return String(F("Sending Update")); }
 
 }; // fsm_EspuiClient_state_SendingUpdate
@@ -60,7 +60,7 @@ public:
     virtual     ~fsm_EspuiClient_state_Rebuilding() {}
 
     virtual bool NotifyClient();
-    virtual void ProcessAck(uint16_t id);
+    virtual void ProcessAck(uint16_t id, String FragmentRequest);
             String GetStateName() { return String(F("Sending Rebuild")); }
 
 }; // fsm_EspuiClient_state_Rebuilding
@@ -72,7 +72,7 @@ public:
     virtual     ~fsm_EspuiClient_state_Reloading() {}
 
     virtual bool NotifyClient() { return false; }
-    virtual void ProcessAck(uint16_t) {}
+    virtual void ProcessAck(uint16_t id, String FragmentRequest);
             String GetStateName() { return String(F("Reloading")); }
 
 }; // fsm_EspuiClient_state_Reloading
