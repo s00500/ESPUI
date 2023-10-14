@@ -859,7 +859,7 @@ void ESPUIClass::updateControl(Control* control, int)
     NotifyClients(ClientUpdateType_t::UpdateNeeded);
 }
 
-void ESPUIClass::setPanelStyle(uint16_t id, String style, int clientId)
+void ESPUIClass::setPanelStyle(uint16_t id, const String& style, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -869,7 +869,7 @@ void ESPUIClass::setPanelStyle(uint16_t id, String style, int clientId)
     }
 }
 
-void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId)
+void ESPUIClass::setElementStyle(uint16_t id, const String& style, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -879,7 +879,7 @@ void ESPUIClass::setElementStyle(uint16_t id, String style, int clientId)
     }
 }
 
-void ESPUIClass::setInputType(uint16_t id, String type, int clientId)
+void ESPUIClass::setInputType(uint16_t id, const String& type, int clientId)
 {
     Control* control = getControl(id);
     if (control)
