@@ -49,14 +49,19 @@ protected:
 
     bool        SendClientNotification(ClientUpdateType_t value);
 
+private:
+    uint32_t    CurrentSyncID = 0;
+    uint32_t    NextSyncID = 0;
+
 public:
                 ESPUIclient(AsyncWebSocketClient * _client);
                 ESPUIclient(const ESPUIclient & source);
     virtual     ~ESPUIclient();
     void        NotifyClient(ClientUpdateType_t value);
-    void        onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t len);
+    bool        onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t len);
     bool        IsSyncronized();
     uint32_t    id() { return client->id(); }
     void        SetState(ClientUpdateType_t value);
     bool        SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document);
+
 };

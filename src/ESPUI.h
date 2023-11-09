@@ -193,7 +193,7 @@ public:
     void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);
 
     Verbosity verbosity = Verbosity::Quiet;
-
+    uint32_t  GetNextControlChangeId();
     // emulate former extended callback API by using an intermediate lambda (no deprecation)
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int, void*)> callback, void* userData)
     {
@@ -255,12 +255,12 @@ protected:
 #define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
     void NotifyClients(ClientUpdateType_t newState);
     void NotifyClient(uint32_t WsClientId, ClientUpdateType_t newState);
-    void ClearControlUpdateFlags();
 
     bool SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId);
 
     std::map<uint32_t, ESPUIclient*> MapOfClients;
 
+    uint32_t    ControlChangeID = 0;
 };
 
 extern ESPUIClass ESPUI;

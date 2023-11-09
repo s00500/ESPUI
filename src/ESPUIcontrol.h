@@ -84,21 +84,15 @@ public:
     bool HasCallback() { return (nullptr != callback); }
     void MarshalControl(ArduinoJson::JsonObject& item, bool refresh, uint32_t DataOffset);
     void MarshalErrorMessage(ArduinoJson::JsonObject& item);
-    bool ToBeDeleted() { return (ControlSyncState_t::deleted == ControlSyncState); }
     void DeleteControl();
-    bool IsUpdated() { return ControlSyncState_t::synchronized != ControlSyncState; }
-    void HasBeenUpdated() { ControlSyncState = ControlSyncState_t::updated; }
-    void HasBeenSynchronized() {ControlSyncState = ControlSyncState_t::synchronized;}
     void onWsEvent(String& cmd, String& data);
-
+    inline bool ToBeDeleted() { return _ToBeDeleted; }
+    inline bool NeedsSync(uint32_t lastControlChangeID) {return (false == _ToBeDeleted) && (lastControlChangeID < ControlChangeID);}
+    void    SetControlChangedId(uint32_t value) {ControlChangeID = value;}
+    
 private:
-    enum ControlSyncState_t
-    {
-        synchronized = 0,
-        updated,
-        deleted,
-    };
-    ControlSyncState_t ControlSyncState = ControlSyncState_t::synchronized;
+    bool _ToBeDeleted = false;
+    uint32_t ControlChangeID = 0;
 };
 
 #define UI_TITLE            ControlType::Title
