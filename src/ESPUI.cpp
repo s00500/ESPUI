@@ -601,10 +601,13 @@ void ESPUIClass::onWsEvent(
             // Serial.println("ESPUIClass::OnWsEvent:Create new client.");
             MapOfClients[client->id()] = new ESPUIclient(client);
         }
-        MapOfClients[client->id()]->onWsEvent(type, arg, data, len);
-    }
 
-    ClearControlUpdateFlags();
+        if(MapOfClients[client->id()]->onWsEvent(type, arg, data, len))
+        {
+            // Serial.println("ESPUIClass::OnWsEvent:notify the clients that they need to be updated.");
+            NotifyClients(ESPUIclient::UpdateNeeded);
+        }
+    }
 
     return;
 }
@@ -854,9 +857,19 @@ void ESPUIClass::updateControl(Control* control, int)
     {
         return;
     }
-    // tel the control it has been updated
-    control->HasBeenUpdated();
+    // tell the control it has been updated
+    control->SetControlChangedId(ESPUI.GetNextControlChangeId());
     NotifyClients(ClientUpdateType_t::UpdateNeeded);
+}
+
+uint32_t ESPUIClass::GetNextControlChangeId()
+{
+    if(uint32_t(-1) == ControlChangeID)
+    {
+        // force a reload which resets the counters
+        jsonReload();
+    }
+    return ++ControlChangeID;
 }
 
 void ESPUIClass::setPanelStyle(uint16_t id, const String& style, int clientId)
@@ -1123,30 +1136,6 @@ void ESPUIClass::NotifyClients(ClientUpdateType_t newState)
     for (auto& CurrentClient : MapOfClients)
     {
         CurrentClient.second->NotifyClient(newState);
-    }
-}
-
-void ESPUIClass::ClearControlUpdateFlags()
-{
-    bool CanClearUpdateFlags = true;
-
-    for (auto& CurrentClient : MapOfClients)
-    {
-        if (!CurrentClient.second->IsSyncronized())
-        {
-            CanClearUpdateFlags = false;
-            break;
-        }
-    }
-
-    if (CanClearUpdateFlags)
-    {
-        Control* control = controls;
-        while (nullptr != control)
-        {
-            control->HasBeenSynchronized();
-            control = control->next;
-        }
     }
 }
 

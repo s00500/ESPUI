@@ -100,7 +100,7 @@ bool ESPUIclient::SendClientNotification(ClientUpdateType_t value)
     {
         if(!CanSend())
         {
-            // Serial.println(F("ESPUIclient::NotifyClient"));
+            // Serial.println(F("ESPUIclient::SendClientNotification:CannotSend"));
             break;
         }
 
@@ -124,42 +124,12 @@ void ESPUIclient::NotifyClient(ClientUpdateType_t newState)
 {
     SetState(newState);
     pCurrentFsmState->NotifyClient();
-
-#ifdef OldWay
-    do // once
-    {
-        // Serial.println(String("ESPUIclient::NotifyClient: State: ") + String(int(newState)));
-        SetState(newState);
-
-        if (HasBeenNotified)
-        {
-            // do not need to do anything
-            break;
-        }
-        
-        if(TransferIsInprogress)
-        {
-            // record that a notification was needed while we were transfering data to the client
-            DelayedNotification = true;
-            break;
-        }
-
-        DelayedNotification = false;
-
-        if (SendJsonDocToWebSocket(document))
-        {
-            HasBeenNotified = true;
-        }
-
-    } while (false);
-
-    return HasBeenNotified;
-#endif // def OldWay
 }
 
 // Handle Websockets Communication
-void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t len)
+bool ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t len)
 {
+    bool Response = false;
     // Serial.println(String("ESPUIclient::OnWsEvent: type: ") + String(type));
 
     switch (type)
@@ -228,21 +198,23 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
 
             if (cmd.equals(F("uiok")))
             {
-                // Serial.println(F("ESPUIclient::OnWsEvent:WS_EVT_DATA:uiok:ProcessAck"));
+                
+                // Serial.println(String(F("ESPUIclient::OnWsEvent:WS_EVT_DATA:uiok:ProcessAck:")) + pCurrentFsmState->GetStateName());
                 pCurrentFsmState->ProcessAck(id, emptyString);
                 break;
             }
 
             if (cmd.equals(F("uifragmentok")))
             {
+                // Serial.println(String(F("ESPUIclient::OnWsEvent:WS_EVT_DATA:uiok:uifragmentok:")) + pCurrentFsmState->GetStateName() + ":ProcessAck");
                 if(!emptyString.equals(value))
                 {
-                    // Serial.println(String(F("ESPUIclient::OnWsEvent:WS_EVT_DATA:uifragmentok:ProcessAck:value: '")) + value + "'");
+                    // Serial.println(String(F("ESPUIclient::OnWsEvent:WS_EVT_DATA:uiok:uifragmentok:")) + pCurrentFsmState->GetStateName() + ":ProcessAck:value:'" +  value + "'");
                     pCurrentFsmState->ProcessAck(uint16_t(-1), value);
                 }
                 else
                 {
-                    // Serial.println(F("ERROR:ESPUIclient::OnWsEvent:WS_EVT_DATA:uifragmentok:ProcessAck:Fragment Header is missing"));
+                    Serial.println(F("ERROR:ESPUIclient::OnWsEvent:WS_EVT_DATA:uifragmentok:ProcessAck:Fragment Header is missing"));
                 }
                 break;
             }
@@ -253,6 +225,7 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
                 break;
             }
 
+            // Serial.println(F("WS_EVT_DATA:Process Control"));
             Control* control = ESPUI.getControl(id);
             if (nullptr == control)
             {
@@ -265,6 +238,8 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
                 break;
             }
             control->onWsEvent(cmd, value);
+            // notify other clients of change
+            Response = true;
             break;
         }
 
@@ -274,6 +249,8 @@ void ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
             break;
         }
     } // end switch
+
+    return Response;
 }
 
 /*
@@ -361,7 +338,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 if(InUpdateMode)
                 {
                     // In update mode we only count the controls that have been updated.
-                    if(control->IsUpdated())
+                    if(control->NeedsSync(CurrentSyncID))
                     {
                         ++currentIndex;
                     }
@@ -397,7 +374,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 
             if(InUpdateMode && !SingleControl)
             {
-                if(control->IsUpdated())
+                if(control->NeedsSync(CurrentSyncID))
                 {
                     // dont skip this control
                 }
@@ -505,6 +482,8 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
         {
             // Serial.println("ESPUIclient:SendControlsToClient: Tell client we are starting a transfer of controls.");
             document["type"] = (ClientUpdateType_t::RebuildNeeded == TransferMode) ? UI_INITIAL_GUI : UI_EXTEND_GUI;
+            CurrentSyncID = NextSyncID;
+            NextSyncID = ESPUI.GetNextControlChangeId();
         }
         // Serial.println(String("ESPUIclient:SendControlsToClient:type: ") + String((uint32_t)document["type"]));
 

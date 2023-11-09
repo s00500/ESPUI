@@ -59,6 +59,7 @@ public:
                  fsm_EspuiClient_state_Rebuilding() {}
     virtual     ~fsm_EspuiClient_state_Rebuilding() {}
 
+            void Init();
     virtual bool NotifyClient();
     virtual void ProcessAck(uint16_t id, String FragmentRequest);
             String GetStateName() { return String(F("Sending Rebuild")); }
@@ -71,7 +72,8 @@ public:
                  fsm_EspuiClient_state_Reloading() {}
     virtual     ~fsm_EspuiClient_state_Reloading() {}
 
-    virtual bool NotifyClient() { return false; }
+            void Init();
+    virtual bool NotifyClient();
     virtual void ProcessAck(uint16_t id, String FragmentRequest);
             String GetStateName() { return String(F("Reloading")); }
 

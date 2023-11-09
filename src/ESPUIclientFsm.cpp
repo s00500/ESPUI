@@ -69,7 +69,7 @@ void fsm_EspuiClient_state_Idle::ProcessAck(uint16_t ControlIndex, String Fragme
     {
         // This is an unexpected request for control data from the browser
         // treat it as if it was a rebuild operation
-        // Serial.println(F("fsm_EspuiClient_state_Idle: ProcessAck"));
+        // Serial.println(F("fsm_EspuiClient_state_Idle: ProcessAck:Error: Rebuild"));
         Parent->NotifyClient(ClientUpdateType_t::RebuildNeeded);
     }
 }
@@ -97,6 +97,14 @@ void fsm_EspuiClient_state_SendingUpdate::ProcessAck(uint16_t ControlIndex, Stri
 //----------------------------------------------
 //----------------------------------------------
 //----------------------------------------------
+void fsm_EspuiClient_state_Rebuilding::Init()
+{
+    // Serial.println(String("fsm_EspuiClient_state:Init: ") + GetStateName());
+    Parent->CurrentSyncID = 0;
+    Parent->NextSyncID = 0;
+    Parent->pCurrentFsmState = this;
+}
+
 bool fsm_EspuiClient_state_Rebuilding::NotifyClient()
 {
     // Serial.println(F("fsm_EspuiClient_state_Rebuilding: NotifyClient"));
@@ -117,6 +125,14 @@ void fsm_EspuiClient_state_Rebuilding::ProcessAck(uint16_t ControlIndex, String 
 //----------------------------------------------
 //----------------------------------------------
 //----------------------------------------------
+void fsm_EspuiClient_state_Reloading::Init()
+{
+    // Serial.println(String("fsm_EspuiClient_state:Init: ") + GetStateName());
+    Parent->CurrentSyncID = 0;
+    Parent->NextSyncID = 0;
+    Parent->pCurrentFsmState = this;
+}
+
 void fsm_EspuiClient_state_Reloading::ProcessAck(uint16_t ControlIndex, String FragmentRequestString)
 {
     if(!emptyString.equals(FragmentRequestString))
@@ -124,4 +140,10 @@ void fsm_EspuiClient_state_Reloading::ProcessAck(uint16_t ControlIndex, String F
         // Serial.println(F("fsm_EspuiClient_state_Reloading::ProcessAck:Fragmentation:Got fragment Header"));
         Parent->SendControlsToClient(ControlIndex, ClientUpdateType_t::UpdateNeeded, FragmentRequestString);
     }
+}
+
+bool fsm_EspuiClient_state_Reloading::NotifyClient()
+{
+    // Serial.println(F("fsm_EspuiClient_state_Reloading: NotifyClient"));
+    return true; /* Ignore request */
 }

@@ -18,6 +18,7 @@ Control::Control(ControlType type, const char* label, std::function<void(Control
       next(nullptr)
 {
     id = ++idCounter;
+    ControlChangeID = 1;
 }
 
 Control::Control(const Control& Control)
@@ -29,7 +30,8 @@ Control::Control(const Control& Control)
         color(Control.color),
         visible(Control.visible),
         parentControl(Control.parentControl),
-        next(Control.next)
+        next(Control.next),
+        ControlChangeID(Control.ControlChangeID)
 { }
 
 void Control::SendCallback(int type)
@@ -42,7 +44,7 @@ void Control::SendCallback(int type)
 
 void Control::DeleteControl() 
 {
-    ControlSyncState = ControlSyncState_t::deleted;
+    _ToBeDeleted = true;
     callback = nullptr;
 }
 
@@ -150,6 +152,8 @@ void Control::onWsEvent(String & cmd, String& data)
 {
     do // once
     {
+        // Serial.println(String(F("Control::onWsEvent")));
+        SetControlChangedId(ESPUI.GetNextControlChangeId());
         if (!HasCallback())
         {
             #if defined(DEBUG_ESPUI)
