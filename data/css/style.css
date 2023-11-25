@@ -14,7 +14,7 @@
 .card {
   min-height: 100px;
   border-radius: 6px;
-  box-shadow: 0 4px 4px rgba(204, 197, 185, 0.5);
+  box-shadow: 0 4px 4px rgb(46 46 46 / 50%);
   padding-left: 20px;
   padding-right: 20px;
   margin-bottom: 40px;
@@ -48,49 +48,51 @@
 .sectionbreak.columns hr {
 	border: none;
     height: 2px;
-    background-color: #666
+    background-color: #0e2237
 }
 
 .card-slider {}
 
 .turquoise {
-  background: #1abc9c;
-  border-bottom: #16a085 3px solid;
+  background: linear-gradient(122deg, rgba(166,34,195,1) 30%, rgba(0,0,0,1) 100%);
+  border-bottom: #090c15 3px solid
 }
 
 .emerald {
-  background: #2ecc71;
-  border-bottom: #27ae60 3px solid;
+  background: linear-gradient(90deg, rgba(239,0,19,1) 0%, rgba(181,0,77,1) 0%, rgba(81,0,177,1) 100%);
+  border-bottom: #090c15 3px solid
 }
 
 .peterriver {
-  background: #3498db;
-  border-bottom: #2980b9 3px solid;
+  background: #144363;
+  background: linear-gradient(-45deg, rgb(56,142,12) 3%, rgba(0,212,255,1) 100%);
+  border-bottom: #090c15 3px solid
 }
 
 .wetasphalt {
-  background: #34495e;
-  border-bottom: #2c3e50 3px solid;
+  background: linear-gradient(90deg, rgb(126,195,34) 67%, rgba(253,187,45,1) 100%);
+  border-bottom: #090c15 3px solid
 }
 
 .sunflower {
-  background: #f1c40f;
-  border-bottom: #e6bb0f 3px solid;
+  background: #886e09;
+  border-bottom: #090c15 3px solid
 }
 
 .carrot {
-  background: #e67e22;
-  border-bottom: #d35400 3px solid;
+  background: linear-gradient(122deg, rgb(79,90,99) 21%, rgba(0,0,0,1) 87%);
+  border-bottom: #090c15 3px solid
+  
 }
 
 .alizarin {
-  background: #e74c3c;
-  border-bottom: #c0392b 3px solid;
+  background: linear-gradient(140deg, rgba(56,66,75,1) 60%, rgba(255,38,0,1) 99%);
+  border-bottom: #090c15 3px solid
 }
 
 .dark {
-  background: #444857;
-  border-bottom: #444857 3px solid;
+  background: linear-gradient(-45deg,rgba(8,232,22,1) 0,rgba(8,186,232,1) 45%,rgba(34,146,175,1) 100%);
+  border-bottom: #090c15 3px solid
 }
 
 .label {
@@ -108,7 +110,7 @@
   vertical-align: baseline;
   position: relative;
   top: -0.15em;
-  background-color: #999999;
+  background-color: #00000073;
   margin-bottom: 10px;
 }
 
@@ -123,11 +125,11 @@
 }
 
 .label.color-red {
-  background-color: #d37c7c;
+  background-color: #e70000
 }
 
 .label.color-green {
-  background-color: #9bc268;
+  background-color: #9bce59;
 }
 
 .label.color-orange {
@@ -315,7 +317,7 @@ body {
   font-weight: 400;
   font-family: "Open Sans", sans-serif;
   color: #222;
-  background-color: #ecf0f1;
+  background: linear-gradient(90deg, rgba(0,68,106,1) 49%, rgba(2,45,56,1) 98%);
 }
 
 /* Typography
@@ -351,9 +353,11 @@ h3 {
 }
 
 h4 {
-  font-size: 2.4rem;
+  font-size: 3rem;
   line-height: 1.35;
   letter-spacing: -0.08rem;
+  color: #fff;
+  font-family: "IBM Plex Mono", monospace;
 }
 
 h5 {
@@ -384,7 +388,7 @@ h6 {
   }
 
   h4 {
-    font-size: 3rem;
+    font-size: 3.8rem;
   }
 
   h5 {
@@ -437,6 +441,7 @@ button:enabled:active {
 #conStatus {
   position: inherit;
   font-size: 0.75em;
+  -webkit-text-fill-color: #ffffff;
 }
 
 /* Spacing
@@ -481,7 +486,7 @@ hr {
   margin-top: 0.5rem;
   margin-bottom: 1.2rem;
   border-width: 0;
-  border-top: 1px solid #e1e1e1;
+  border-top: 2px solid #0e2237;
 }
 
 /* Clearing
@@ -870,46 +875,25 @@ hr {
   background-color: #27ae60;
 }
 
-.peterriver {
-  background: #3498db;
-  border-bottom: #2980b9 3px solid;
-}
-
 .rkmd-slider.slider-discrete.slider-peterriver .slider-label {
   background-color: #2980b9;
 }
 
-.wetasphalt {
-  background: #34495e;
-  border-bottom: #2c3e50 3px solid;
-}
 
 .rkmd-slider.slider-discrete.slider-wetasphalt .slider-label {
   background-color: #2c3e50;
 }
 
-.sunflower {
-  background: #f1c40f;
-  border-bottom: #e6bb0f 3px solid;
-}
 
 .rkmd-slider.slider-discrete.slider-sunflower .slider-label {
   background-color: #e6bb0f;
 }
 
-.carrot {
-  background: #e67e22;
-  border-bottom: #d35400 3px solid;
-}
 
 .rkmd-slider.slider-discrete.slider-carrot .slider-label {
   background-color: #d35400;
 }
 
-.alizarin {
-  background: #e74c3c;
-  border-bottom: #c0392b 3px solid;
-}
 
 .rkmd-slider.slider-discrete.slider-alizarin .slider-label {
   background-color: #c0392b;
@@ -967,7 +951,7 @@ body div>ul.navigation {
   margin: 0;
   margin-bottom: 30px;
   padding: 0;
-  border-bottom: 3px solid #666;
+  border-bottom: 3px solid #0e2237;
   overflow: hidden;
 }
 
@@ -985,24 +969,24 @@ ul.navigation li a {
   font-weight: bold;
   display: inline-block;
   padding: 6px 12px;
-  color: #888;
+  color: #fff;
   outline: 0;
   text-decoration: none;
-  background: #f3f3f3;
-  background: -webkit-gradient(linear, 0 0, 0 bottom, from(#eee), to(#e4e4e4));
-  background: -moz-linear-gradient(#eee, #e4e4e4);
-  background: linear-gradient(#eee, #e4e4e4);
-  -pie-background: linear-gradient(#eee, #e4e4e4);
+  background: #fff;
+  background: -webkit-gradient(linear,0 0,0 bottom,from(#eee),to(#5e5252));
+  background: -moz-linear-gradient(#eee,#e4e4e4);
+  background: linear-gradient(#0e2237,#1c1e2d);
+  -pie-background: linear-gradient(#eee,#e4e4e4)
 }
 
 ul.navigation li.active a {
   pointer-events: none;
   color: white;
-  background: #666;
-  background: -webkit-gradient(linear, 0 0, 0 bottom, from(#888), to(#666));
-  background: -moz-linear-gradient(#888, #666);
-  background: linear-gradient(#888, #666);
-  -pie-background: linear-gradient(#888, #666);
+  background: #0e2237;
+  background: -webkit-gradient(linear,0 0,0 bottom,from(#888),to(#302e2e));
+  background: -moz-linear-gradient(#877f7f,#666);
+  background: linear-gradient(#0e2237,#000000);
+  -pie-background: linear-gradient(#1d334a,#c7c7c7)
 }
 
 div.tabscontent>div {
