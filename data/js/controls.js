@@ -636,7 +636,7 @@ function start() {
 
             case UPDATE_TIME:
                 var date = new Date();
-                date.setHours(date.getHours() + date.getTimezoneOffset());
+                date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
                 var rv = date.toISOString();
                 websock.send("time:" + rv + ":" + data.id);
                 break;
