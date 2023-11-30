@@ -630,7 +630,10 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
 uint16_t ESPUIClass::addControl(
     ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
 {
-    return addControl(type, label, value, color, parentControl, new Control(type, label, nullptr, value, color, true, parentControl));
+    Control * ctrl = new Control(type, label, nullptr, value, color, true, parentControl);
+    if (auto_update_values && ctrl)
+        ctrl->auto_update_value = true;
+    return addControl(type, label, value, color, parentControl, ctrl);
 }
 
 uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
@@ -1103,7 +1106,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     } while (false);
 }
 
-bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId)
+bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, int clientId)
 {
     bool Response = false;
 
