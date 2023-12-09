@@ -1435,6 +1435,10 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             request->send(404);
         }
     });
+	
+	if (onCreateServerCallback) {
+        onCreateServerCallback(server);
+    }
 
     server->begin();
 
