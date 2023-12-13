@@ -30,7 +30,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 #include <umm_malloc/umm_heap_select.h>
-#ifndef CORE_MOCK
 #ifndef MMU_IRAM_HEAP
 #warning Try MMU option '2nd heap shared' in 'tools' IDE menu (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#option-summary)
 #warning use decorators: { HeapSelectIram doAllocationsInIRAM; ESPUI.addControl(...) ... } (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#how-to-select-heap)
@@ -38,7 +37,6 @@
 #endif // MMU_IRAM_HEAP
 #ifndef DEBUG_ESP_OOM
 #error on ESP8266 and ESPUI, you must define OOM debug option when developping
-#endif
 #endif
 #endif
 
@@ -398,8 +396,7 @@ void extendedCallback(Control* sender, int type, void* param)
     Serial.print(sender->label);
     Serial.print("' = ");
     Serial.println(sender->value);
-    Serial.print("param = ");
-    Serial.println((long)param);
+    Serial.println(String("param = ") + String((int)param));
 }
 
 void setup() {
@@ -446,7 +443,6 @@ void loop() {
 				#if !defined(ESP32)
 					((void (*)())0xf00fdead)();
 				#endif
-				break;
 			default:
 				Serial.print('#');
 				break;
