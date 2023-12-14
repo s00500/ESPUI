@@ -231,7 +231,7 @@ function start() {
         port != 80 ||
         port != 443
     ) {
-        websock = new WebSocket( "ws://" + location + "/ws" );
+        websock = new WebSocket( "ws://" + location + ":" + port + "/ws" );
     } else {
         websock = new WebSocket("ws://" + location + "/ws");
     }
