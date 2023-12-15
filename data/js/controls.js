@@ -635,8 +635,10 @@ function start() {
                 break;
 
             case UPDATE_TIME:
-                var rv = new Date().toISOString();
-                websock.send("time:" + rv + ":" + data.id);
+                var date = new Date();
+                websock.send("time:" + date.toISOString() + ":" + data.id);
+		        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+		        websock.send("localtime:" + date.toISOString() + ":" + data.id);
                 break;
 
             case UI_FRAGMENT:
