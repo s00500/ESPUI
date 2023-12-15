@@ -30,6 +30,7 @@ enum ControlType : uint8_t
     Accel,
     Separator,
     Time,
+    LocalTime,
 
     Fragment,
     Password = 99,

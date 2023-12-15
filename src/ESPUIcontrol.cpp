@@ -269,6 +269,11 @@ void Control::onWsEvent(String & cmd, String& data)
             // updateControl(c, client->id());
             SendCallback(TM_VALUE);
         }
+	    else if (cmd.equals(F("localtime")))
+	    {
+            value = data;
+	        SendCallback(TML_VALUE);
+	    }
         else
         {
             #if defined(DEBUG_ESPUI)

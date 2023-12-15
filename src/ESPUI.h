@@ -76,6 +76,7 @@ enum MessageTypes : uint8_t
 #define T_VALUE 10
 #define S_VALUE 11
 #define TM_VALUE 12
+#define TML_VALUE 13
 
 enum Verbosity : uint8_t
 {
