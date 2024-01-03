@@ -873,7 +873,7 @@ Control* ESPUIClass::getControlNoLock(uint16_t id)
 
 void ESPUIClass::updateControl(Control* control, int)
 {
-    if (!control)
+    if (!control || !ws)
     {
         return;
     }
