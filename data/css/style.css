@@ -1200,32 +1200,27 @@ input:disabled {
 }
 
 .Alert {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  min-width: 350px;
-  max-width: 20%;
-  height: auto;
-  margin: 20px;
-  padding-left: 25px;
-  padding-right: 25px;
-  border-radius: 3px;
-  font-size: 20px;
-  text-align: center;
-  color: white;
-  background-color: rgba(0, 100, 0, 0.75);
-  font-family: "Roboto";
-  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-  animation: ozFadeIn ease 0.25s;
-  z-index: 999999;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    min-width: 350px;
+    max-width: 20%;
+    height: auto;
+    margin: 20px;
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 20px;
+    text-align: center;
+    color: white;
+    background-color: rgba(0,100,0,0.75);
 }
 
-/* Styles the div container for the icon */
 .AlertIcon {
-  position: absolute;
-  left: 25px;
+    position: absolute;
+    font-size: 55px;
+    left: 25px
 }
 
 /* Styles the div container for the message */
