@@ -45,6 +45,10 @@ enum MessageTypes : uint8_t
     ExtendGUI = 210,
     UpdateGui = 220,
     ExtendedUpdateGui = 230,
+    AlertInfo = 240,
+    AlertWarning,
+    AlertError,
+    AllertSuccess
 };
 
 #define UI_INITIAL_GUI  MessageTypes::InitialGui
@@ -192,8 +196,31 @@ public:
 
     void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
+    typedef enum
+    {
+        ALERT_INFO = 0,
+        ALERT_WARNING,
+        ALERT_ERROR,
+        ALERT_SUCCESS
+    } alert_type_t;
+
+    void Alert(const char* message, alert_type_t alert_type = ALERT_INFO, int clientId = -1);
+    void AlertInfo(const char* message) { Alert(message); }
+    void AlertWarning(const char* message){ Alert(message, ALERT_WARNING); }
+    void AlertError(const char* message){ Alert(message, ALERT_ERROR); }
+    void AlertSuccess(const char* message){ Alert(message, ALERT_SUCCESS); }
+    void AlertInfo(String& message) { AlertInfo(message.c_str()); }
+    void AlertWarning(String& message){ AlertWarning(message.c_str()); }
+    void AlertError(String& message){ AlertError(message.c_str()); }
+    void AlertSuccess(String& message){ AlertSuccess(message.c_str()); }
+    void AlertInfo(const __FlashStringHelper * message) { AlertInfo(String(message).c_str()); }
+    void AlertWarning(const __FlashStringHelper * message){ AlertWarning(String(message).c_str()); }
+    void AlertError(const __FlashStringHelper * message){ AlertError(String(message).c_str()); }
+    void AlertSuccess(const __FlashStringHelper * message){ AlertSuccess(String(message).c_str()); }
+
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
+    
     Control* controls = nullptr;
     void jsonReload();
     void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);

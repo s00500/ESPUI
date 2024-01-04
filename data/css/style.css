@@ -1198,3 +1198,84 @@ input:disabled {
 .switch.checked.disabled {
   background: #b1d092;
 }
+
+.Alert {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  min-width: 350px;
+  max-width: 20%;
+  height: auto;
+  margin: 20px;
+  padding-left: 25px;
+  padding-right: 25px;
+  border-radius: 3px;
+  font-size: 20px;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 100, 0, 0.75);
+  font-family: "Roboto";
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+  animation: ozFadeIn ease 0.25s;
+  z-index: 999999;
+}
+
+/* Styles the div container for the icon */
+.AlertIcon {
+  position: absolute;
+  left: 25px;
+}
+
+/* Styles the div container for the message */
+.AlertMessage {
+  height: auto;
+  width: 80%;
+  overflow-wrap: break-word;
+}
+
+/* Styles the div container for the controls */
+.AlertControls {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+/* Styles the buttons used for the dialog type */
+.BtnConfirm {
+  margin-right: 30px; 
+  transition: 0.3s;
+  border-radius: 2px;
+  border: none; 
+  padding: 8px;
+  padding-left: 15px; 
+  padding-right: 15px;
+  outline: none;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  cursor: pointer;
+}
+
+.BtnConfirm:hover {
+  background-color: rgba(37, 155, 53, 0.75); 
+  color: white; 
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+.BtnCancel {
+  margin-left: 30px;
+  transition: 0.3s;
+  border-radius: 2px;
+  border: none; 
+  padding: 8px;
+  padding-left: 15px; 
+  padding-right: 15px;
+  outline: none;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  cursor: pointer;
+}
+
+.BtnCancel:hover {
+  background-color: rgba(155, 37, 37, 0.75);
+  color: white; 
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}

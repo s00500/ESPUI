@@ -1127,7 +1127,7 @@ bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& docume
 {
     bool Response = false;
 
-    if (0 > clientId)
+    if (clientId >= 0)
     {
         if (MapOfClients.end() != MapOfClients.find(clientId))
         {
@@ -1471,6 +1471,20 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
 void ESPUIClass::setVerbosity(Verbosity v)
 {
     verbosity = v;
+}
+
+void ESPUIClass::Alert(const char * message,alert_type_t alert_type, int clientId)
+{
+    if (!message && !strlen(message))
+        return;
+    
+    DynamicJsonDocument document(jsonUpdateDocumentSize);
+    JsonObject root = document.to<JsonObject>();
+
+    root[F("type")] = (int)MessageTypes::AlertInfo + (int)alert_type;
+    root[F("value")] = message;
+
+    SendJsonDocToWebSocket(document, clientId);
 }
 
 ESPUIClass ESPUI;
