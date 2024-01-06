@@ -49,32 +49,67 @@ enum ControlColor : uint8_t
     None = 0xFF
 };
 
+#define CTRL_OPT_ENABLED                    0x01
+#define CTRL_OPT_VISIBLE                    0x02
+#define CTRL_OPT_LABEL_IN_FLASH             0x04
+#define CTRL_OPT_AUTO_UPDATE_VALUE          0x08
+#define CTRL_OPT_WIDE                       0x10
+#define CTRL_OPT_VERTICAL                   0x20
+
 class Control
 {
 public:
-    ControlType type;
-    uint16_t id; // just mirroring the id here for practical reasons
-    const char* label;
+    static constexpr uint16_t noParent = 0xffff;
+    
+    // Pointers
+    union
+    {
+        const char* label_r;
+        const __FlashStringHelper* label_f;
+    };    
     std::function<void(Control*, int)> callback;
+    Control* next;
+
+    // Strings
     String value;
-    ControlColor color;
-    bool visible;
-    bool wide;
-    bool vertical;
-    bool enabled;
-    bool auto_update_value;
-    uint16_t parentControl;
     String panelStyle;
     String elementStyle;
     String inputType;
-    Control* next;
+    
+    //enums
+    ControlType type;
+    ControlColor color;
 
-    static constexpr uint16_t noParent = 0xffff;
+    // uint16_t
+    uint16_t id; // just mirroring the id here for practical reasons
+    uint16_t parentControl;
+
+    union
+    {
+        struct
+        {
+            uint16_t enabled : 1 ; 
+            uint16_t visible : 1; 
+            uint16_t lablel_is_in_flash : 1;
+            uint16_t auto_update_value : 1;
+            uint16_t wide : 1;
+            uint16_t vertical : 1;
+        };
+        uint16_t options;
+    };
 
     Control(ControlType type, 
             const char* label, 
             std::function<void(Control*, int)> callback,
             const String& value, 
+            ControlColor color, 
+            bool visible, 
+            uint16_t parentControl);
+    
+    Control(ControlType type, 
+            const __FlashStringHelper* label, 
+            std::function<void(Control*, int)> callback, 
+            const String& value,
             ControlColor color, 
             bool visible, 
             uint16_t parentControl);
@@ -93,7 +128,7 @@ public:
     
 private:
     bool _ToBeDeleted = false;
-    uint32_t ControlChangeID = 0;
+    uint32_t ControlChangeID;
 };
 
 #define UI_TITLE            ControlType::Title

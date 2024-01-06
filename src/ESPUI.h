@@ -132,13 +132,18 @@ public:
     uint16_t addControl(ControlType type, const char* label, const String& value);
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color);
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl);
+    uint16_t addControl(ControlType type, const __FlashStringHelper* label, const String& value, ControlColor color, uint16_t parentControl);
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int)> callback);
+    uint16_t addControl(ControlType type, const __FlashStringHelper * label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int)> callback);
 
     bool removeControl(uint16_t id, bool force_rebuild_ui = false);
 
     // create Elements
     // Create Event Button
     uint16_t button(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value = "");
+    uint16_t button(const __FlashStringHelper* label, const __FlashStringHelper* value,
+        std::function<void(Control*, int)> callback, uint16_t parentControl = Control::noParent, ControlColor color = ControlColor::Dark);
+    
     uint16_t switcher(const char* label, std::function<void(Control*, int)> callback, ControlColor color, bool startState = false); // Create Toggle Button
     uint16_t pad(const char* label, std::function<void(Control*, int)> callback, ControlColor color); // Create Pad Control
     uint16_t padWithCenter(const char* label, std::function<void(Control*, int)> callback, ControlColor color); // Create Pad Control with Centerbutton
@@ -168,6 +173,7 @@ public:
 
     void updateControlLabel(uint16_t control, const char * value, int clientId = -1);
     void updateControlLabel(Control* control, const char * value, int clientId = -1);
+    void updateControlLabel(Control* control, const __FlashStringHelper* value, int clientId = -1);
 
     void updateControl(uint16_t id, int clientId = -1);
     void updateControl(Control* control, int clientId = -1);
@@ -285,7 +291,7 @@ protected:
     bool basicAuth = true;
     uint16_t controlCount = 0;
 
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, Control* control);
+    uint16_t addControl(Control* control);
 
 #define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
     void NotifyClients(ClientUpdateType_t newState);

@@ -5,35 +5,52 @@ static const String ControlError = "*** ESPUI ERROR: Could not transfer control 
 
 Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback, const String& value,
     ControlColor color, bool visible, uint16_t parentControl)
-    : type(type),
-      label(label),
+    : label_r(label),
       callback(callback),
+      next(nullptr),
       value(value),
+      type(type),
       color(color),
-      visible(visible),
-      wide(false),
-      vertical(false),
-      enabled(true),
-      auto_update_value(false),
       parentControl(parentControl),
-      next(nullptr)
+      options(CTRL_OPT_ENABLED),
+      ControlChangeID(1)
 {
+    this->visible = visible;
     id = ++idCounter;
-    ControlChangeID = 1;
+}
+
+Control::Control(ControlType type, const __FlashStringHelper* label, std::function<void(Control*, int)> callback,
+    const String& value, ControlColor color, bool visible, uint16_t parentControl)
+    : label_f(label),
+      callback(callback),
+      next(nullptr),
+      value(value),
+      type(type),
+      color(color),
+      parentControl(parentControl),
+      options(CTRL_OPT_ENABLED | CTRL_OPT_LABEL_IN_FLASH),
+      ControlChangeID(1)
+{
+    this->visible = visible;
+    id = ++idCounter;
 }
 
 Control::Control(const Control& Control)
-    : type(Control.type),
-        id(Control.id),
-        label(Control.label),
-        callback(Control.callback),
-        value(Control.value),
-        color(Control.color),
-        visible(Control.visible),
-        parentControl(Control.parentControl),
-        next(Control.next),
-        ControlChangeID(Control.ControlChangeID)
-{ }
+    : label_r(Control.label_r),
+      callback(Control.callback),
+      next(Control.next),
+      value(Control.value),
+      type(Control.type),
+      color(Control.color),
+      id(Control.id),
+      parentControl(Control.parentControl),
+      visible(Control.visible),
+      ControlChangeID(Control.ControlChangeID)
+{
+    options = Control.options;
+    if (lablel_is_in_flash)
+        label_f = Control.label_f;
+}
 
 void Control::SendCallback(int type)
 {
@@ -97,7 +114,10 @@ void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t Starting
         item[F("type")] = uint32_t(TempType);
     }
 
-    item[F("label")]   = label;
+    if (lablel_is_in_flash)
+        item[F("label")] = label_f;
+    else
+        item[F("label")] = label_r;
     item[F ("value")]   = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, length + StartingOffset);
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
