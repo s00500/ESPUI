@@ -232,6 +232,9 @@ public:
         return accelerometer(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color);
     }
 
+    AsyncWebServer* WebServer() {return server;}
+    AsyncWebSocket* WebSocket() {return ws;}
+
 protected:
     friend class ESPUIclient;
     friend class ESPUIcontrol;
