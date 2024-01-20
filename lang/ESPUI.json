@@ -38,6 +38,25 @@
 				"LANG_ESPUI_SWITCH_SWITCH": "UI 开关",
 				"LANG_ESPUI_PAD_PAD": "UI 面板",
 				"LANG_ESPUI_PAD_CENTER": "中间按钮?"
+			},
+		"tr-TR": {
+			"keys": {
+				"LANG_SUBCATERGORY_ESPUI": "Kullanıcı Arayüzü",
+				"LANG_ESPUI_ESPUI_TITLE": "Başlık",
+				"LANG_ESPUI_ESPUI_HOTSPOT": "Wifi Erişim Noktası Kodunu Etkinleştir",
+				"LANG_ESPUI_ESPUI_TOOLTIP": "ESP32/ESP8266'da bir web arayüzü oluşturur",
+				"LANG_ESPUI_BUTTON_BUTTON": "Kullanıcı Arayüzü Düğmesi",
+				"LANG_ESPUI_NAME": "ad",
+				"LANG_ESPUI_COLOR": "Renk",
+				"LANG_ESPUI_TEXT": "Metin",
+				"LANG_ESPUI_BUTTON_TOOLTIP": "Bir web arayüzü düğmesi",
+				"LANG_ESPUI_LABEL_LABEL": "Kullanıcı Arayüzü Etiketi",
+				"LANG_ESPUI_LABEL": "Etiket",
+				"LANG_ESPUI_LABEL_TOOLTIP": "Kodunuzdan güncelleyebileceğiniz bir web arayüzü etiketi",
+				"LANG_ESPUI_STATE": "Durum",
+				"LANG_ESPUI_SWITCH_SWITCH": "Kullanıcı Arayüzü Anahtarı",
+				"LANG_ESPUI_PAD_PAD": "UI Pad",
+				"LANG_ESPUI_PAD_CENTER": "Orta düğme?"
 			}
 		}
 	}
