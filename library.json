@@ -24,6 +24,11 @@
       "name": "ArduinoJson",
       "authors": "Benoit Blanchon",
       "frameworks": "arduino"
+    },
+    {
+      "name": "LittleFS_esp32",
+      "authors": "lorol",
+      "frameworks": "arduino"
     }
   ],
   "version": "2.2.3",

@@ -4,6 +4,11 @@ const UPDATE_OFFSET = 100;
 
 const UI_EXTEND_GUI = 210;
 
+const ALERT_I = 240;
+const ALERT_W = 241;
+const ALERT_E = 242;
+const ALERT_S = 243;
+
 const UI_TITEL = 0;
 
 const UI_PAD = 1;
@@ -80,10 +85,168 @@ const C_DARK = 7;
 const C_NONE = 255;
 
 var controlAssemblyArray = new Object();
-var FragmentAssemblyTimer = new Object();
+var FragmentAssemblyTimer = 0;
 var graphData = new Array();
 var hasAccel = false;
 var sliderContinuous = false;
+
+class Alert {
+  static fire(
+    icon,
+    message,
+    position = "tl",
+    type = "",
+    options = {},
+    onConfirm = function () {},
+    onCancel = function () {}
+  ) {
+    // Creates essential elements
+    const el = document.createElement("div");
+    el.className = "Alert";
+    const divIcon = document.createElement("div");
+    divIcon.className = "AlertIcon";
+    const divMessage = document.createElement("div");
+    divMessage.className = "AlertMessage";
+
+    // Appends elements to parent element
+    el.appendChild(divIcon);
+    el.appendChild(divMessage);
+    
+     // Handles icon selection based on parameter "icon"
+    if (icon == "succ") {
+      divIcon.innerHTML = '&check;';
+    } else if (icon == "err") {
+      divIcon.innerHTML = '&#10807;';
+      el.style.backgroundColor = "rgba(180, 0, 0, 0.75)"
+      message = "<b>ERROR</b><br>" + message;
+    } else if (icon == "info") {
+      divIcon.innerHTML = '&#9888;';
+    } else if (icon == "warn") {
+      divIcon.innerHTML = "&#120142;";
+      el.style.backgroundColor = "rgba(100, 0, 0, 0.75);"
+    }   
+
+    // Sets message based on parameter "message"
+    divMessage.innerHTML = "<p>" + message + "</p>";
+
+    // Creates Alert instance of type "dialog" based on "type" parameter
+    if (type == "dialog") {
+      // Necessary changes to styling for dialog
+      el.style.flexDirection = "column";
+      divIcon.style.position = "relative"; 
+      divIcon.style.left = "0px";
+      divIcon.style.marginTop = "15px";
+
+      // Creates necessary table elements for dialog
+      const divControls = document.createElement("div");
+      divControls.className = "AlertControls";
+
+      const btnConfirm = document.createElement("button");
+      btnConfirm.className = "BtnConfirm";
+      btnConfirm.innerHTML = "Confirm";
+      const btnCancel = document.createElement("button");
+      btnCancel.className = "BtnCancel";
+      btnCancel.innerHTML = "Cancel";
+
+      // Appends elements to parent element
+      el.appendChild(divControls);
+      divControls.appendChild(btnConfirm);
+      divControls.appendChild(btnCancel);
+
+      // Handles functions on dialog button click
+      btnConfirm.onclick = function () {
+        onConfirm();
+        removeAlert(el);
+      };
+
+      btnCancel.onclick = function () {
+        onCancel();
+        removeAlert(el);
+      };
+
+      // Sets dialog specific options based on "options" object parameter
+      if (Object.keys(options).length > 0) {
+        if (options.confirmButtonText) {
+          btnConfirm.innerHTML = options.confirmButtonText;
+        }
+        if (options.cancelButtonText) {
+          btnCancel.innerHTML = options.cancelButtonText;
+        }
+        if (options.confirmButtonColor) {
+          btnConfirm.style.backgroundColor = options.confirmButtonColor;
+        }
+        if (options.cancelButtonColor) {
+          btnCancel.style.backgroundColor = options.cancelButtonColor;
+        }
+      }
+    }
+
+    // Handles position based on parameter "position"
+    el.style.left = 0;
+    switch (position) {
+      case "tl":
+        el.style.top = 0;
+        break;
+
+      case "tm":
+        el.style.right = 0;
+        el.style.marginLeft = "auto";
+        el.style.marginRight = "auto";
+        break;
+
+      case "bl":
+        el.style.bottom = 0;
+        break;
+
+      case "bm":
+        el.style.right = 0;
+        el.style.bottom = 0;
+        el.style.marginLeft = "auto";
+        el.style.marginRight = "auto";
+        break;
+
+      case "center":
+        el.style.right = 0;
+        el.style.marginLeft = "auto";
+        el.style.marginRight = "auto";
+        el.style.marginTop = "20%";
+        break;
+    }
+
+    // Sets general options based on "options" object passed as parameter
+    if (Object.keys(options).length > 0) {
+      if (options.backgroundColor) {
+        el.style.backgroundColor = options.backgroundColor;
+      }
+      if (options.fontColor) {
+        divMessage.style.color = options.fontColor;
+      }
+      if (options.iconColor) {
+        divIcon.style.color = options.iconColor;
+      }
+      if (options.borderRadius) {
+        el.style.borderRadius = options.borderRadius;
+      }
+      if (options.border) {
+        el.style.border = options.border;
+      }
+    }
+
+    // Finally appends Alert alert element to document body
+    document.body.appendChild(el);
+
+    // Handles behavior of Alert alert upon deletion based on type
+    if (type == "") { //notification
+      setTimeout(() => {
+        el.parentNode.removeChild(el);
+      }, 8000);
+    }
+
+    function remAlert(element) {
+        element.parentNode.removeChild(element);
+    }
+  }
+}
 
 function colorClass(colorId) {
     colorId = Number(colorId);
@@ -193,11 +356,16 @@ function restart() {
     start();
 }
 
+function FragmentAssemblyTimerStop(){        
+	if(FragmentAssemblyTimer)
+        	FragmentAssemblyTimer.forEach(element => {
+            clearInterval(element);
+        	});
+        FragmentAssemblyTimer = 0;
+ }
+
 function conStatusError() {
-    FragmentAssemblyTimer.forEach(element => {
-        clearInterval(element);
-    });
-    FragmentAssemblyTimer = new Object();
+    FragmentAssemblyTimerStop();
     controlAssemblyArray = new Object();
 
     if (true === websockConnected) {
@@ -222,8 +390,6 @@ function handleVisibilityChange() {
 function start() {
     let location = window.location.hostname;
     let port = window.location.port;
-//    let location = "192.168.10.229";
-//    let port = "";
 
     document.addEventListener("visibilitychange", handleVisibilityChange, false);
     if (
@@ -243,7 +409,7 @@ function start() {
             // console.info("Periodic Timer has expired");
             // is the socket closed?
             if (websock.readyState === 3) {
-                // console.info("Web Socket Is Closed");
+                console.info("Web Socket Is Closed");
                 restart();
             }
         }, 5000);
@@ -254,10 +420,7 @@ function start() {
         $("#conStatus").addClass("color-green");
         $("#conStatus").text("Connected");
         websockConnected = true;
-        FragmentAssemblyTimer.forEach(element => {
-            clearInterval(element);
-        });
-        FragmentAssemblyTimer = new Object();
+
         controlAssemblyArray = new Object();
     };
 
@@ -267,10 +430,7 @@ function start() {
         // console.log("Close code: '" + evt.code + "'");
         console.log("websock close");
         conStatusError();
-        FragmentAssemblyTimer.forEach(element => {
-            clearInterval(element);
-        });
-        FragmentAssemblyTimer = new Object();
+        FragmentAssemblyTimerStop();
         controlAssemblyArray = new Object();
     };
 
@@ -280,10 +440,7 @@ function start() {
         // console.log("Error data: '" + evt.data + "'");
 
         restart();
-        FragmentAssemblyTimer.forEach(element => {
-            clearInterval(element);
-        });
-        FragmentAssemblyTimer = new Object();
+        FragmentAssemblyTimerStop();
         controlAssemblyArray = new Object();
     };
 
@@ -301,7 +458,7 @@ function start() {
         }
         var e = document.body;
         var center = "";
-        // console.info("data.type: '" + data.type + "'");
+        console.info("data.type: '" + data.type + "'");
 
         switch (data.type) {
             case UI_INITIAL_GUI:
@@ -354,6 +511,19 @@ function start() {
                 document.title = data.label;
                 $("#mainHeader").html(data.label);
                 break;
+                
+            case ALERT_I:
+                Alert.fire("info", data.value);
+            break;        
+            case ALERT_W:
+            	Alert.fire("warn", data.value);
+            break;            
+            case ALERT_E:
+            	Alert.fire("err", data.value);
+            break;
+            case ALERT_S:
+            	Alert.fire("succ", data.value);
+            break;
 
             /*
               Most elements have the same behaviour when added.
@@ -773,6 +943,10 @@ function start() {
 function StartFragmentAssemblyTimer(Id)
 {
     StopFragmentAssemblyTimer(Id);
+    
+    if(!FragmentAssemblyTimer)
+     	FragmentAssemblyTimer = new Object();
+    
     FragmentAssemblyTimer[Id] = setInterval(function(_Id)
     {
         // does the fragment assembly still exist?
@@ -791,13 +965,8 @@ function StartFragmentAssemblyTimer(Id)
 
 function StopFragmentAssemblyTimer(Id)
 {
-    if("undefined" !== typeof FragmentAssemblyTimer[Id])
-    {
-        if(FragmentAssemblyTimer[Id])
-        {
-            clearInterval(FragmentAssemblyTimer[Id]);
-        }
-    }
+    if(!FragmentAssemblyTimer && ("undefined" !== typeof FragmentAssemblyTimer[Id]) && FragmentAssemblyTimer[Id])
+	    clearInterval(FragmentAssemblyTimer[Id]);
 }
 
 function sliderchange(number) {

@@ -3,36 +3,54 @@
 static uint16_t idCounter = 0;
 static const String ControlError = "*** ESPUI ERROR: Could not transfer control ***";
 
-Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback,
-    const String& value, ControlColor color, bool visible, uint16_t parentControl)
-    : type(type),
-      label(label),
+Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback, const String& value,
+    ControlColor color, bool visible, uint16_t parentControl)
+    : label_r(label),
       callback(callback),
+      next(nullptr),
       value(value),
+      type(type),
       color(color),
-      visible(visible),
-      wide(false),
-      vertical(false),
-      enabled(true),
       parentControl(parentControl),
-      next(nullptr)
+      options(CTRL_OPT_ENABLED),
+      ControlChangeID(1)
 {
+    this->visible = visible;
     id = ++idCounter;
-    ControlChangeID = 1;
+}
+
+Control::Control(ControlType type, const __FlashStringHelper* label, std::function<void(Control*, int)> callback,
+    const String& value, ControlColor color, bool visible, uint16_t parentControl)
+    : label_f(label),
+      callback(callback),
+      next(nullptr),
+      value(value),
+      type(type),
+      color(color),
+      parentControl(parentControl),
+      options(CTRL_OPT_ENABLED | CTRL_OPT_LABEL_IN_FLASH),
+      ControlChangeID(1)
+{
+    this->visible = visible;
+    id = ++idCounter;
 }
 
 Control::Control(const Control& Control)
-    : type(Control.type),
-        id(Control.id),
-        label(Control.label),
-        callback(Control.callback),
-        value(Control.value),
-        color(Control.color),
-        visible(Control.visible),
-        parentControl(Control.parentControl),
-        next(Control.next),
-        ControlChangeID(Control.ControlChangeID)
-{ }
+    : label_r(Control.label_r),
+      callback(Control.callback),
+      next(Control.next),
+      value(Control.value),
+      type(Control.type),
+      color(Control.color),
+      id(Control.id),
+      parentControl(Control.parentControl),
+      visible(Control.visible),
+      ControlChangeID(Control.ControlChangeID)
+{
+    options = Control.options;
+    if (lablel_is_in_flash)
+        label_f = Control.label_f;
+}
 
 void Control::SendCallback(int type)
 {
@@ -96,7 +114,10 @@ void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t Starting
         item[F("type")] = uint32_t(TempType);
     }
 
-    item[F("label")]   = label;
+    if (lablel_is_in_flash)
+        item[F("label")] = label_f;
+    else
+        item[F("label")] = label_r;
     item[F ("value")]   = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, length + StartingOffset);
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
@@ -154,129 +175,128 @@ void Control::onWsEvent(String & cmd, String& data)
     {
         // Serial.println(String(F("Control::onWsEvent")));
         SetControlChangedId(ESPUI.GetNextControlChangeId());
-        if (!HasCallback())
-        {
-            #if defined(DEBUG_ESPUI)
-                if (ESPUI.verbosity)
-                {
-                    Serial.println(String(F("Control::onWsEvent:No callback found for ID ")) + String(id));
-                }
-            #endif
-            break;
-        }
 
-        // Serial.println("Control::onWsEvent:Generating callback");
+        int arg = 0;
+
         if (cmd.equals(F("bdown")))
         {
-            SendCallback(B_DOWN);
-            break;
+            arg = B_DOWN;
         }
-        
-        if (cmd.equals(F("bup")))
+        else if (cmd.equals(F("bup")))
         {
-            SendCallback(B_UP);
-            break;
+            arg = B_UP;
         }
-
-        if (cmd.equals(F("pfdown")))
+        else if (cmd.equals(F("pfdown")))
         {
-            SendCallback(P_FOR_DOWN);
-            break;
+            arg = P_FOR_DOWN;
         }
-        
-        if (cmd.equals(F("pfup")))
+        else if (cmd.equals(F("pfup")))
         {
-            SendCallback(P_FOR_UP);
-            break;
+            arg = P_FOR_UP;
         }
-
-        if (cmd.equals(F("pldown")))
+        else if (cmd.equals(F("pldown")))
         {
-            SendCallback(P_LEFT_DOWN);
-            break;
+            arg = P_LEFT_DOWN;
         }
-
         else if (cmd.equals(F("plup")))
         {
-            SendCallback(P_LEFT_UP);
+            arg = P_LEFT_UP;
         }
         else if (cmd.equals(F("prdown")))
         {
-            SendCallback(P_RIGHT_DOWN);
+            arg = P_RIGHT_DOWN;
         }
         else if (cmd.equals(F("prup")))
         {
-            SendCallback(P_RIGHT_UP);
+            arg = P_RIGHT_UP;
         }
         else if (cmd.equals(F("pbdown")))
         {
-            SendCallback(P_BACK_DOWN);
+            arg = P_BACK_DOWN;
         }
         else if (cmd.equals(F("pbup")))
         {
-            SendCallback(P_BACK_UP);
+            arg = P_BACK_UP;
         }
         else if (cmd.equals(F("pcdown")))
         {
-            SendCallback(P_CENTER_DOWN);
+            arg = P_CENTER_DOWN;
         }
         else if (cmd.equals(F("pcup")))
         {
-            SendCallback(P_CENTER_UP);
+            arg = P_CENTER_UP;
         }
         else if (cmd.equals(F("sactive")))
         {
-            value = "1";
-            SendCallback(S_ACTIVE);
+            if (auto_update_value)
+                value = "1";
+            arg = S_ACTIVE;
         }
         else if (cmd.equals(F("sinactive")))
         {
-            value = "0";
-            // updateControl(c, client->id());
-            SendCallback(S_INACTIVE);
+            if (auto_update_value)
+                value = "0";
+            arg = S_INACTIVE;
         }
         else if (cmd.equals(F("slvalue")))
         {
-            value = data;
-            // updateControl(c, client->id());
-            SendCallback(SL_VALUE);
+            if (auto_update_value)
+                value = data;
+            arg = SL_VALUE;
         }
         else if (cmd.equals(F("nvalue")))
         {
-            value = data;
-            // updateControl(c, client->id());
-            SendCallback(N_VALUE);
+            if (auto_update_value)
+                value = data;
+            arg = N_VALUE;
         }
         else if (cmd.equals(F("tvalue")))
         {
-            value = data;
-            // updateControl(c, client->id());
-            SendCallback(T_VALUE);
+            if (auto_update_value)
+                value = data;
+            arg = T_VALUE;
         }
         else if (cmd.equals(F("tabvalue")))
         {
-            SendCallback(0);
+            arg = 0;
         }
         else if (cmd.equals(F("svalue")))
         {
-            value = data;
-            // updateControl(c, client->id());
-            SendCallback(S_VALUE);
+            if (auto_update_value)
+                value = data;
+            arg = S_VALUE;
         }
         else if (cmd.equals(F("time")))
         {
-            value = data;
-            // updateControl(c, client->id());
-            SendCallback(TM_VALUE);
+            if (auto_update_value)
+                value = data;
+            arg = TM_VALUE;
         }
         else
         {
-            #if defined(DEBUG_ESPUI)
-                if (ESPUI.verbosity)
-                {
-                    Serial.println(F("Control::onWsEvent:Malformed message from the websocket"));
-                }
-            #endif
+        #if defined(DEBUG_ESPUI)
+            if (ESPUI.verbosity)
+            {
+                Serial.println(F("Control::onWsEvent:Malformed message from the websocket"));
+            }
+        #endif
+            break;
         }
+
+        if (!HasCallback())
+        {
+#if defined(DEBUG_ESPUI)
+            if (ESPUI.verbosity)
+            {
+                Serial.println(String(F("Control::onWsEvent:No callback found for ID ")) + String(id));
+            }
+#endif
+        }
+        else
+        {
+            // Serial.println("Control::onWsEvent:Generating callback");
+            SendCallback(arg);
+        }
+
     } while (false);
 }

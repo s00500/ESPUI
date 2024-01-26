@@ -28,9 +28,7 @@
 
 #else
 
-#include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
 #include <ESPAsyncTCP.h>
 #include <Hash.h>
 
@@ -47,6 +45,10 @@ enum MessageTypes : uint8_t
     ExtendGUI = 210,
     UpdateGui = 220,
     ExtendedUpdateGui = 230,
+    AlertInfo = 240,
+    AlertWarning,
+    AlertError,
+    AllertSuccess
 };
 
 #define UI_INITIAL_GUI  MessageTypes::InitialGui
@@ -105,8 +107,16 @@ public:
     bool sliderContinuous = false;
     void onWsEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len);
 	bool captivePortal = true;
+    bool auto_update_values = false;
 
     void setVerbosity(Verbosity verbosity);
+	
+	typedef std::function<void(AsyncWebServer*)> onCreateServerCallback_t;
+	void onCreateServerCallbackSet(onCreateServerCallback_t callback)
+	{
+        onCreateServerCallback = callback;
+	}
+	
     void begin(const char* _title, const char* username = nullptr, const char* password = nullptr,
         uint16_t port = 80); // Setup server and page in Memorymode
     void beginSPIFFS(const char* _title, const char* username = nullptr, const char* password = nullptr,
@@ -122,13 +132,18 @@ public:
     uint16_t addControl(ControlType type, const char* label, const String& value);
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color);
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl);
+    uint16_t addControl(ControlType type, const __FlashStringHelper* label, const String& value, ControlColor color, uint16_t parentControl);
     uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int)> callback);
+    uint16_t addControl(ControlType type, const __FlashStringHelper * label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int)> callback);
 
     bool removeControl(uint16_t id, bool force_rebuild_ui = false);
 
     // create Elements
     // Create Event Button
     uint16_t button(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value = "");
+    uint16_t button(const __FlashStringHelper* label, const __FlashStringHelper* value,
+        std::function<void(Control*, int)> callback, uint16_t parentControl = Control::noParent, ControlColor color = ControlColor::Dark);
+    
     uint16_t switcher(const char* label, std::function<void(Control*, int)> callback, ControlColor color, bool startState = false); // Create Toggle Button
     uint16_t pad(const char* label, std::function<void(Control*, int)> callback, ControlColor color); // Create Pad Control
     uint16_t padWithCenter(const char* label, std::function<void(Control*, int)> callback, ControlColor color); // Create Pad Control with Centerbutton
@@ -158,6 +173,7 @@ public:
 
     void updateControlLabel(uint16_t control, const char * value, int clientId = -1);
     void updateControlLabel(Control* control, const char * value, int clientId = -1);
+    void updateControlLabel(Control* control, const __FlashStringHelper* value, int clientId = -1);
 
     void updateControl(uint16_t id, int clientId = -1);
     void updateControl(Control* control, int clientId = -1);
@@ -186,8 +202,31 @@ public:
 
     void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
+    typedef enum
+    {
+        ALERT_INFO = 0,
+        ALERT_WARNING,
+        ALERT_ERROR,
+        ALERT_SUCCESS
+    } alert_type_t;
+
+    void Alert(const char* message, alert_type_t alert_type = ALERT_INFO, int clientId = -1);
+    void AlertInfo(const char* message) { Alert(message); }
+    void AlertWarning(const char* message){ Alert(message, ALERT_WARNING); }
+    void AlertError(const char* message){ Alert(message, ALERT_ERROR); }
+    void AlertSuccess(const char* message){ Alert(message, ALERT_SUCCESS); }
+    void AlertInfo(String& message) { AlertInfo(message.c_str()); }
+    void AlertWarning(String& message){ AlertWarning(message.c_str()); }
+    void AlertError(String& message){ AlertError(message.c_str()); }
+    void AlertSuccess(String& message){ AlertSuccess(message.c_str()); }
+    void AlertInfo(const __FlashStringHelper * message) { AlertInfo(String(message).c_str()); }
+    void AlertWarning(const __FlashStringHelper * message){ AlertWarning(String(message).c_str()); }
+    void AlertError(const __FlashStringHelper * message){ AlertError(String(message).c_str()); }
+    void AlertSuccess(const __FlashStringHelper * message){ AlertSuccess(String(message).c_str()); }
+
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
+    
     Control* controls = nullptr;
     void jsonReload();
     void jsonDom(uint16_t startidx, AsyncWebSocketClient* client = nullptr, bool Updating = false);
@@ -231,6 +270,9 @@ public:
     {
         return accelerometer(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color);
     }
+    
+    AsyncWebServer* WebServer() {return server;}
+    AsyncWebSocket* WebSocket() {return ws;}
 
     AsyncWebServer* WebServer() {return server;}
     AsyncWebSocket* WebSocket() {return ws;}
@@ -247,19 +289,21 @@ protected:
 
     AsyncWebServer* server;
     AsyncWebSocket* ws;
-
+	
+	
+	onCreateServerCallback_t onCreateServerCallback = nullptr;
     const char* basicAuthUsername = nullptr;
     const char* basicAuthPassword = nullptr;
     bool basicAuth = true;
     uint16_t controlCount = 0;
 
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, Control* control);
+    uint16_t addControl(Control* control);
 
 #define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
     void NotifyClients(ClientUpdateType_t newState);
     void NotifyClient(uint32_t WsClientId, ClientUpdateType_t newState);
 
-    bool SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId);
+    bool SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, int clientId);
 
     std::map<uint32_t, ESPUIclient*> MapOfClients;
 
