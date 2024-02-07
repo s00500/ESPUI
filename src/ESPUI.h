@@ -143,6 +143,7 @@ public:
     uint16_t gauge(const char* label, ControlColor color, int value, int min = 0,
         int max = 100); // Create Gauge display
     uint16_t separator(const char* label); //Create separator
+    uint16_t fileDisplay(const char* label, ControlColor color, String filename);
 
     // Input only
     uint16_t accelerometer(const char* label, std::function<void(Control*, int)> callback, ControlColor color);

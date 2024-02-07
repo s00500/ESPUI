@@ -60,7 +60,10 @@ const UPDATE_SEPARATOR = 119;
 const UI_TIME = 20;
 const UPDATE_TIME = 120;
 
-const UI_FRAGMENT = 21;
+const UI_FILEDISPLAY = 21;
+const UPDATE_FILEDISPLAY = 121;
+
+const UI_FRAGMENT = 98;
 
 const UP = 0;
 const DOWN = 1;
@@ -80,7 +83,7 @@ const C_DARK = 7;
 const C_NONE = 255;
 
 var controlAssemblyArray = new Object();
-var FragmentAssemblyTimer = new Object();
+var FragmentAssemblyTimer = new Array();
 var graphData = new Array();
 var hasAccel = false;
 var sliderContinuous = false;
@@ -197,8 +200,8 @@ function conStatusError() {
     FragmentAssemblyTimer.forEach(element => {
         clearInterval(element);
     });
-    FragmentAssemblyTimer = new Object();
-    controlAssemblyArray = new Object();
+    FragmentAssemblyTimer = new Array();
+    controlAssemblyArray = new Array();
 
     if (true === websockConnected) {
         websockConnected = false;
@@ -220,10 +223,10 @@ function handleVisibilityChange() {
 }
 
 function start() {
-    let location = window.location.hostname;
-    let port = window.location.port;
-//    let location = "192.168.10.229";
-//    let port = "";
+//    let location = window.location.hostname;
+//    let port = window.location.port;
+    let location = "192.168.10.219";
+    let port = "";
 
     document.addEventListener("visibilitychange", handleVisibilityChange, false);
     if (
@@ -257,8 +260,8 @@ function start() {
         FragmentAssemblyTimer.forEach(element => {
             clearInterval(element);
         });
-        FragmentAssemblyTimer = new Object();
-        controlAssemblyArray = new Object();
+        FragmentAssemblyTimer = new Array();
+        controlAssemblyArray = new Array();
     };
 
     websock.onclose = function (evt) {
@@ -270,8 +273,8 @@ function start() {
         FragmentAssemblyTimer.forEach(element => {
             clearInterval(element);
         });
-        FragmentAssemblyTimer = new Object();
-        controlAssemblyArray = new Object();
+        FragmentAssemblyTimer = new Array();
+        controlAssemblyArray = new Array();
     };
 
     websock.onerror = function (evt) {
@@ -283,8 +286,8 @@ function start() {
         FragmentAssemblyTimer.forEach(element => {
             clearInterval(element);
         });
-        FragmentAssemblyTimer = new Object();
-        controlAssemblyArray = new Object();
+        FragmentAssemblyTimer = new Array();
+        controlAssemblyArray = new Array();
     };
 
     var handleEvent = function (evt) {
@@ -367,7 +370,7 @@ function start() {
                 if (data.visible) addToHTML(data);
                 break;
 
-            /*
+                /*
               These elements must call additional functions after being added to the DOM
             */
             case UI_BUTTON:
@@ -565,6 +568,14 @@ function start() {
                 }
                 break;
 
+            case UI_FILEDISPLAY:
+                if (data.visible)
+                {
+                    addToHTML(data);
+                    FileDisplayUploadFile(data);
+                }
+                break;
+    
             /*
              * Update messages change the value/style of a component without adding new HTML
              */
@@ -639,6 +650,10 @@ function start() {
                 websock.send("time:" + rv + ":" + data.id);
                 break;
 
+            case UPDATE_FILEDISPLAY:
+                FileDisplayUploadFile(data);
+                break;
+        
             case UI_FRAGMENT:
                 let FragmentLen = data.length;
                 let FragementOffset = data.offset;
@@ -769,6 +784,25 @@ function start() {
 
     websock.onmessage = handleEvent;
 }
+
+function FileDisplayUploadFile(data)
+{
+    let text = downloadFile(data.value);
+    // populate the text object
+} // FileDisplayUploadFile
+
+async function downloadFile(filename) {
+	let response = await fetch(filename);
+		
+	if(response.status != 200) {
+		throw new Error("File Read Server Error: '" + response.status + "'");
+	}
+		
+	// read response stream as text
+	let text_data = await response.text();
+
+	return text_data;
+} // downloadFile
 
 function StartFragmentAssemblyTimer(Id)
 {
@@ -930,6 +964,7 @@ var addToHTML = function (data) {
             case UI_GRAPH:
             case UI_GAUGE:
             case UI_ACCEL:
+            case UI_FILEDISPLAY:
                 html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
                     colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
                     elementHTML(data) +
@@ -1020,8 +1055,6 @@ var elementHTML = function (data) {
     }
 }
 
-
-
 var processEnabled = function (data) {
     //Handle the enabling and disabling of controls
     //Most controls can be disabled through the use of $("#<item>").prop("disabled", true) and CSS will style it accordingly
@@ -1067,6 +1100,8 @@ var processEnabled = function (data) {
         case UI_CPAD:
         case UPDATE_PAD:
         case UPDATE_CPAD:
+        case UI_FILEDISPLAY:
+        case UPDATE_FILEDISPLAY:
             if (data.enabled) {
                 $("#id" + data.id + " nav").removeClass('disabled');
             } else {

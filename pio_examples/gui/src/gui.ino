@@ -11,8 +11,8 @@ DNSServer dnsServer;
 #include <ESP8266WiFi.h>
 #endif
 
-const char* ssid = "ESPUI";
-const char* password = "espui";
+const char* ssid = "MaRtInG";
+const char* password = "martinshomenetwork";
 
 const char* hostname = "espui";
 
@@ -238,6 +238,7 @@ void setup(void)
     ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
     ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
     ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+    ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, "DisplayFile.txt");
 
     graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
 
@@ -258,7 +259,22 @@ void setup(void)
      * password, for example begin("ESPUI Control", "username", "password")
      */
     ESPUI.sliderContinuous = true;
-    ESPUI.begin("ESPUI Control");
+    ESPUI.beginLITTLEFS("ESPUI Control");
+
+    // create a text file
+    ESPUI.prepareFileSystem();
+    #if defined(ESP32)
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+    File testFile = LittleFS.open("/DisplayFile.txt", "w");
+#else
+    File testFile = LITTLEFS.open("/DisplayFile.txt", "w");
+#endif
+#else
+    File testFile = LittleFS.open("/DisplayFile.txt", "w");
+#endif
+    String TestLine = "Test Line\n";
+    testFile.write((const uint8_t*)TestLine.c_str(), TestLine.length());
+    testFile.close();
 }
 
 void loop(void)

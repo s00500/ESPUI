@@ -30,8 +30,9 @@ enum ControlType : uint8_t
     Accel,
     Separator,
     Time,
+    FileDisplay,
 
-    Fragment,
+    Fragment = 98,
     Password = 99,
     UpdateOffset = 100,
 };
@@ -93,6 +94,7 @@ public:
 private:
     bool _ToBeDeleted = false;
     uint32_t ControlChangeID = 0;
+    String OldValue = emptyString;
 };
 
 #define UI_TITLE            ControlType::Title

@@ -805,6 +805,11 @@ uint16_t ESPUIClass::separator(const char* label)
     return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
 }
 
+uint16_t ESPUIClass::fileDisplay(const char* label, ControlColor color, String filename)
+{
+    return addControl(ControlType::FileDisplay, label, filename, color, Control::noParent);
+}
+
 uint16_t ESPUIClass::accelerometer(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
 {
     return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
@@ -1425,6 +1430,14 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
     server->onNotFound([this](AsyncWebServerRequest* request) {
         if (captivePortal)
         {
+            AsyncResponseStream *response = request->beginResponseStream("text/html");
+            String responseText;
+            responseText.reserve(1024);
+            responseText += F("<!DOCTYPE html><html><head><title>Captive Portal</title></head><body>");
+            responseText += ("<p>If site does not re-direct click here <a href='http://" +  WiFi.softAPIP().toString() + "'>this link</a></p>");
+            responseText += ("</body></html><head><meta http-equiv=\"Refresh\" content=\"0; URL='http://" +  WiFi.softAPIP().toString() + "'\" /></head>");
+            response->write(responseText.c_str(), responseText.length());
+            request->send(response);
             request->redirect("/");
         }
         else
