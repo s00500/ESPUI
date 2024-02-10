@@ -223,10 +223,10 @@ function handleVisibilityChange() {
 }
 
 function start() {
-//    let location = window.location.hostname;
-//    let port = window.location.port;
-    let location = "192.168.10.219";
-    let port = "";
+    let location = window.location.hostname;
+    let port = window.location.port;
+//    let location = "192.168.10.219";
+//    let port = "";
 
     document.addEventListener("visibilitychange", handleVisibilityChange, false);
     if (
@@ -785,14 +785,29 @@ function start() {
     websock.onmessage = handleEvent;
 }
 
-function FileDisplayUploadFile(data)
+async function FileDisplayUploadFile(data)
 {
-    let text = downloadFile(data.value);
+    let text = await downloadFile(data.value);
+    let ItemToUpdateId = "fd" + data.id;
+    // console.info("ItemToUpdateId: " + ItemToUpdateId);
+    // console.info("          text: " + text);
     // populate the text object
+    $("#" + ItemToUpdateId).val(text);
+    $("#" + ItemToUpdateId).css("textAlign", "left");
+    $("#" + ItemToUpdateId).css("white-space", "nowrap");
+    $("#" + ItemToUpdateId).css("overflow", "scroll");
+    $("#" + ItemToUpdateId).css("overflow-y", "scroll");
+    $("#" + ItemToUpdateId).css("overflow-x", "scroll");
+    $("#" + ItemToUpdateId).scrollTop($("#" + ItemToUpdateId).val().length);
+
+    // scroll the page to the updated control
+    // $("#" + ItemToUpdateId).focus();
+
 } // FileDisplayUploadFile
 
-async function downloadFile(filename) {
-	let response = await fetch(filename);
+async function downloadFile(filename)
+{
+    let response = await fetch(filename);
 		
 	if(response.status != 200) {
 		throw new Error("File Read Server Error: '" + response.status + "'");
@@ -970,6 +985,7 @@ var addToHTML = function (data) {
                     elementHTML(data) +
                     "</div>";
                 break;
+
             case UI_SEPARATOR:
                 html = "<div id='id" + data.id + "' " + panelStyle + " class='sectionbreak columns'>" +
                     "<h5>" + data.label + "</h5><hr/></div>";
@@ -996,6 +1012,9 @@ var elementHTML = function (data) {
         case UI_LABEL:
             return "<span id='l" + id + "' " + elementStyle +
                 " class='label label-wrap'>" + data.value + "</span>";
+        case UI_FILEDISPLAY:
+            return "<textarea id='fd" + id + "' rows='4' " + elementStyle +
+                " class='label label-wrap'>" + "</textarea>";
         case UI_BUTTON:
             return "<button id='btn" + id + "' " + elementStyle +
                 " onmousedown='buttonclick(" + id + ", true)'" +
