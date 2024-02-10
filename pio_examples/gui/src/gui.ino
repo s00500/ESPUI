@@ -16,10 +16,12 @@ const char* password = "martinshomenetwork";
 
 const char* hostname = "espui";
 
-int statusLabelId;
-int graphId;
-int millisLabelId;
-int testSwitchId;
+String DisplayTestFileName = "/FileName.txt";
+int statusLabelId = Control::noParent;
+int graphId = Control::noParent;
+int millisLabelId = Control::noParent;
+int testSwitchId = Control::noParent;
+int fileDisplayId = Control::noParent;
 
 void numberCall(Control* sender, int type)
 {
@@ -238,7 +240,7 @@ void setup(void)
     ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
     ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
     ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
-    ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, "DisplayFile.txt");
+    fileDisplayId = ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, DisplayTestFileName);
 
     graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
 
@@ -259,20 +261,20 @@ void setup(void)
      * password, for example begin("ESPUI Control", "username", "password")
      */
     ESPUI.sliderContinuous = true;
+    ESPUI.prepareFileSystem();
     ESPUI.beginLITTLEFS("ESPUI Control");
 
     // create a text file
-    ESPUI.prepareFileSystem();
     #if defined(ESP32)
 #if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    File testFile = LittleFS.open("/DisplayFile.txt", "w");
+    File testFile = LittleFS.open(String("/") + DisplayTestFileName, "w");
 #else
-    File testFile = LITTLEFS.open("/DisplayFile.txt", "w");
+    File testFile = LITTLEFS.open(String("/") + DisplayTestFileName, "w");
 #endif
 #else
-    File testFile = LittleFS.open("/DisplayFile.txt", "w");
+    File testFile = LittleFS.open(String("/") + DisplayTestFileName, "w");
 #endif
-    String TestLine = "Test Line\n";
+    String TestLine = String("Current Time = ") + String(millis()) + "\n";
     testFile.write((const uint8_t*)TestLine.c_str(), TestLine.length());
     testFile.close();
 }
@@ -284,7 +286,6 @@ void loop(void)
     static long oldTime = 0;
     static bool testSwitchState = false;
     delay(10);
-    return;
 
     if (millis() - oldTime > 5000)
     {
@@ -294,6 +295,29 @@ void loop(void)
 
         testSwitchState = !testSwitchState;
         ESPUI.updateSwitcher(testSwitchId, testSwitchState);
+
+    #if defined(ESP32)
+#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+        File testFile = LittleFS.open(String("/") + DisplayTestFileName, "a");
+        uint32_t filesize = testFile.size();
+#else
+        File testFile = LITTLEFS.open(String("/") + DisplayTestFileName, "a");
+        uint32_t filesize = testFile.size();
+#endif
+#else
+        File testFile = LittleFS.open(String("/") + DisplayTestFileName, "a");
+        uint32_t filesize = testFile.fileSize();
+#endif
+        String TestLine = String("Current Time = ") + String(millis()) + "\n";
+        if(filesize < 1000)
+        {
+            testFile.write((const uint8_t*)TestLine.c_str(), TestLine.length());
+            ESPUI.updateControl(fileDisplayId);
+            
+            TestLine += String("filesize: ") + String(filesize);
+            // Serial.println(TestLine);
+        }
+        testFile.close();
 
         oldTime = millis();
     }
