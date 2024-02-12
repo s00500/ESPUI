@@ -11,8 +11,8 @@ DNSServer dnsServer;
 #include <ESP8266WiFi.h>
 #endif
 
-const char* ssid = "MaRtInG";
-const char* password = "martinshomenetwork";
+const char* ssid = "YourNetworkName";
+const char* password = "YourNetworkPassphrase";
 
 const char* hostname = "espui";
 
