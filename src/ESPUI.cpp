@@ -76,16 +76,7 @@ void listDir(const char* dirname, uint8_t levels)
     }
 #endif
 
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    File root = LittleFS.open(dirname);
-#else
-    File root = LITTLEFS.open(dirname);
-#endif
-#else
-    File root = LittleFS.open(dirname);
-#endif
-
+    File root = ESPUI.EspuiLittleFS.open(dirname);
     if (!root)
     {
 #if defined(DEBUG_ESPUI)
@@ -160,7 +151,7 @@ void listDir(const char* dirname, uint8_t levels)
     }
 #endif
 
-    Dir dir = LittleFS.openDir(dirname);
+    Dir dir = EspuiLittleFS.openDir(dirname);
 
     while (dir.next())
     {
@@ -199,63 +190,33 @@ void listDir(const char* dirname, uint8_t levels)
 
 void ESPUIClass::list()
 {
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    if (!LittleFS.begin())
-#else
-    if (!LITTLEFS.begin())
-#endif
+    if (!EspuiLittleFS.begin())
     {
-        Serial.println(F("LITTLEFS Mount Failed"));
+        Serial.println(F("Espui LittleFS Mount Failed"));
         return;
     }
-#else
-    if (!LittleFS.begin())
-    {
-        Serial.println(F("LittleFS Mount Failed"));
-        return;
-    }
-#endif
 
     listDir("/", 1);
+
 #if defined(ESP32)
-
     Serial.print(F("Total KB: "));
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    Serial.println(LittleFS.totalBytes() / 1024);
-#else
-    Serial.println(LITTLEFS.totalBytes() / 1024);
-#endif
+    Serial.println(EspuiLittleFS.totalBytes() / 1024);
     Serial.print(F("Used KB: "));
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    Serial.println(LittleFS.usedBytes() / 1024);
-#else
-    Serial.println(LITTLEFS.usedBytes() / 1024);
-#endif
-
+    Serial.println(EspuiLittleFS.usedBytes() / 1024);
 #else
     FSInfo fs_info;
-    LittleFS.info(fs_info);
+    EspuiLittleFS.info(fs_info);
 
     Serial.print(F("Total KB: "));
     Serial.println(fs_info.totalBytes / 1024);
     Serial.print(F("Used KB: "));
     Serial.println(fs_info.usedBytes / 1024);
-
-#endif
+#endif // !defined(ESP32)
 }
 
 void deleteFile(const char* path)
 {
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    bool exists = LittleFS.exists(path);
-#else
-    bool exists = LITTLEFS.exists(path);
-#endif
-#else
-    bool exists = LittleFS.exists(path);
-#endif
+    bool exists = ESPUI.EspuiLittleFS.exists(path);
     if (!exists)
     {
 #if defined(DEBUG_ESPUI)
@@ -275,15 +236,7 @@ void deleteFile(const char* path)
     }
 #endif
 
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    bool didRemove = LittleFS.remove(path);
-#else
-    bool didRemove = LITTLEFS.remove(path);
-#endif
-#else
-    bool didRemove = LittleFS.remove(path);
-#endif
+    bool didRemove = ESPUI.EspuiLittleFS.remove(path);
     if (didRemove)
     {
 #if defined(DEBUG_ESPUI)
@@ -304,7 +257,7 @@ void deleteFile(const char* path)
     }
 }
 
-void writeFile(const char* path, const char* data)
+void ESPUIClass::writeFile(const char* path, const char* data)
 {
 #if defined(DEBUG_ESPUI)
     if (ESPUI.verbosity)
@@ -313,15 +266,7 @@ void writeFile(const char* path, const char* data)
     }
 #endif
 
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    File file = LittleFS.open(path, FILE_WRITE);
-#else
-    File file = LITTLEFS.open(path, FILE_WRITE);
-#endif
-#else
-    File file = LittleFS.open(path, FILE_WRITE);
-#endif
+    File file = EspuiLittleFS.open(path, FILE_WRITE);
     if (!file)
     {
 #if defined(DEBUG_ESPUI)
@@ -335,48 +280,26 @@ void writeFile(const char* path, const char* data)
     }
 
 #if defined(ESP32)
-
     if (file.print(data))
-    {
-#if defined(DEBUG_ESPUI)
-        if (ESPUI.verbosity)
-        {
-            Serial.println(F("File written"));
-        }
-#endif
-    }
-    else
-    {
-#if defined(DEBUG_ESPUI)
-        if (ESPUI.verbosity)
-        {
-            Serial.println(F("Write failed"));
-        }
-#endif
-    }
-
 #else
-
     if (file.print(FPSTR(data)))
+#endif // !defined(ESP32)
+
     {
 #if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
             Serial.println(F("File written"));
         }
-#endif
     }
     else
     {
-#if defined(DEBUG_ESPUI)
         if (ESPUI.verbosity)
         {
             Serial.println(F("Write failed"));
         }
 #endif
     }
-
-#endif
     file.close();
 }
 
@@ -394,18 +317,17 @@ void ESPUIClass::prepareFileSystem(bool format)
 #endif
 
 #if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    if (!LittleFS.begin(false)) // Test for an already formatted LittleFS by a mount failure
-#else
-    if (!LITTLEFS.begin(false)) // Test for an already formatted LittleFS by a mount failure
-#endif
+    if (!EspuiLittleFS.begin(false)) // Test for an already formatted LittleFS by a mount failure
     {
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-        if (!LittleFS.begin(true)) // Attempt to format LittleFS
-#else
-        if (!LITTLEFS.begin(true)) // Attempt to format LittleFS
-#endif
+        if (!EspuiLittleFS.begin(true)) // Attempt to format LittleFS
         {
+#else
+    if (!EspuiLittleFS.begin()) // Test for an already formatted LittleFS by a mount failure
+    {
+        if (EspuiLittleFS.format()) // Attempt to format LittleFS
+        {
+#endif // !defined(ESP32)
+
 #if defined(DEBUG_ESPUI)
             if (verbosity)
             {
@@ -417,11 +339,8 @@ void ESPUIClass::prepareFileSystem(bool format)
     }
     else if (format)
     {
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-        LittleFS.format();
-#else
-        LITTLEFS.format();
-#endif
+        EspuiLittleFS.format();
+
 #if defined(DEBUG_ESPUI)
         if (verbosity)
         {
@@ -436,51 +355,6 @@ void ESPUIClass::prepareFileSystem(bool format)
         listDir("/", 1);
         Serial.println(F("LittleFS Mount ESP32 Done"));
     }
-#endif
-
-#else
-
-    if (!LittleFS.begin()) // Test for an already formatted LittleFS by a mount failure
-    {
-        if (LittleFS.format()) // Attempt to format LittleFS
-        {
-#if defined(DEBUG_ESPUI)
-            if (verbosity)
-            {
-                Serial.println(F("LittleFS Formatted"));
-            }
-#endif
-        }
-        else
-        {
-#if defined(DEBUG_ESPUI)
-            if (verbosity)
-            {
-                Serial.println(F("LittleFS Mount Failed"));
-            }
-#endif
-            return;
-        }
-    }
-    else if (format)
-    {
-        LittleFS.format();
-#if defined(DEBUG_ESPUI)
-        if (verbosity)
-        {
-            Serial.println(F("LittleFS Formatted"));
-        }
-#endif
-    }
-
-#if defined(DEBUG_ESPUI)
-    if (verbosity)
-    {
-        listDir("/", 1);
-        Serial.println(F("LittleFS Mount ESP8266 Done"));
-    }
-#endif
-
 #endif
 
     deleteFile("/index.htm");
@@ -503,31 +377,18 @@ void ESPUIClass::prepareFileSystem(bool format)
 
     // Now write
 #ifdef ESP32
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
     writeFile("/index.htm", HTML_INDEX);
-    LittleFS.mkdir("/css");
+    EspuiLittleFS.mkdir("/css");
     writeFile("/css/style.css", CSS_STYLE);
     writeFile("/css/normalize.css", CSS_NORMALIZE);
-    LittleFS.mkdir("/js");
+    EspuiLittleFS.mkdir("/js");
     writeFile("/js/zepto.min.js", JS_ZEPTO);
     writeFile("/js/controls.js", JS_CONTROLS);
     writeFile("/js/slider.js", JS_SLIDER);
     writeFile("/js/graph.js", JS_GRAPH);
 
     writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
-#else
-    writeFile("/index.htm", HTML_INDEX);
-    LITTLEFS.mkdir("/css");
-    writeFile("/css/style.css", CSS_STYLE);
-    writeFile("/css/normalize.css", CSS_NORMALIZE);
-    LITTLEFS.mkdir("/js");
-    writeFile("/js/zepto.min.js", JS_ZEPTO);
-    writeFile("/js/controls.js", JS_CONTROLS);
-    writeFile("/js/slider.js", JS_SLIDER);
-    writeFile("/js/graph.js", JS_GRAPH);
 
-    writeFile("/js/tabbedcontent.js", JS_TABBEDCONTENT);
-#endif
 #else
     writeFile("/index.htm", HTML_INDEX);
 
@@ -560,15 +421,7 @@ void ESPUIClass::prepareFileSystem(bool format)
 
 #endif
 
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    LittleFS.end();
-#else
-    LITTLEFS.end();
-#endif
-#else
-    LittleFS.end();
-#endif
+    EspuiLittleFS.end();
 }
 
 // Handle Websockets Communication
@@ -1177,15 +1030,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     server = new AsyncWebServer(port);
     ws = new AsyncWebSocket("/ws");
 
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    bool fsBegin = LittleFS.begin();
-#else
-    bool fsBegin = LITTLEFS.begin();
-#endif
-#else
-    bool fsBegin = LittleFS.begin();
-#endif
+    bool fsBegin = EspuiLittleFS.begin();
     if (!fsBegin)
     {
 #if defined(DEBUG_ESPUI)
@@ -1206,15 +1051,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
     }
 #endif
 
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    bool indexExists = LittleFS.exists("/index.htm");
-#else
-    bool indexExists = LITTLEFS.exists("/index.htm");
-#endif
-#else
-    bool indexExists = LittleFS.exists("/index.htm");
-#endif
+    bool indexExists = EspuiLittleFS.exists("/index.htm");
     if (!indexExists)
     {
 #if defined(DEBUG_ESPUI)
@@ -1238,27 +1075,11 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
         {
             ws->setAuthentication(basicAuthUsername, basicAuthPassword);
         }
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
-#else
-        server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
-#endif
-#else
-        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
-#endif
+        server->serveStatic("/", EspuiLittleFS, "/").setDefaultFile("index.htm").setAuthentication(username, password);
     }
     else
     {
-#if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
-#else
-        server->serveStatic("/", LITTLEFS, "/").setDefaultFile("index.htm");
-#endif
-#else
-        server->serveStatic("/", LittleFS, "/").setDefaultFile("index.htm");
-#endif
+        server->serveStatic("/", EspuiLittleFS, "/").setDefaultFile("index.htm");
     }
 
     // Heap for general Servertest
@@ -1444,6 +1265,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         {
             request->send(404);
         }
+        yield();
     });
 
     server->begin();
