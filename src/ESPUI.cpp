@@ -151,7 +151,7 @@ void listDir(const char* dirname, uint8_t levels)
     }
 #endif
 
-    Dir dir = EspuiLittleFS.openDir(dirname);
+    Dir dir = ESPUI.EspuiLittleFS.openDir(dirname);
 
     while (dir.next())
     {
