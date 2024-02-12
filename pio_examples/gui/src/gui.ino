@@ -265,18 +265,11 @@ void setup(void)
     ESPUI.beginLITTLEFS("ESPUI Control");
 
     // create a text file
-    #if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-    File testFile = LittleFS.open(String("/") + DisplayTestFileName, "w");
-#else
-    File testFile = LITTLEFS.open(String("/") + DisplayTestFileName, "w");
-#endif
-#else
-    File testFile = LittleFS.open(String("/") + DisplayTestFileName, "w");
-#endif
-    String TestLine = String("Current Time = ") + String(millis()) + "\n";
-    testFile.write((const uint8_t*)TestLine.c_str(), TestLine.length());
-    testFile.close();
+    ESPUI.writeFile("/DisplayFile.txt", "Test Line\n");
+
+    // these files are used by browsers to auto config a connection.
+    ESPUI.writeFile("/wpad.dat", " ");
+    ESPUI.writeFile("/connecttest.txt", " ");
 }
 
 void loop(void)
@@ -296,18 +289,10 @@ void loop(void)
         testSwitchState = !testSwitchState;
         ESPUI.updateSwitcher(testSwitchId, testSwitchState);
 
-    #if defined(ESP32)
-#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
-        File testFile = LittleFS.open(String("/") + DisplayTestFileName, "a");
+        // update the file Display file.
+        File testFile = ESPUI.EspuiLittleFS.open(String("/") + DisplayTestFileName, "a");
         uint32_t filesize = testFile.size();
-#else
-        File testFile = LITTLEFS.open(String("/") + DisplayTestFileName, "a");
-        uint32_t filesize = testFile.size();
-#endif
-#else
-        File testFile = LittleFS.open(String("/") + DisplayTestFileName, "a");
-        uint32_t filesize = testFile.fileSize();
-#endif
+
         String TestLine = String("Current Time = ") + String(millis()) + "\n";
         if(filesize < 1000)
         {
