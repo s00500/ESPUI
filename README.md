@@ -65,6 +65,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - Delayed response support @MartinMueller2003
 - Fragmented control transfer @ MartinMueller2003
 - Extended Callback @MartinMueller2003
+- Added a file display element
 
 ## Roadmap
 
@@ -146,6 +147,7 @@ more program memory to work with.
 - Separator
 - Time
 - Graph (partial implementation)
+- File Display
 
 
 ## Documentation
@@ -352,6 +354,19 @@ Note that not all browsers support all input types, and that the control display
 
 However even with a type set, user input should still be validated 
 because it is easy to bypass client-side checks. Never trust user input.
+
+
+#### File Display
+
+![filedisplay](docs/ui_fileDisplay.png)
+
+The File Display control is used to upload a file from the ESP file system and display the contents on the UI. The content is Auto Scrolled 
+to the last line in the file. Syntax:
+
+`fileDisplayId = ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, FullyQualified FilePath);`
+
+After updating the contents of the file, trigger a display update using: 
+`ESPUI.updateControl(fileDisplayId);`
 
 
 #### Select control
