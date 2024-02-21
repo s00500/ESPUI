@@ -28,6 +28,7 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
   * [Slider](#slider)
   * [Number Input](#number-input)
   * [Text Input](#text-input)
+  * [File Display](#filedisplay)
   * [Date, Time, Colour and Password Input](#date-time-colour-and-password-input)
   * [Select control](#select-control)
   * [Getting the Time](#getting-the-time)
@@ -63,9 +64,9 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 - Vertical controls by @iangray001
 - Time/date/password/color input types by @pcbbc
 - Delayed response support @MartinMueller2003
-- Fragmented control transfer @ MartinMueller2003
+- Fragmented control transfer @MartinMueller2003
 - Extended Callback @MartinMueller2003
-- Added a file display element
+- Added a file display element @MartinMueller2003
 
 ## Roadmap
 
