@@ -117,6 +117,7 @@ public:
     void prepareFileSystem(bool format = true); // Initially preps the filesystem and loads a lot of
                               // stuff into LITTLEFS
     void list(); // Lists LITTLEFS directory
+    void writeFile(const char* path, const char* data);
 
     uint16_t addControl(ControlType type, const char* label);
     uint16_t addControl(ControlType type, const char* label, const String& value);
@@ -143,6 +144,7 @@ public:
     uint16_t gauge(const char* label, ControlColor color, int value, int min = 0,
         int max = 100); // Create Gauge display
     uint16_t separator(const char* label); //Create separator
+    uint16_t fileDisplay(const char* label, ControlColor color, String filename);
 
     // Input only
     uint16_t accelerometer(const char* label, std::function<void(Control*, int)> callback, ControlColor color);
@@ -234,6 +236,16 @@ public:
 
     AsyncWebServer* WebServer() {return server;}
     AsyncWebSocket* WebSocket() {return ws;}
+
+#if defined(ESP32)
+#   if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
+        fs::LittleFSFS & EspuiLittleFS = LittleFS;
+    #else
+        fs::LITTLEFSFS & EspuiLittleFS = LITTLEFS;
+#   endif
+#else
+    fs::FS & EspuiLittleFS = LittleFS;
+#endif
 
 protected:
     friend class ESPUIclient;

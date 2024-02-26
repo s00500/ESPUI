@@ -16,10 +16,12 @@ const char* password = "espui";
 
 const char* hostname = "espui";
 
-int statusLabelId;
-int graphId;
-int millisLabelId;
-int testSwitchId;
+String DisplayTestFileName = "/FileName.txt";
+int statusLabelId = Control::noParent;
+int graphId = Control::noParent;
+int millisLabelId = Control::noParent;
+int testSwitchId = Control::noParent;
+int fileDisplayId = Control::noParent;
 
 void numberCall(Control* sender, int type)
 {
@@ -238,6 +240,7 @@ void setup(void)
     ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
     ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
     ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+    fileDisplayId = ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, DisplayTestFileName);
 
     graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
 
@@ -258,7 +261,15 @@ void setup(void)
      * password, for example begin("ESPUI Control", "username", "password")
      */
     ESPUI.sliderContinuous = true;
-    ESPUI.begin("ESPUI Control");
+    ESPUI.prepareFileSystem();
+    ESPUI.beginLITTLEFS("ESPUI Control");
+
+    // create a text file
+    ESPUI.writeFile("/DisplayFile.txt", "Test Line\n");
+
+    // these files are used by browsers to auto config a connection.
+    ESPUI.writeFile("/wpad.dat", " ");
+    ESPUI.writeFile("/connecttest.txt", " ");
 }
 
 void loop(void)
@@ -268,7 +279,6 @@ void loop(void)
     static long oldTime = 0;
     static bool testSwitchState = false;
     delay(10);
-    return;
 
     if (millis() - oldTime > 5000)
     {
@@ -278,6 +288,21 @@ void loop(void)
 
         testSwitchState = !testSwitchState;
         ESPUI.updateSwitcher(testSwitchId, testSwitchState);
+
+        // update the file Display file.
+        File testFile = ESPUI.EspuiLittleFS.open(String("/") + DisplayTestFileName, "a");
+        uint32_t filesize = testFile.size();
+
+        String TestLine = String("Current Time = ") + String(millis()) + "\n";
+        if(filesize < 1000)
+        {
+            testFile.write((const uint8_t*)TestLine.c_str(), TestLine.length());
+            ESPUI.updateControl(fileDisplayId);
+            
+            TestLine += String("filesize: ") + String(filesize);
+            // Serial.println(TestLine);
+        }
+        testFile.close();
 
         oldTime = millis();
     }
