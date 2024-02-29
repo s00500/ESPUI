@@ -269,6 +269,8 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 
     // Serial.println(String("prepareJSONChunk: Start. InUpdateMode: ") + String(InUpdateMode));
     int elementcount = 0;
+    uint32_t MaxEstimatedMarshaledJsonSize = (!InUpdateMode) ? ESPUI.jsonInitialDocumentSize: ESPUI.jsonUpdateDocumentSize;
+    uint32_t TotalEstimatedMarshaledJsonSize = 0;
 
     do // once
     {
@@ -386,11 +388,16 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 }
             }
 
+            TotalEstimatedMarshaledJsonSize += control->GetEstimatedMarshaledSize();
+            bool DocWillOverflow = TotalEstimatedMarshaledJsonSize >= MaxEstimatedMarshaledJsonSize;
             JsonObject item = items.createNestedObject();
             elementcount++;
-            control->MarshalControl(item, InUpdateMode, DataOffset);
-            
-            if (rootDoc.overflowed() || (ESPUI.jsonChunkNumberMax > 0 && (elementcount % ESPUI.jsonChunkNumberMax) == 0))
+            if(!DocWillOverflow)
+            {
+                control->MarshalControl(item, InUpdateMode, DataOffset);
+            }
+
+            if (DocWillOverflow || (ESPUI.jsonChunkNumberMax > 0 && (elementcount % ESPUI.jsonChunkNumberMax) == 0))
             {
                 // String("prepareJSONChunk: too much data in the message. Remove the last entry");
                 if (1 == elementcount)
