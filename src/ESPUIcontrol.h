@@ -89,12 +89,20 @@ public:
     void onWsEvent(String& cmd, String& data);
     inline bool ToBeDeleted() { return _ToBeDeleted; }
     inline bool NeedsSync(uint32_t lastControlChangeID) {return (false == _ToBeDeleted) && (lastControlChangeID < ControlChangeID);}
-    void    SetControlChangedId(uint32_t value) {ControlChangeID = value;}
-    
+    void    SetControlChangedId(uint32_t value) {ControlChangeID = value; EstimateMarshaledSize();}
+    uint32_t GetEstimatedMarshaledSize() {return EstimatedMarshaledSize;}
+
 private:
     bool _ToBeDeleted = false;
     uint32_t ControlChangeID = 0;
+    uint32_t EstimatedMarshaledSize = 0;
     String OldValue = emptyString;
+
+    // multiplier for converting a typical controller label and value to a Json object
+    #define JsonMarshalingRatio 6
+    // estimated number of bytes for the fixed portion of a control rendered as Json
+    #define MarshalingOverhead 90
+    void EstimateMarshaledSize();
 };
 
 #define UI_TITLE            ControlType::Title

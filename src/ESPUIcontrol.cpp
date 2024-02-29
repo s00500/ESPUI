@@ -19,6 +19,7 @@ Control::Control(ControlType type, const char* label, std::function<void(Control
 {
     id = ++idCounter;
     ControlChangeID = 1;
+    EstimateMarshaledSize();
 }
 
 Control::Control(const Control& Control)
@@ -31,7 +32,8 @@ Control::Control(const Control& Control)
         visible(Control.visible),
         parentControl(Control.parentControl),
         next(Control.next),
-        ControlChangeID(Control.ControlChangeID)
+        ControlChangeID(Control.ControlChangeID),
+        EstimatedMarshaledSize(Control.EstimatedMarshaledSize)
 { }
 
 void Control::SendCallback(int type)
@@ -97,7 +99,7 @@ void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t Starting
     }
 
     item[F("label")]   = label;
-    item[F ("value")]   = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, length + StartingOffset);
+    item[F ("value")]  = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, length + StartingOffset);
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
     item[F("enabled")] = enabled;
@@ -280,4 +282,10 @@ void Control::onWsEvent(String & cmd, String& data)
         }
     } while (false);
 }
+
+void Control::EstimateMarshaledSize()
+{
+    EstimatedMarshaledSize = MarshalingOverhead + (JsonMarshalingRatio * (strlen(label) + value.length()));
+
+} // EstimateSerializedSize
 
