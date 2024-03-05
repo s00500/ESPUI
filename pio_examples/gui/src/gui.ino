@@ -16,12 +16,22 @@ const char* password = "YourNetworkPassphrase";
 
 const char* hostname = "espui";
 
+#ifdef TEST_FILEDISPLAY
 String DisplayTestFileName = "/FileName.txt";
+int fileDisplayId = Control::noParent;
+#endif // def TEST_FILEDISPLAY
+
 int statusLabelId = Control::noParent;
+
+#ifdef TEST_GRAPH
 int graphId = Control::noParent;
+#endif // def TEST_GRAPH
 int millisLabelId = Control::noParent;
 int testSwitchId = Control::noParent;
-int fileDisplayId = Control::noParent;
+
+#ifdef TEST_HUGE_TEXT
+char HugeText[1025];
+#endif // def TEST_HUGE_TEXT
 
 void numberCall(Control* sender, int type)
 {
@@ -166,6 +176,11 @@ void setup(void)
     ESPUI.setVerbosity(Verbosity::VerboseJSON);
     Serial.begin(115200);
 
+#ifdef TEST_HUGE_TEXT
+    memset(HugeText, 0x0, sizeof(HugeText));
+    memset(HugeText, 'a', sizeof(HugeText)-1);
+#endif // def TEST_HUGE_TEXT
+    
 #if defined(ESP32)
     WiFi.setHostname(hostname);
 #else
@@ -239,10 +254,20 @@ void setup(void)
     ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30, 0, 30);
     ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
     ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
-    ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
-    fileDisplayId = ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, DisplayTestFileName);
 
+#ifdef TEST_HUGE_TEXT
+    ESPUI.text("Huge Text Test:", &textCall, ControlColor::Alizarin, HugeText);
+#endif // def TEST_HUGE_TEXT
+
+    ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+
+#ifdef TEST_FILEDISPLAY
+    fileDisplayId = ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, DisplayTestFileName);
+#endif // def TEST_FILEDISPLAY
+
+#ifdef TEST_GRAPH
     graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
+#endif // def TEST_GRAPH
 
     /*
      * .begin loads and serves all files from PROGMEM directly.
@@ -261,8 +286,9 @@ void setup(void)
      * password, for example begin("ESPUI Control", "username", "password")
      */
     ESPUI.sliderContinuous = true;
+
+#ifdef TEST_FILEDISPLAY
     ESPUI.prepareFileSystem();
-    ESPUI.beginLITTLEFS("ESPUI Control");
 
     // create a text file
     ESPUI.writeFile("/DisplayFile.txt", "Test Line\n");
@@ -270,6 +296,9 @@ void setup(void)
     // these files are used by browsers to auto config a connection.
     ESPUI.writeFile("/wpad.dat", " ");
     ESPUI.writeFile("/connecttest.txt", " ");
+#endif // def TEST_FILEDISPLAY
+
+    ESPUI.beginLITTLEFS("ESPUI Control");
 }
 
 void loop(void)
@@ -284,11 +313,14 @@ void loop(void)
     {
         ESPUI.print(millisLabelId, String(millis()));
 
+#ifdef TEST_GRAPH
         ESPUI.addGraphPoint(graphId, random(1, 50));
+#endif // def TEST_GRAPH
 
         testSwitchState = !testSwitchState;
         ESPUI.updateSwitcher(testSwitchId, testSwitchState);
 
+#ifdef TEST_FILEDISPLAY
         // update the file Display file.
         File testFile = ESPUI.EspuiLittleFS.open(String("/") + DisplayTestFileName, "a");
         uint32_t filesize = testFile.size();
@@ -303,6 +335,7 @@ void loop(void)
             // Serial.println(TestLine);
         }
         testFile.close();
+#endif // def TEST_FILEDISPLAY
 
         oldTime = millis();
     }
