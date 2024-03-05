@@ -267,10 +267,12 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
     xSemaphoreTake(ESPUI.ControlsSemaphore, portMAX_DELAY);
 #endif // def ESP32
 
-    // Serial.println(String("prepareJSONChunk: Start. InUpdateMode: ") + String(InUpdateMode));
+    // Serial.println(String("prepareJSONChunk: Start.          InUpdateMode: ") + String(InUpdateMode));
+    // Serial.println(String("prepareJSONChunk: Start.            startindex: ") + String(startindex));
+    // Serial.println(String("prepareJSONChunk: Start. FragmentRequestString: '") + FragmentRequestString + "'");
     int elementcount = 0;
-    uint32_t MaxEstimatedMarshaledJsonSize = (!InUpdateMode) ? ESPUI.jsonInitialDocumentSize: ESPUI.jsonUpdateDocumentSize;
-    uint32_t TotalEstimatedMarshaledJsonSize = 0;
+    uint32_t MaxMarshaledJsonSize = (!InUpdateMode) ? ESPUI.jsonInitialDocumentSize: ESPUI.jsonUpdateDocumentSize;
+    uint32_t EstimatedUsedMarshaledJsonSize = 0;
 
     do // once
     {
@@ -388,21 +390,32 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 }
             }
 
-            TotalEstimatedMarshaledJsonSize += control->GetEstimatedMarshaledSize();
-            bool DocWillOverflow = TotalEstimatedMarshaledJsonSize >= MaxEstimatedMarshaledJsonSize;
+            // Serial.println(String(F("prepareJSONChunk: MaxMarshaledJsonSize: ")) + String(MaxMarshaledJsonSize));
+            // Serial.println(String(F("prepareJSONChunk: Cur EstimatedUsedMarshaledJsonSize: ")) + String(EstimatedUsedMarshaledJsonSize));
+
             JsonObject item = items.createNestedObject();
             elementcount++;
-            if(!DocWillOverflow)
-            {
-                control->MarshalControl(item, InUpdateMode, DataOffset);
-            }
+            uint32_t RemainingSpace = (MaxMarshaledJsonSize - EstimatedUsedMarshaledJsonSize) - 100;
+            // Serial.println(String(F("prepareJSONChunk: RemainingSpace: ")) + String(RemainingSpace));
+            uint32_t SpaceUsedByMarshaledControl = 0;
+            bool ControlIsFragmented = control->MarshalControl(item, 
+                                                               InUpdateMode, 
+                                                               DataOffset, 
+                                                               RemainingSpace,
+                                                               SpaceUsedByMarshaledControl);
+            // Serial.println(String(F("prepareJSONChunk: SpaceUsedByMarshaledControl: ")) + String(SpaceUsedByMarshaledControl));
+            EstimatedUsedMarshaledJsonSize += SpaceUsedByMarshaledControl;
+            // Serial.println(String(F("prepareJSONChunk: New EstimatedUsedMarshaledJsonSize: ")) + String(EstimatedUsedMarshaledJsonSize));
+            // Serial.println(String(F("prepareJSONChunk:                ControlIsFragmented: ")) + String(ControlIsFragmented));
 
-            if (DocWillOverflow || (ESPUI.jsonChunkNumberMax > 0 && (elementcount % ESPUI.jsonChunkNumberMax) == 0))
+            // did the control get added to the doc?
+            if (0 == SpaceUsedByMarshaledControl || 
+                (ESPUI.jsonChunkNumberMax > 0 && (elementcount % ESPUI.jsonChunkNumberMax) == 0))
             {
-                // String("prepareJSONChunk: too much data in the message. Remove the last entry");
+                // Serial.println( String("prepareJSONChunk: too much data in the message. Remove the last entry"));
                 if (1 == elementcount)
                 {
-                    Serial.println(String(F("ERROR: prepareJSONChunk: Control ")) + String(control->id) + F(" is too large to be sent to the browser."));
+                    // Serial.println(String(F("prepareJSONChunk: Control ")) + String(control->id) + F(" is too large to be sent to the browser."));
                     // Serial.println(String(F("ERROR: prepareJSONChunk: value: ")) + control->value);
                     rootDoc.clear();
                     item = items.createNestedObject();
@@ -420,13 +433,16 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                 // exit the loop
                 control = nullptr;
             }
-            else if (SingleControl)
+            else if ((SingleControl) || 
+                     (ControlIsFragmented) ||
+                     (MaxMarshaledJsonSize < (EstimatedUsedMarshaledJsonSize + 100)))
             {
-                // Serial.println("prepareJSONChunk: exit loop");
+                // Serial.println("prepareJSONChunk: Doc is Full, Fragmented Control or Single Control. exit loop");
                 control = nullptr;
             }
             else
             {
+                // Serial.println("prepareJSONChunk: Next Control");
                 control = control->next;
             }
         } // end while (control != nullptr)
@@ -437,7 +453,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
     xSemaphoreGive(ESPUI.ControlsSemaphore);
 #endif // def ESP32
 
-    // Serial.println(String("prepareJSONChunk: elementcount: ") + String(elementcount));
+    // Serial.println(String("prepareJSONChunk: END: elementcount: ") + String(elementcount));
     return elementcount;
 }
 
