@@ -287,18 +287,18 @@ void setup(void)
      */
     ESPUI.sliderContinuous = true;
 
-#ifdef TEST_FILEDISPLAY
     ESPUI.prepareFileSystem();
 
-    // create a text file
-    ESPUI.writeFile("/DisplayFile.txt", "Test Line\n");
+    ESPUI.beginLITTLEFS("ESPUI Control");
 
     // these files are used by browsers to auto config a connection.
     ESPUI.writeFile("/wpad.dat", " ");
     ESPUI.writeFile("/connecttest.txt", " ");
-#endif // def TEST_FILEDISPLAY
 
-    ESPUI.beginLITTLEFS("ESPUI Control");
+#ifdef TEST_FILEDISPLAY
+    // create a text file
+    ESPUI.writeFile("/DisplayFile.txt", "Test Line\n");
+#endif // def TEST_FILEDISPLAY
 }
 
 void loop(void)
