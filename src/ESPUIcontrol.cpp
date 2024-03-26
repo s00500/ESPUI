@@ -133,7 +133,7 @@ bool Control::MarshalControl(JsonObject & _item,
         _item[F("offset")] = StartingOffset;
         _item[F("length")] = ValueLenToSend;
         _item[F("total")] = value.length();
-        item = _item.createNestedObject(F("control"));
+        AllocateNamedJsonObject(item, _item, F("control"));
     }
 
     item[F("id")]      = id;

@@ -74,14 +74,14 @@ bool ESPUIclient::CanSend()
     return Response;
 }
 
-void ESPUIclient::FillInHeader(DynamicJsonDocument& document)
+void ESPUIclient::FillInHeader(JsonDocument& document)
 {
     document[F("type")] = UI_EXTEND_GUI;
     document[F("sliderContinuous")] = ESPUI.sliderContinuous;
     document[F("startindex")] = 0;
     document[F("totalcontrols")] = ESPUI.controlCount;
-    JsonArray items = document.createNestedArray(F("controls"));
-    JsonObject titleItem = items.createNestedObject();
+    JsonArray items = AllocateJsonArray(document, F("controls"));
+    JsonObject titleItem = AllocateJsonObject(items);
     titleItem[F("type")] = (int)UI_TITLE;
     titleItem[F("label")] = ESPUI.ui_title;
 }
@@ -104,7 +104,7 @@ bool ESPUIclient::SendClientNotification(ClientUpdateType_t value)
             break;
         }
 
-        DynamicJsonDocument document(ESPUI.jsonUpdateDocumentSize);
+        AllocateJsonDocument(document, ESPUI.jsonUpdateDocumentSize);
         FillInHeader(document);
         if(ClientUpdateType_t::ReloadNeeded == value)
         {
@@ -259,7 +259,7 @@ number this will represent the entire UI. More likely, it will represent a small
 client will acknowledge receipt by requesting the next chunk.
  */
 uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
-                                      DynamicJsonDocument & rootDoc,
+                                      JsonDocument & rootDoc,
                                       bool InUpdateMode,
                                       String FragmentRequestString)
 {
@@ -293,12 +293,15 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
             // this is actually a fragment or directed update request
             // parse the string we got from the UI and try to update that specific 
             // control.
-            DynamicJsonDocument FragmentRequest(FragmentRequestString.length() * 3);
+            AllocateJsonDocument(FragmentRequest, FragmentRequestString.length() * 3);
+/*
+            ArduinoJson::detail::sizeofObject(N);
             if(0 >= FragmentRequest.capacity())
             {
                 Serial.println(F("ERROR:prepareJSONChunk:Fragmentation:Could not allocate memory for a fragmentation request. Skipping Response"));
                 break;
             }
+*/
             size_t FragmentRequestStartOffset = FragmentRequestString.indexOf("{");
             DeserializationError error = deserializeJson(FragmentRequest, FragmentRequestString.substring(FragmentRequestStartOffset));
             if(DeserializationError::Ok != error)
@@ -393,7 +396,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
             // Serial.println(String(F("prepareJSONChunk: MaxMarshaledJsonSize: ")) + String(MaxMarshaledJsonSize));
             // Serial.println(String(F("prepareJSONChunk: Cur EstimatedUsedMarshaledJsonSize: ")) + String(EstimatedUsedMarshaledJsonSize));
 
-            JsonObject item = items.createNestedObject();
+            JsonObject item = AllocateJsonObject(items);
             elementcount++;
             uint32_t RemainingSpace = (MaxMarshaledJsonSize - EstimatedUsedMarshaledJsonSize) - 100;
             // Serial.println(String(F("prepareJSONChunk: RemainingSpace: ")) + String(RemainingSpace));
@@ -418,7 +421,7 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                     // Serial.println(String(F("prepareJSONChunk: Control ")) + String(control->id) + F(" is too large to be sent to the browser."));
                     // Serial.println(String(F("ERROR: prepareJSONChunk: value: ")) + control->value);
                     rootDoc.clear();
-                    item = items.createNestedObject();
+                    item = AllocateJsonObject(items);
                     control->MarshalErrorMessage(item);
                     elementcount = 0;
                 }
@@ -496,7 +499,7 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
             break;
         }
 
-        DynamicJsonDocument document(ESPUI.jsonInitialDocumentSize);
+        AllocateJsonDocument(document, ESPUI.jsonInitialDocumentSize);
         FillInHeader(document);
         document[F("startindex")] = startidx;
         document[F("totalcontrols")] = uint16_t(-1); // ESPUI.controlCount;
@@ -544,7 +547,7 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
     return Response;
 }
 
-bool ESPUIclient::SendJsonDocToWebSocket(DynamicJsonDocument& document)
+bool ESPUIclient::SendJsonDocToWebSocket(JsonDocument& document)
 {
     bool Response = true;
 

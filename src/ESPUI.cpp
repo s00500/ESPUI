@@ -927,7 +927,7 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId)
             break;
         }
 
-        DynamicJsonDocument document(jsonUpdateDocumentSize);
+        AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
         root[F("type")] = (int)ControlType::Graph + UpdateOffset;
@@ -949,7 +949,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
             break;
         }
 
-        DynamicJsonDocument document(jsonUpdateDocumentSize);
+        AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
         root[F("type")] = (int)ControlType::GraphPoint;
@@ -961,7 +961,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     } while (false);
 }
 
-bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId)
+bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId)
 {
     bool Response = false;
 
