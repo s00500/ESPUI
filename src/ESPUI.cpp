@@ -266,7 +266,7 @@ void ESPUIClass::writeFile(const char* path, const char* data)
     }
 #endif
 
-    File file = EspuiLittleFS.open(path, FILE_WRITE);
+    File file = EspuiLittleFS.open(path, FILE_WRITING);
     if (!file)
     {
 #if defined(DEBUG_ESPUI)

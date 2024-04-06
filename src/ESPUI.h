@@ -47,7 +47,7 @@
 #include <ESPAsyncTCP.h>
 #include <Hash.h>
 
-#define FILE_WRITE "w"
+#define FILE_WRITING "w"
 
 #endif
 
