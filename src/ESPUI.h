@@ -47,9 +47,9 @@
 #include <ESPAsyncTCP.h>
 #include <Hash.h>
 
-#define FILE_WRITING "w"
-
 #endif
+
+#define FILE_WRITING "w"
 
 // Message Types (and control types)
 
