@@ -449,6 +449,11 @@ void ESPUIClass::onWsEvent(
     }
     else
     {
+        if(type == WS_EVT_CONNECT)
+        {
+            ws->cleanupClients();
+        }
+        
         if (MapOfClients.end() == MapOfClients.find(client->id()))
         {
             // Serial.println("ESPUIClass::OnWsEvent:Create new client.");
