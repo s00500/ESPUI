@@ -74,10 +74,10 @@ bool ESPUIclient::CanSend()
     return Response;
 }
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-void ESPUIclient::FillInHeader(DynamicJsonDocument& document)
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
 void ESPUIclient::FillInHeader(JsonDocument& document)
+#else
+void ESPUIclient::FillInHeader(DynamicJsonDocument& document)
 #endif
 {
     document[F("type")] = UI_EXTEND_GUI;
@@ -85,12 +85,12 @@ void ESPUIclient::FillInHeader(JsonDocument& document)
     document[F("startindex")] = 0;
     document[F("totalcontrols")] = ESPUI.controlCount;
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-    JsonArray items = document.createNestedArray(F("controls"));
-    JsonObject titleItem = items.createNestedObject();
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
     JsonArray items = document["controls"].to<JsonArray>();
     JsonObject titleItem = items.add<JsonObject>();
+#else
+    JsonArray items = document.createNestedArray(F("controls"));
+    JsonObject titleItem = items.createNestedObject();
 #endif
     titleItem[F("type")] = (int)UI_TITLE;
     titleItem[F("label")] = ESPUI.ui_title;
@@ -113,11 +113,12 @@ bool ESPUIclient::SendClientNotification(ClientUpdateType_t value)
             // Serial.println(F("ESPUIclient::SendClientNotification:CannotSend"));
             break;
         }
-#if ARDUINOJSON_VERSION_MAJOR < 7
-        DynamicJsonDocument document(ESPUI.jsonUpdateDocumentSize);
-#else
+
+#if ARDUINOJSON_VERSION_MAJOR > 6
         JsonDocument document;
-#endif     
+#else
+        DynamicJsonDocument document(ESPUI.jsonUpdateDocumentSize);
+#endif
         FillInHeader(document);
         if(ClientUpdateType_t::ReloadNeeded == value)
         {
@@ -271,14 +272,14 @@ Prepare a chunk of elements as a single JSON string. If the allowed number of el
 number this will represent the entire UI. More likely, it will represent a small section of the UI to be sent. The
 client will acknowledge receipt by requesting the next chunk.
  */
-#if ARDUINOJSON_VERSION_MAJOR < 7
+#if ARDUINOJSON_VERSION_MAJOR > 6
 uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
-                                      DynamicJsonDocument & rootDoc,
+                                      JsonDocument & rootDoc,
                                       bool InUpdateMode,
                                       String FragmentRequestString)
 #else
 uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
-                                      JsonDocument & rootDoc,
+                                      DynamicJsonDocument & rootDoc,
                                       bool InUpdateMode,
                                       String FragmentRequestString)
 #endif
@@ -309,15 +310,15 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
             // this is actually a fragment or directed update request
             // parse the string we got from the UI and try to update that specific 
             // control.
-#if ARDUINOJSON_VERSION_MAJOR < 7
+#if ARDUINOJSON_VERSION_MAJOR > 6
+            JsonDocument FragmentRequest;
+#else
             DynamicJsonDocument FragmentRequest(FragmentRequestString.length() * 3);
             if(0 >= FragmentRequest.capacity())
             {
                 Serial.println(F("ERROR:prepareJSONChunk:Fragmentation:Could not allocate memory for a fragmentation request. Skipping Response"));
                 break;
             }
-#else
-            JsonDocument FragmentRequest;
 #endif
             size_t FragmentRequestStartOffset = FragmentRequestString.indexOf("{");
             DeserializationError error = deserializeJson(FragmentRequest, FragmentRequestString.substring(FragmentRequestStartOffset));
@@ -409,11 +410,12 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                     continue;
                 }
             }
-#if ARDUINOJSON_VERSION_MAJOR < 7
-            JsonObject item = items.createNestedObject();
-#else
+
+#if ARDUINOJSON_VERSION_MAJOR > 6
             JsonObject item = items.add<JsonObject>();
-#endif            
+#else
+            JsonObject item = items.createNestedObject();
+#endif        
             elementcount++;
             control->MarshalControl(item, InUpdateMode, DataOffset);
             
@@ -425,10 +427,10 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                     Serial.println(String(F("ERROR: prepareJSONChunk: Control ")) + String(control->id) + F(" is too large to be sent to the browser."));
                     // Serial.println(String(F("ERROR: prepareJSONChunk: value: ")) + control->value);
                     rootDoc.clear();
-#if ARDUINOJSON_VERSION_MAJOR < 7
-                    item = items.createNestedObject();
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
                     item = items.add<JsonObject>();
+#else
+                    item = items.createNestedObject();
 #endif
                     control->MarshalErrorMessage(item);
                     elementcount = 0;
@@ -504,10 +506,10 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
             break;
         }
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-        DynamicJsonDocument document(ESPUI.jsonInitialDocumentSize);
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
         JsonDocument document;
+#else
+        DynamicJsonDocument document(ESPUI.jsonInitialDocumentSize);
 #endif
         FillInHeader(document);
         document[F("startindex")] = startidx;
@@ -556,10 +558,10 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
     return Response;
 }
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-bool ESPUIclient::SendJsonDocToWebSocket(DynamicJsonDocument& document)
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
 bool ESPUIclient::SendJsonDocToWebSocket(JsonDocument& document)
+#else
+bool ESPUIclient::SendJsonDocToWebSocket(DynamicJsonDocument& document)
 #endif
 {
     bool Response = true;

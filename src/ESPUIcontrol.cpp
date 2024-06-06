@@ -82,10 +82,10 @@ void Control::MarshalControl(JsonObject & _item, bool refresh, uint32_t Starting
         _item[F("offset")] = StartingOffset;
         _item[F("length")] = length;
         _item[F("total")] = value.length();
-#if ARDUINOJSON_VERSION_MAJOR < 7
-        item = _item.createNestedObject(F("control"));
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
         item = _item["control"].add<JsonObject>();
+#else
+        item = _item.createNestedObject(F("control"));
 #endif
     }
 

@@ -932,11 +932,11 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId)
             break;
         }
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-        DynamicJsonDocument document(jsonUpdateDocumentSize);
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
         JsonDocument document;
-#endif      
+#else
+        DynamicJsonDocument document(jsonUpdateDocumentSize);
+#endif    
         JsonObject root = document.to<JsonObject>();
 
         root[F("type")] = (int)ControlType::Graph + UpdateOffset;
@@ -958,10 +958,10 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
             break;
         }
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-        DynamicJsonDocument document(jsonUpdateDocumentSize);
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
         JsonDocument document;
+#else
+        DynamicJsonDocument document(jsonUpdateDocumentSize);
 #endif
         JsonObject root = document.to<JsonObject>();
 
@@ -974,10 +974,10 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     } while (false);
 }
 
-#if ARDUINOJSON_VERSION_MAJOR < 7
-bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId)
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
 bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId)
+#else
+bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId)
 #endif
 {
     bool Response = false;

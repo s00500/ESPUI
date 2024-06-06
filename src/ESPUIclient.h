@@ -43,15 +43,14 @@ protected:
     // bool        NeedsNotification() { return pCurrentFsmState != &fsm_EspuiClient_state_Idle_imp; }
 
     bool        CanSend();
-#if ARDUINOJSON_VERSION_MAJOR < 7
-    void        FillInHeader(ArduinoJson::DynamicJsonDocument& document);
-    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode, String value);
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
     void        FillInHeader(ArduinoJson::JsonDocument& document);
     uint32_t    prepareJSONChunk(uint16_t startindex, JsonDocument& rootDoc, bool InUpdateMode, String value);
-#endif    
+#else
+    void        FillInHeader(ArduinoJson::DynamicJsonDocument& document);
+    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode, String value);
+#endif 
     bool        SendControlsToClient(uint16_t startidx, ClientUpdateType_t TransferMode, String FragmentRequest);
-
     bool        SendClientNotification(ClientUpdateType_t value);
 
 private:
@@ -67,9 +66,9 @@ public:
     bool        IsSyncronized();
     uint32_t    id() { return client->id(); }
     void        SetState(ClientUpdateType_t value);
-#if ARDUINOJSON_VERSION_MAJOR < 7
-    bool        SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document);
-#else
+#if ARDUINOJSON_VERSION_MAJOR > 6
     bool        SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document);
+#else
+    bool        SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document);
 #endif
 };
