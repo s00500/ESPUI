@@ -84,8 +84,14 @@ void ESPUIclient::FillInHeader(JsonDocument& document)
     document[F("sliderContinuous")] = ESPUI.sliderContinuous;
     document[F("startindex")] = 0;
     document[F("totalcontrols")] = ESPUI.controlCount;
+
+#if ARDUINOJSON_VERSION_MAJOR < 7
     JsonArray items = document.createNestedArray(F("controls"));
     JsonObject titleItem = items.createNestedObject();
+#else
+    JsonArray items = document["controls"].to<JsonArray>();
+    JsonObject titleItem = items.add<JsonObject>();
+#endif
     titleItem[F("type")] = (int)UI_TITLE;
     titleItem[F("label")] = ESPUI.ui_title;
 }
@@ -403,8 +409,11 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                     continue;
                 }
             }
-
+#if ARDUINOJSON_VERSION_MAJOR < 7
             JsonObject item = items.createNestedObject();
+#else
+            JsonObject item = items.add<JsonObject>();
+#endif            
             elementcount++;
             control->MarshalControl(item, InUpdateMode, DataOffset);
             
@@ -416,7 +425,11 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                     Serial.println(String(F("ERROR: prepareJSONChunk: Control ")) + String(control->id) + F(" is too large to be sent to the browser."));
                     // Serial.println(String(F("ERROR: prepareJSONChunk: value: ")) + control->value);
                     rootDoc.clear();
+#if ARDUINOJSON_VERSION_MAJOR < 7
                     item = items.createNestedObject();
+#else
+                    item = items.add<JsonObject>();
+#endif
                     control->MarshalErrorMessage(item);
                     elementcount = 0;
                 }
