@@ -271,7 +271,11 @@ protected:
     void NotifyClients(ClientUpdateType_t newState);
     void NotifyClient(uint32_t WsClientId, ClientUpdateType_t newState);
 
+#if ARDUINOJSON_VERSION_MAJOR < 7
     bool SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId);
+#else
+    bool SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId);
+#endif
 
     std::map<uint32_t, ESPUIclient*> MapOfClients;
 
