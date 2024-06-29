@@ -83,18 +83,23 @@ public:
 
     void SendCallback(int type);
     bool HasCallback() { return (nullptr != callback); }
-    void MarshalControl(ArduinoJson::JsonObject& item, bool refresh, uint32_t DataOffset);
+    bool MarshalControl(ArduinoJson::JsonObject& item, bool refresh, uint32_t DataOffset, uint32_t MaxLength, uint32_t & EstimmatedUsedSpace);
     void MarshalErrorMessage(ArduinoJson::JsonObject& item);
     void DeleteControl();
     void onWsEvent(String& cmd, String& data);
     inline bool ToBeDeleted() { return _ToBeDeleted; }
     inline bool NeedsSync(uint32_t lastControlChangeID) {return (false == _ToBeDeleted) && (lastControlChangeID < ControlChangeID);}
     void    SetControlChangedId(uint32_t value) {ControlChangeID = value;}
-    
+
 private:
     bool _ToBeDeleted = false;
     uint32_t ControlChangeID = 0;
     String OldValue = emptyString;
+
+    // multiplier for converting a typical controller label or value to a Json object
+    #define JsonMarshalingRatio 3
+    // Marshaed Control overhead length
+    #define JsonMarshaledOverhead 64
 };
 
 #define UI_TITLE            ControlType::Title

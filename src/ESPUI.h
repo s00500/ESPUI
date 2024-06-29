@@ -5,7 +5,20 @@
 #define WS_AUTHENTICATION false
 
 #include <Arduino.h>
+
 #include <ArduinoJson.h>
+#if ARDUINOJSON_VERSION_MAJOR > 6
+    #define AllocateJsonDocument(name, size)    JsonDocument name
+    #define AllocateJsonArray(doc, name)        doc[name].to<JsonArray>()
+    #define AllocateJsonObject(doc)             doc.add<JsonObject>()
+    #define AllocateNamedJsonObject(t, s, n)    t[n] = s
+#else
+    #define AllocateJsonDocument(name, size)    DynamicJsonDocument name(size)
+    #define AllocateJsonArray(doc, name)        doc.createNestedArray(name)
+    #define AllocateJsonObject(doc)             doc.createNestedObject()
+    #define AllocateNamedJsonObject(t, s, n)    t = s.createNestedObject(n)
+#endif
+
 #include <stdlib_noniso.h>
 #ifdef ESP32
 	#if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
@@ -34,9 +47,9 @@
 #include <ESPAsyncTCP.h>
 #include <Hash.h>
 
-#define FILE_WRITING "w"
-
 #endif
+
+#define FILE_WRITING "w"
 
 // Message Types (and control types)
 
@@ -271,7 +284,7 @@ protected:
     void NotifyClients(ClientUpdateType_t newState);
     void NotifyClient(uint32_t WsClientId, ClientUpdateType_t newState);
 
-    bool SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document, uint16_t clientId);
+    bool SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId);
 
     std::map<uint32_t, ESPUIclient*> MapOfClients;
 

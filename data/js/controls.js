@@ -225,7 +225,7 @@ function handleVisibilityChange() {
 function start() {
     let location = window.location.hostname;
     let port = window.location.port;
-//    let location = "192.168.10.219";
+//    let location = "192.168.10.198";
 //    let port = "";
 
     document.addEventListener("visibilitychange", handleVisibilityChange, false);
@@ -655,6 +655,7 @@ function start() {
                 break;
         
             case UI_FRAGMENT:
+                // console.info("Starting Fragment Processing");
                 let FragmentLen = data.length;
                 let FragementOffset = data.offset;
                 let NextFragmentOffset = FragementOffset + FragmentLen;
@@ -671,6 +672,7 @@ function start() {
                 if (!data.hasOwnProperty('control')) 
                 {
                     console.error("UI_FRAGMENT:Missing control record, skipping control");
+                    // console.info("Done Fragment Processing");
                     break;
                 }
                 let control = data.control;
@@ -686,7 +688,8 @@ function start() {
                     StartFragmentAssemblyTimer(control.id);
                     let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : NextFragmentOffset });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
-                    // console.info("asked for fragment 2");
+                    // console.info("asked for fragment " + TotalRequest);
+                    // console.info("Done Fragment Processing");
                     break;
                 }
 
@@ -698,7 +701,8 @@ function start() {
                     StartFragmentAssemblyTimer(control.id);
                     let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : 0 });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
-                    // console.info("asked for fragment 1");
+                    // console.info("asked for fragment " + TotalRequest);
+                    // console.info("Done Fragment Processing");
                     break;
                 }
                 
@@ -709,7 +713,8 @@ function start() {
                     StartFragmentAssemblyTimer(control.id);
                     let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : controlAssemblyArray[control.id].length + controlAssemblyArray[control.id].offset });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
-                    // console.info("asked for the expected fragment");
+                    // console.info("asked for the expected fragment: " + TotalRequest);
+                    // console.info("Done Fragment Processing");
                     break;
                 }
 
@@ -733,7 +738,9 @@ function start() {
                     StartFragmentAssemblyTimer(control.id);
                     let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : NextFragmentOffset});
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
+                    // console.info("asked for the next fragment: " + TotalRequest);
                 }
+                // console.info("Done Fragment Processing");
                 break;
 
             default:

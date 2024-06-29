@@ -43,8 +43,8 @@ protected:
     // bool        NeedsNotification() { return pCurrentFsmState != &fsm_EspuiClient_state_Idle_imp; }
 
     bool        CanSend();
-    void        FillInHeader(ArduinoJson::DynamicJsonDocument& document);
-    uint32_t    prepareJSONChunk(uint16_t startindex, DynamicJsonDocument& rootDoc, bool InUpdateMode, String value);
+    void        FillInHeader(ArduinoJson::JsonDocument& document);
+    uint32_t    prepareJSONChunk(uint16_t startindex, JsonDocument& rootDoc, bool InUpdateMode, String value);
     bool        SendControlsToClient(uint16_t startidx, ClientUpdateType_t TransferMode, String FragmentRequest);
 
     bool        SendClientNotification(ClientUpdateType_t value);
@@ -62,6 +62,6 @@ public:
     bool        IsSyncronized();
     uint32_t    id() { return client->id(); }
     void        SetState(ClientUpdateType_t value);
-    bool        SendJsonDocToWebSocket(ArduinoJson::DynamicJsonDocument& document);
+    bool        SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document);
 
 };
