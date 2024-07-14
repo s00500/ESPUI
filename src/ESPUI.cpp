@@ -470,28 +470,27 @@ void ESPUIClass::onWsEvent(
     return;
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label)
+uint16_t ESPUIClass::addControl(Control::Type type, const char* label)
 {
     return addControl(type, label, String(""));
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value)
+uint16_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value)
 {
-    return addControl(type, label, value, ControlColor::Turquoise);
+    return addControl(type, label, value, Control::Color::Turquoise);
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color)
+uint16_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value, Control::Color color)
 {
     return addControl(type, label, value, color, Control::noParent);
 }
 
-uint16_t ESPUIClass::addControl(
-    ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
+uint16_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value, Control::Color color, uint16_t parentControl)
 {
     return addControl(type, label, value, color, parentControl, new Control(type, label, nullptr, value, color, true, parentControl));
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
+uint16_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value, Control::Color color,
     uint16_t parentControl, std::function<void(Control*, int)> callback)
 {
     uint16_t id = addControl(type, label, value, color, parentControl);
@@ -500,8 +499,7 @@ uint16_t ESPUIClass::addControl(ControlType type, const char* label, const Strin
     return id;
 }
 
-uint16_t ESPUIClass::addControl(
-    ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, Control* control)
+uint16_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value, Control::Color color, uint16_t parentControl, Control* control)
 {
 #ifdef ESP32
     xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
@@ -601,81 +599,81 @@ void ESPUIClass::RemoveToBeDeletedControls()
 #endif // def ESP32
 }
 
-uint16_t ESPUIClass::label(const char* label, ControlColor color, const String& value)
+uint16_t ESPUIClass::label(const char* label, Control::Color color, const String& value)
 {
-    return addControl(ControlType::Label, label, value, color);
+    return addControl(Control::Type::Label, label, value, color);
 }
 
-uint16_t ESPUIClass::graph(const char* label, ControlColor color)
+uint16_t ESPUIClass::graph(const char* label, Control::Color color)
 {
-    return addControl(ControlType::Graph, label, "", color);
+    return addControl(Control::Type::Graph, label, "", color);
 }
 
 uint16_t ESPUIClass::slider(
-    const char* label, std::function<void(Control*, int)> callback, ControlColor color, int value, int min, int max)
+    const char* label, std::function<void(Control*, int)> callback, Control::Color color, int value, int min, int max)
 {
     uint16_t sliderId
-        = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback);
-    addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
-    addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
+        = addControl(Control::Type::Slider, label, String(value), color, Control::noParent, callback);
+    addControl(Control::Type::Min, label, String(min), Control::Color::None, sliderId);
+    addControl(Control::Type::Max, label, String(max), Control::Color::None, sliderId);
     return sliderId;
 }
 
-uint16_t ESPUIClass::button(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value)
+uint16_t ESPUIClass::button(const char* label, std::function<void(Control*, int)> callback, Control::Color color, const String& value)
 {
-    return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
+    return addControl(Control::Type::Button, label, value, color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::switcher(const char* label, std::function<void(Control*, int)> callback, ControlColor color, bool startState)
+uint16_t ESPUIClass::switcher(const char* label, std::function<void(Control*, int)> callback, Control::Color color, bool startState)
 {
-    return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
+    return addControl(Control::Type::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::pad(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
+uint16_t ESPUIClass::pad(const char* label, std::function<void(Control*, int)> callback, Control::Color color)
 {
-    return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
+    return addControl(Control::Type::Pad, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::padWithCenter(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
+uint16_t ESPUIClass::padWithCenter(const char* label, std::function<void(Control*, int)> callback, Control::Color color)
 {
-    return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
+    return addControl(Control::Type::PadWithCenter, label, "", color, Control::noParent, callback);
 }
 
 uint16_t ESPUIClass::number(
-    const char* label, std::function<void(Control*, int)> callback, ControlColor color, int number, int min, int max)
+    const char* label, std::function<void(Control*, int)> callback, Control::Color color, int number, int min, int max)
 {
-    uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
-    addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
-    addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+    uint16_t numberId = addControl(Control::Type::Number, label, String(number), color, Control::noParent, callback);
+    addControl(Control::Type::Min, label, String(min), Control::Color::None, numberId);
+    addControl(Control::Type::Max, label, String(max), Control::Color::None, numberId);
     return numberId;
 }
 
-uint16_t ESPUIClass::gauge(const char* label, ControlColor color, int number, int min, int max)
+uint16_t ESPUIClass::gauge(const char* label, Control::Color color, int number, int min, int max)
 {
-    uint16_t numberId = addControl(ControlType::Gauge, label, String(number), color, Control::noParent);
-    addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
-    addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+    uint16_t numberId = addControl(Control::Type::Gauge, label, String(number), color, Control::noParent);
+    addControl(Control::Type::Min, label, String(min), Control::Color::None, numberId);
+    addControl(Control::Type::Max, label, String(max), Control::Color::None, numberId);
     return numberId;
 }
 
 uint16_t ESPUIClass::separator(const char* label)
 {
-    return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
+    return addControl(Control::Type::Separator, label, "", Control::Color::Alizarin, Control::noParent, nullptr);
 }
 
-uint16_t ESPUIClass::fileDisplay(const char* label, ControlColor color, String filename)
+uint16_t ESPUIClass::fileDisplay(const char* label, Control::Color color, String filename)
 {
-    return addControl(ControlType::FileDisplay, label, filename, color, Control::noParent);
+    return addControl(Control::Type::FileDisplay, label, filename, color, Control::noParent);
 }
 
-uint16_t ESPUIClass::accelerometer(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
+uint16_t ESPUIClass::accelerometer(const char* label, std::function<void(Control*, int)> callback, Control::Color color)
 {
-    return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
+    return addControl(Control::Type::Accel, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::text(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value)
+uint16_t ESPUIClass::text(const char* label, std::function<void(Control*, int)> callback, Control::Color color, const String& value)
 {
-    return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
+    return addControl(Control::Type::Text, label, value, color, Control::noParent, callback);
 }
 
 Control* ESPUIClass::getControl(uint16_t id)
@@ -935,7 +933,7 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId)
         AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
-        root[F("type")] = (int)ControlType::Graph + UpdateOffset;
+        root[F("type")] = (int)Control::Type::Graph + Control::Type::UpdateOffset;
         root[F("value")] = 0;
         root[F("id")] = control->id;
 
@@ -957,7 +955,7 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
         AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
-        root[F("type")] = (int)ControlType::GraphPoint;
+        root[F("type")] = (int)Control::Type::GraphPoint;
         root[F("value")] = nValue;
         root[F("id")] = control->id;
 

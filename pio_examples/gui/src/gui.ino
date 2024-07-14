@@ -172,6 +172,7 @@ void setup(void)
     ESPUI.setVerbosity(Verbosity::VerboseJSON);
     Serial.begin(115200);
 
+
     memset(HugeText, 0x0, sizeof(HugeText));
     memset(HugeText, 'a', sizeof(HugeText)-1);
 
@@ -237,26 +238,26 @@ void setup(void)
     Serial.print("IP address: ");
     Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
 
-    statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
-    millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
-    ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
-    ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press", (void*)19);
-    ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
-    ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
-    testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
-    ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-    ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30, 0, 30);
-    ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
-    ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
+    statusLabelId = ESPUI.label("Status:", Control::Color::Turquoise, "Stop");
+    millisLabelId = ESPUI.label("Millis:",Control::Color::Emerald, "0");
+    ESPUI.button("Push Button", &buttonCallback,Control::Color::Peterriver, "Press");
+    ESPUI.button("Other Button", &buttonExample,Control::Color::Wetasphalt, "Press", (void*)19);
+    ESPUI.padWithCenter("Pad with center", &padExample,Control::Color::Sunflower);
+    ESPUI.pad("Pad without center", &padExample,Control::Color::Carrot);
+    testSwitchId = ESPUI.switcher("Switch one", &switchExample,Control::Color::Alizarin, false);
+    ESPUI.switcher("Switch two", &otherSwitchExample,Control::Color::None, true);
+    ESPUI.slider("Slider one", &slider,Control::Color::Alizarin, 30, 0, 30);
+    ESPUI.slider("Slider two", &slider,Control::Color::None, 100);
+    ESPUI.text("Text Test:", &textCall,Control::Color::Alizarin, "a Text Field");
 
-    ESPUI.text("Huge Text Test:", &textCall, ControlColor::Alizarin, HugeText);
+    ESPUI.text("Huge Text Test:", &textCall,Control::Color::Alizarin, HugeText);
 
-    ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+    ESPUI.number("Numbertest", &numberCall,Control::Color::Alizarin, 5, 0, 10);
 
-    fileDisplayId = ESPUI.fileDisplay("Filetest", ControlColor::Turquoise, DisplayTestFileName);
+    fileDisplayId = ESPUI.fileDisplay("Filetest",Control::Color::Turquoise, DisplayTestFileName);
 
 #ifdef TEST_GRAPH
-    graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
+    graphId = ESPUI.graph("Graph Test",Control::Color::Wetasphalt);
 #endif // def TEST_GRAPH
 
     /*

@@ -14,7 +14,7 @@ DNSServer dnsServer;
 #ifndef CORE_MOCK
 #ifndef MMU_IRAM_HEAP
 #warning Try MMU option '2nd heap shared' in 'tools' IDE menu (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#option-summary)
-#warning use decorators: { HeapSelectIram doAllocationsInIRAM; ESPUI.addControl(...) ... } (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#how-to-select-heap)
+#warning use decorators: { HeapSelectIram doAllocationsInIRAM; ESPUI.addControl(Control::Type::...) ... } (cf. https://arduino-esp8266.readthedocs.io/en/latest/mmu.html#how-to-select-heap)
 #warning then check http://<ip>/heap
 #endif // MMU_IRAM_HEAP
 #ifndef DEBUG_ESP_OOM
@@ -242,20 +242,20 @@ void setup(void)
     { HeapSelectIram doAllocationsInIRAM;
 #endif
 
-    statusLabelId = ESPUI.label("Status:", ControlColor::Turquoise, "Stop");
-    millisLabelId = ESPUI.label("Millis:", ControlColor::Emerald, "0");
-    ESPUI.button("Push Button", &buttonCallback, ControlColor::Peterriver, "Press");
-    ESPUI.button("Other Button", &buttonExample, ControlColor::Wetasphalt, "Press", (void*)19);
-    ESPUI.padWithCenter("Pad with center", &padExample, ControlColor::Sunflower);
-    ESPUI.pad("Pad without center", &padExample, ControlColor::Carrot);
-    testSwitchId = ESPUI.switcher("Switch one", &switchExample, ControlColor::Alizarin, false);
-    ESPUI.switcher("Switch two", &otherSwitchExample, ControlColor::None, true);
-    ESPUI.slider("Slider one", &slider, ControlColor::Alizarin, 30);
-    ESPUI.slider("Slider two", &slider, ControlColor::None, 100);
-    ESPUI.text("Text Test:", &textCall, ControlColor::Alizarin, "a Text Field");
-    ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);
+    statusLabelId = ESPUI.label("Status:", Control::Color::Turquoise, "Stop");
+    millisLabelId = ESPUI.label("Millis:", Control::Color::Emerald, "0");
+    ESPUI.button("Push Button", &buttonCallback, Control::Color::Peterriver, "Press");
+    ESPUI.button("Other Button", &buttonExample, Control::Color::Wetasphalt, "Press", (void*)19);
+    ESPUI.padWithCenter("Pad with center", &padExample, Control::Color::Sunflower);
+    ESPUI.pad("Pad without center", &padExample, Control::Color::Carrot);
+    testSwitchId = ESPUI.switcher("Switch one", &switchExample, Control::Color::Alizarin, false);
+    ESPUI.switcher("Switch two", &otherSwitchExample, Control::Color::None, true);
+    ESPUI.slider("Slider one", &slider, Control::Color::Alizarin, 30);
+    ESPUI.slider("Slider two", &slider, Control::Color::None, 100);
+    ESPUI.text("Text Test:", &textCall, Control::Color::Alizarin, "a Text Field");
+    ESPUI.number("Numbertest", &numberCall, Control::Color::Alizarin, 5, 0, 10);
 
-    graphId = ESPUI.graph("Graph Test", ControlColor::Wetasphalt);
+    graphId = ESPUI.graph("Graph Test", Control::Color::Wetasphalt);
 
     /*
      * .begin loads and serves all files from PROGMEM directly.

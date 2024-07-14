@@ -132,35 +132,35 @@ public:
     void list(); // Lists LITTLEFS directory
     void writeFile(const char* path, const char* data);
 
-    uint16_t addControl(ControlType type, const char* label);
-    uint16_t addControl(ControlType type, const char* label, const String& value);
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color);
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl);
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int)> callback);
+    uint16_t addControl(Control::Type type, const char* label);
+    uint16_t addControl(Control::Type type, const char* label, const String& value);
+    uint16_t addControl(Control::Type type, const char* label, const String& value, Control::Color color);
+    uint16_t addControl(Control::Type type, const char* label, const String& value, Control::Color color, uint16_t parentControl);
+    uint16_t addControl(Control::Type type, const char* label, const String& value, Control::Color color, uint16_t parentControl, std::function<void(Control*, int)> callback);
 
     bool removeControl(uint16_t id, bool force_rebuild_ui = false);
 
     // create Elements
     // Create Event Button
-    uint16_t button(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value = "");
-    uint16_t switcher(const char* label, std::function<void(Control*, int)> callback, ControlColor color, bool startState = false); // Create Toggle Button
-    uint16_t pad(const char* label, std::function<void(Control*, int)> callback, ControlColor color); // Create Pad Control
-    uint16_t padWithCenter(const char* label, std::function<void(Control*, int)> callback, ControlColor color); // Create Pad Control with Centerbutton
-    uint16_t slider(const char* label, std::function<void(Control*, int)> callback, ControlColor color, int value, int min = 0, int max = 100); // Create Slider Control
-    uint16_t number(const char* label, std::function<void(Control*, int)> callback, ControlColor color, int value, int min = 0, int max = 100); // Create a Number Input Control
-    uint16_t text(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value = ""); // Create a Text Input Control
+    uint16_t button(const char* label, std::function<void(Control*, int)> callback, Control::Color color, const String& value = "");
+    uint16_t switcher(const char* label, std::function<void(Control*, int)> callback, Control::Color color, bool startState = false); // Create Toggle Button
+    uint16_t pad(const char* label, std::function<void(Control*, int)> callback, Control::Color color); // Create Pad Control
+    uint16_t padWithCenter(const char* label, std::function<void(Control*, int)> callback, Control::Color color); // Create Pad Control with Centerbutton
+    uint16_t slider(const char* label, std::function<void(Control*, int)> callback, Control::Color color, int value, int min = 0, int max = 100); // Create Slider Control
+    uint16_t number(const char* label, std::function<void(Control*, int)> callback, Control::Color color, int value, int min = 0, int max = 100); // Create a Number Input Control
+    uint16_t text(const char* label, std::function<void(Control*, int)> callback, Control::Color color, const String& value = ""); // Create a Text Input Control
 
     // Output only
-    uint16_t label(const char* label, ControlColor color,
+    uint16_t label(const char* label, Control::Color color,
         const String& value = ""); // Create Label
-    uint16_t graph(const char* label, ControlColor color); // Create Graph display
-    uint16_t gauge(const char* label, ControlColor color, int value, int min = 0,
+    uint16_t graph(const char* label, Control::Color color); // Create Graph display
+    uint16_t gauge(const char* label, Control::Color color, int value, int min = 0,
         int max = 100); // Create Gauge display
     uint16_t separator(const char* label); //Create separator
-    uint16_t fileDisplay(const char* label, ControlColor color, String filename);
+    uint16_t fileDisplay(const char* label, Control::Color color, String filename);
 
     // Input only
-    uint16_t accelerometer(const char* label, std::function<void(Control*, int)> callback, ControlColor color);
+    uint16_t accelerometer(const char* label, std::function<void(Control*, int)> callback, Control::Color color);
 
     // Update Elements
 
@@ -210,39 +210,39 @@ public:
     Verbosity verbosity = Verbosity::Quiet;
     uint32_t  GetNextControlChangeId();
     // emulate former extended callback API by using an intermediate lambda (no deprecation)
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, std::function<void(Control*, int, void*)> callback, void* userData)
+    uint16_t addControl(Control::Type type, const char* label, const String& value, Control::Color color, uint16_t parentControl, std::function<void(Control*, int, void*)> callback, void* userData)
     {
         return addControl(type, label, value, color, parentControl, [callback, userData](Control* sender, int type){ callback(sender, type, userData); });
     }
-    uint16_t button(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, const String& value, void* userData)
+    uint16_t button(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, const String& value, void* userData)
     {
         return button(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color, value);
     }
-    uint16_t switcher(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, bool startState, void* userData)
+    uint16_t switcher(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, bool startState, void* userData)
     {
         return switcher(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color, startState);
     }
-    uint16_t pad(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, void* userData)
+    uint16_t pad(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, void* userData)
     {
         return pad(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color);
     }
-    uint16_t padWithCenter(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, void* userData)
+    uint16_t padWithCenter(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, void* userData)
     {
         return padWithCenter(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color);
     }
-    uint16_t slider(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, int value, int min, int max, void* userData)
+    uint16_t slider(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, int value, int min, int max, void* userData)
     {
         return slider(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color, value, min, max);
     }
-    uint16_t number(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, int value, int min, int max, void* userData)
+    uint16_t number(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, int value, int min, int max, void* userData)
     {
         return number(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color, value, min, max);
     }
-    uint16_t text(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, const String& value, void* userData)
+    uint16_t text(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, const String& value, void* userData)
     {
         return text(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); } , color, value);
     }
-    uint16_t accelerometer(const char* label, std::function<void(Control*, int, void*)> callback, ControlColor color, void* userData)
+    uint16_t accelerometer(const char* label, std::function<void(Control*, int, void*)> callback, Control::Color color, void* userData)
     {
         return accelerometer(label, [callback, userData](Control* sender, int type){ callback(sender, type, userData); }, color);
     }
@@ -278,7 +278,7 @@ protected:
     bool basicAuth = true;
     uint16_t controlCount = 0;
 
-    uint16_t addControl(ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, Control* control);
+    uint16_t addControl(Control::Type type, const char* label, const String& value, Control::Color color, uint16_t parentControl, Control* control);
 
 #define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
     void NotifyClients(ClientUpdateType_t newState);

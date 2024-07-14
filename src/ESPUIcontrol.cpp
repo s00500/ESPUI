@@ -3,8 +3,8 @@
 static uint16_t idCounter = 0;
 static const String ControlError = "*** ESPUI ERROR: Could not transfer control ***";
 
-Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback,
-    const String& value, ControlColor color, bool visible, uint16_t parentControl)
+Control::Control(Control::Type type, const char* label, std::function<void(Control*, int)> callback,
+    const String& value, Control::Color color, bool visible, uint16_t parentControl)
     : type(type),
       label(label),
       callback(callback),
@@ -125,7 +125,7 @@ bool Control::MarshalControl(JsonObject & _item,
         ControlIsFragmented = true;
 
         // fill in the fragment header
-        _item[F("type")] = uint32_t(ControlType::Fragment);
+        _item[F("type")] = uint32_t(Control::Type::Fragment);
         _item[F("id")]   = id;
 
         // Serial.println(String("MarshalControl:Final length:      ") + String(length));
@@ -137,10 +137,10 @@ bool Control::MarshalControl(JsonObject & _item,
     }
 
     item[F("id")]      = id;
-    ControlType TempType = (ControlType::Password == type) ? ControlType::Text : type;
+    Control::Type TempType = (Control::Type::Password == type) ? Control::Type::Text : type;
     if(refresh)
     {
-        item[F("type")] = uint32_t(TempType) + uint32_t(ControlType::UpdateOffset);
+        item[F("type")] = uint32_t(TempType) + uint32_t(Control::Type::UpdateOffset);
     }
     else
     {
@@ -148,7 +148,7 @@ bool Control::MarshalControl(JsonObject & _item,
     }
 
     item[F("label")]   = label;
-    item[F ("value")]  = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, StartingOffset + ValueLenToSend);
+    item[F ("value")]  = (Control::Type::Password == type) ? F ("--------") : value.substring(StartingOffset, StartingOffset + ValueLenToSend);
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
     item[F("enabled")] = enabled;
@@ -165,7 +165,7 @@ bool Control::MarshalControl(JsonObject & _item,
 
     // special case for selects: to preselect an option, you have to add
     // "selected" to <option>
-    if (ControlType::Option == type)
+    if (Control::Type::Option == type)
     {
         Control* ParentControl = ESPUI.getControlNoLock(parentControl);
         if (nullptr == ParentControl)
@@ -189,11 +189,11 @@ bool Control::MarshalControl(JsonObject & _item,
 void Control::MarshalErrorMessage(JsonObject & item)
 {
     item[F("id")]      = id;
-    item[F("type")]    = uint32_t(ControlType::Label);
+    item[F("type")]    = uint32_t(Control::Type::Label);
     item[F("label")]   = ControlError.c_str();
     item[F("value")]   = ControlError;
     item[F("visible")] = true;
-    item[F("color")]   = (int)ControlColor::Carrot;
+    item[F("color")]   = (int)Control::Color::Carrot;
     item[F("enabled")] = true;
 
     if (parentControl != Control::noParent)
