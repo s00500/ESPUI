@@ -1,11 +1,11 @@
 #include "ESPUI.h"
 
-static uint16_t idCounter = 0;
 static const String ControlError = "*** ESPUI ERROR: Could not transfer control ***";
 
-Control::Control(Control::Type type, const char* label, std::function<void(Control*, int)> callback,
-    const String& value, Control::Color color, bool visible, uint16_t parentControl)
-    : type(type),
+Control::Control(Control::ControlId_t id, Control::Type type, const char* label, std::function<void(Control*, int)> callback,
+    const String& value, Control::Color color, bool visible, ControlId_t parentControl)
+    : id(id),
+      type(type),
       label(label),
       callback(callback),
       value(value),
@@ -14,24 +14,21 @@ Control::Control(Control::Type type, const char* label, std::function<void(Contr
       wide(false),
       vertical(false),
       enabled(true),
-      parentControl(parentControl),
-      next(nullptr)
+      parentControl(parentControl)
 {
-    id = ++idCounter;
     ControlChangeID = 1;
 }
 
 Control::Control(const Control& Control)
     : type(Control.type),
-        id(Control.id),
-        label(Control.label),
-        callback(Control.callback),
-        value(Control.value),
-        color(Control.color),
-        visible(Control.visible),
-        parentControl(Control.parentControl),
-        next(Control.next),
-        ControlChangeID(Control.ControlChangeID)
+      id(Control::noParent),
+      label(Control.label),
+      callback(Control.callback),
+      value(Control.value),
+      color(Control.color),
+      visible(Control.visible),
+      parentControl(Control.parentControl),
+      ControlChangeID(Control.ControlChangeID)
 { }
 
 void Control::SendCallback(int type)
@@ -42,15 +39,15 @@ void Control::SendCallback(int type)
     }
 }
 
-void Control::DeleteControl() 
+void Control::DeleteControl()
 {
     _ToBeDeleted = true;
     callback = nullptr;
 }
 
-bool Control::MarshalControl(JsonObject & _item, 
-                             bool refresh, 
-                             uint32_t StartingOffset, 
+bool Control::MarshalControl(JsonObject & _item,
+                             bool refresh,
+                             uint32_t StartingOffset,
                              uint32_t AvailMarshaledLength,
                              uint32_t &EstimatedMarshaledLength)
 {
@@ -225,7 +222,7 @@ void Control::onWsEvent(String & cmd, String& data)
             SendCallback(B_DOWN);
             break;
         }
-        
+
         if (cmd.equals(F("bup")))
         {
             SendCallback(B_UP);
@@ -237,7 +234,7 @@ void Control::onWsEvent(String & cmd, String& data)
             SendCallback(P_FOR_DOWN);
             break;
         }
-        
+
         if (cmd.equals(F("pfup")))
         {
             SendCallback(P_FOR_UP);
@@ -249,7 +246,6 @@ void Control::onWsEvent(String & cmd, String& data)
             SendCallback(P_LEFT_DOWN);
             break;
         }
-
         else if (cmd.equals(F("plup")))
         {
             SendCallback(P_LEFT_UP);
