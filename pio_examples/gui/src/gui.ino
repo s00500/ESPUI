@@ -37,7 +37,7 @@ void numberCall(Control* sender, int type)
 void textCall(Control* sender, int type)
 {
     Serial.print("Text: ID: ");
-    Serial.print(sender->id);
+    Serial.print(sender->GetId());
     Serial.print(", Value: ");
     Serial.println(sender->value);
 }
@@ -45,7 +45,7 @@ void textCall(Control* sender, int type)
 void slider(Control* sender, int type)
 {
     Serial.print("Slider: ID: ");
-    Serial.print(sender->id);
+    Serial.print(sender->GetId());
     Serial.print(", Value: ");
     Serial.println(sender->value);
     // Like all Control Values in ESPUI slider values are Strings. To use them as int simply do this:
@@ -130,7 +130,7 @@ void padExample(Control* sender, int value)
     }
 
     Serial.print(" ");
-    Serial.println(sender->id);
+    Serial.println(sender->GetId());
 }
 
 void switchExample(Control* sender, int value)
@@ -147,7 +147,7 @@ void switchExample(Control* sender, int value)
     }
 
     Serial.print(" ");
-    Serial.println(sender->id);
+    Serial.println(sender->GetId());
 }
 
 void otherSwitchExample(Control* sender, int value)
@@ -164,7 +164,7 @@ void otherSwitchExample(Control* sender, int value)
     }
 
     Serial.print(" ");
-    Serial.println(sender->id);
+    Serial.println(sender->GetId());
 }
 
 void setup(void)
