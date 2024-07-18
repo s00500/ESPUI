@@ -657,6 +657,19 @@ Graph points are saved in the browser in **localstorage** to be persistant, clea
 
 _There are many issues with the graph component currently and work is ongoing. Consider helping us out with development!_
 
+Upgrade From Version 2.2.3 to 2.3.1
+
+A significant change that breaks backwards compatibility with 2.2.3 and earlier based applications has been made in this upgrade.
+
+All of the control type and control color enums and definitions have been moved inside of the control class public name space. This means that the usage of the Type and Color values now requires the Control::Type and Control::Color prefixes
+
+To do this:
+
+- Replace all instances of ControlType with Control::Type
+- Replace all instances of ControlColor with Control::Color
+- If your code has been created directly using the control type without the scope, then you will need to add Control::Type:: in front of the type usage. Ex. Control::Type::Button
+- If your code has been created directly using the control color without the scope, then you will need to add Control::Color:: in front of the color usage. Ex. Control::Color::Carrot
+
 ### Captive Portal
 
 ESPUI will redirect all unknown URLs it is asked for to the 'root' of the local HTTP server instead of responding with an HTTP code 404. This makes it act as a simple 'captive portal'. Note you must also set up the ESP to be a DNS server that responds to all DNS requests with the IP address of the ESP. This only effective when the ESP is acting as a WiFi hotspot in AP mode and assigning itself as the DNS server to connected clients. 

@@ -1,11 +1,11 @@
 #include "ESPUI.h"
 
-static uint16_t idCounter = 0;
 static const String ControlError = "*** ESPUI ERROR: Could not transfer control ***";
 
-Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback,
-    const String& value, ControlColor color, bool visible, uint16_t parentControl)
-    : type(type),
+Control::Control(Control::ControlId_t id, Control::Type type, const char* label, std::function<void(Control*, int)> callback,
+    const String& value, Control::Color color, bool visible, ControlId_t parentControl)
+    : id(id),
+      type(type),
       label(label),
       callback(callback),
       value(value),
@@ -14,24 +14,21 @@ Control::Control(ControlType type, const char* label, std::function<void(Control
       wide(false),
       vertical(false),
       enabled(true),
-      parentControl(parentControl),
-      next(nullptr)
+      parentControl(parentControl)
 {
-    id = ++idCounter;
     ControlChangeID = 1;
 }
 
 Control::Control(const Control& Control)
     : type(Control.type),
-        id(Control.id),
-        label(Control.label),
-        callback(Control.callback),
-        value(Control.value),
-        color(Control.color),
-        visible(Control.visible),
-        parentControl(Control.parentControl),
-        next(Control.next),
-        ControlChangeID(Control.ControlChangeID)
+      id(Control::noParent),
+      label(Control.label),
+      callback(Control.callback),
+      value(Control.value),
+      color(Control.color),
+      visible(Control.visible),
+      parentControl(Control.parentControl),
+      ControlChangeID(Control.ControlChangeID)
 { }
 
 void Control::SendCallback(int type)
@@ -42,15 +39,15 @@ void Control::SendCallback(int type)
     }
 }
 
-void Control::DeleteControl() 
+void Control::DeleteControl()
 {
     _ToBeDeleted = true;
     callback = nullptr;
 }
 
-bool Control::MarshalControl(JsonObject & _item, 
-                             bool refresh, 
-                             uint32_t StartingOffset, 
+bool Control::MarshalControl(JsonObject & _item,
+                             bool refresh,
+                             uint32_t StartingOffset,
                              uint32_t AvailMarshaledLength,
                              uint32_t &EstimatedMarshaledLength)
 {
@@ -125,7 +122,7 @@ bool Control::MarshalControl(JsonObject & _item,
         ControlIsFragmented = true;
 
         // fill in the fragment header
-        _item[F("type")] = uint32_t(ControlType::Fragment);
+        _item[F("type")] = uint32_t(Control::Type::Fragment);
         _item[F("id")]   = id;
 
         // Serial.println(String("MarshalControl:Final length:      ") + String(length));
@@ -137,10 +134,10 @@ bool Control::MarshalControl(JsonObject & _item,
     }
 
     item[F("id")]      = id;
-    ControlType TempType = (ControlType::Password == type) ? ControlType::Text : type;
+    Control::Type TempType = (Control::Type::Password == type) ? Control::Type::Text : type;
     if(refresh)
     {
-        item[F("type")] = uint32_t(TempType) + uint32_t(ControlType::UpdateOffset);
+        item[F("type")] = uint32_t(TempType) + uint32_t(Control::Type::UpdateOffset);
     }
     else
     {
@@ -148,7 +145,7 @@ bool Control::MarshalControl(JsonObject & _item,
     }
 
     item[F("label")]   = label;
-    item[F ("value")]  = (ControlType::Password == type) ? F ("--------") : value.substring(StartingOffset, StartingOffset + ValueLenToSend);
+    item[F ("value")]  = (Control::Type::Password == type) ? F ("--------") : value.substring(StartingOffset, StartingOffset + ValueLenToSend);
     item[F("visible")] = visible;
     item[F("color")]   = (int)color;
     item[F("enabled")] = enabled;
@@ -165,7 +162,7 @@ bool Control::MarshalControl(JsonObject & _item,
 
     // special case for selects: to preselect an option, you have to add
     // "selected" to <option>
-    if (ControlType::Option == type)
+    if (Control::Type::Option == type)
     {
         Control* ParentControl = ESPUI.getControlNoLock(parentControl);
         if (nullptr == ParentControl)
@@ -189,11 +186,11 @@ bool Control::MarshalControl(JsonObject & _item,
 void Control::MarshalErrorMessage(JsonObject & item)
 {
     item[F("id")]      = id;
-    item[F("type")]    = uint32_t(ControlType::Label);
+    item[F("type")]    = uint32_t(Control::Type::Label);
     item[F("label")]   = ControlError.c_str();
     item[F("value")]   = ControlError;
     item[F("visible")] = true;
-    item[F("color")]   = (int)ControlColor::Carrot;
+    item[F("color")]   = (int)Control::Color::Carrot;
     item[F("enabled")] = true;
 
     if (parentControl != Control::noParent)
@@ -225,7 +222,7 @@ void Control::onWsEvent(String & cmd, String& data)
             SendCallback(B_DOWN);
             break;
         }
-        
+
         if (cmd.equals(F("bup")))
         {
             SendCallback(B_UP);
@@ -237,7 +234,7 @@ void Control::onWsEvent(String & cmd, String& data)
             SendCallback(P_FOR_DOWN);
             break;
         }
-        
+
         if (cmd.equals(F("pfup")))
         {
             SendCallback(P_FOR_UP);
@@ -249,7 +246,6 @@ void Control::onWsEvent(String & cmd, String& data)
             SendCallback(P_LEFT_DOWN);
             break;
         }
-
         else if (cmd.equals(F("plup")))
         {
             SendCallback(P_LEFT_UP);
