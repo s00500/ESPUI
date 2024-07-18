@@ -7,54 +7,54 @@
 class Control
 {
 public:
-enum Type : uint8_t
-{
-    // fixed Controls
-    Title = 0,
+    enum Type : uint8_t
+    {
+        // fixed Controls
+        Title = 0,
 
-    // updatable Controls
-    Pad,
-    PadWithCenter,
-    Button,
-    Label,
-    Switcher,
-    Slider,
-    Number,
-    Text,
-    Graph,
-    GraphPoint,
-    Tab,
-    Select,
-    Option,
-    Min,
-    Max,
-    Step,
-    Gauge,
-    Accel,
-    Separator,
-    Time,
-    FileDisplay,
+        // updatable Controls
+        Pad,
+        PadWithCenter,
+        Button,
+        Label,
+        Switcher,
+        Slider,
+        Number,
+        Text,
+        Graph,
+        GraphPoint,
+        Tab,
+        Select,
+        Option,
+        Min,
+        Max,
+        Step,
+        Gauge,
+        Accel,
+        Separator,
+        Time,
+        FileDisplay,
 
-    Fragment = 98,
-    Password = 99,
-    UpdateOffset = 100,
-};
+        Fragment = 98,
+        Password = 99,
+        UpdateOffset = 100,
+    };
 
-enum Color : uint8_t
-{
-    Turquoise,
-    Emerald,
-    Peterriver,
-    Wetasphalt,
-    Sunflower,
-    Carrot,
-    Alizarin,
-    Dark,
-    None = 0xFF
-};
+    enum Color : uint8_t
+    {
+        Turquoise,
+        Emerald,
+        Peterriver,
+        Wetasphalt,
+        Sunflower,
+        Carrot,
+        Alizarin,
+        Dark,
+        None = 0xFF
+    };
 
-    Type type;
-    uint16_t id; // just mirroring the id here for practical reasons
+    typedef uint16_t ControlId_t;
+
     const char* label;
     std::function<void(Control*, int)> callback;
     String value;
@@ -63,15 +63,15 @@ enum Color : uint8_t
     bool wide;
     bool vertical;
     bool enabled;
-    uint16_t parentControl;
+    ControlId_t parentControl;
     String panelStyle;
     String elementStyle;
     String inputType;
-    Control* next;
 
     static constexpr uint16_t noParent = 0xffff;
 
-    Control(Type type,
+    Control(ControlId_t id,
+            Type type,
             const char* label,
             std::function<void(Control*, int)> callback,
             const String& value,
@@ -90,7 +90,8 @@ enum Color : uint8_t
     inline bool ToBeDeleted() { return _ToBeDeleted; }
     inline bool NeedsSync(uint32_t lastControlChangeID) {return (false == _ToBeDeleted) && (lastControlChangeID < ControlChangeID);}
     void    SetControlChangedId(uint32_t value) {ControlChangeID = value;}
-
+    inline ControlId_t GetId() {return id;}
+    inline Type        GetType() {return type;}
 
 #define UI_TITLE            Control::Type::Title
 #define UI_LABEL            Control::Type::Label
@@ -123,6 +124,9 @@ enum Color : uint8_t
 #define COLOR_NONE          Control::Color::None
 
 private:
+    Type type = Type::Title;
+    ControlId_t id = Control::noParent;
+
     bool _ToBeDeleted = false;
     uint32_t ControlChangeID = 0;
     String OldValue = emptyString;
