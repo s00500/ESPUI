@@ -1,6 +1,6 @@
 set(includedirs src)
 
-set(req arduino ESPAsyncWebServer ArduinoJson)
+set(req arduino-esp32 ESPAsyncWebServer ArduinoJson)
 
 idf_component_register(
 	INCLUDE_DIRS ${includedirs} 

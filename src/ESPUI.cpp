@@ -1379,7 +1379,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             return request->requestAuthentication();
         }
 
-        AsyncWebServerResponse* response = request->beginResponse_P(200, "text/html", HTML_INDEX);
+        AsyncWebServerResponse* response = request->beginResponse(200, "text/html", HTML_INDEX);
         request->send(response);
     });
 
@@ -1392,7 +1392,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         }
 
         AsyncWebServerResponse* response
-            = request->beginResponse_P(200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
+            = request->beginResponse(200, "application/javascript", JS_ZEPTO_GZIP, sizeof(JS_ZEPTO_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
@@ -1404,7 +1404,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         }
 
         AsyncWebServerResponse* response
-            = request->beginResponse_P(200, "application/javascript", JS_CONTROLS_GZIP, sizeof(JS_CONTROLS_GZIP));
+            = request->beginResponse(200, "application/javascript", JS_CONTROLS_GZIP, sizeof(JS_CONTROLS_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
@@ -1416,7 +1416,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         }
 
         AsyncWebServerResponse* response
-            = request->beginResponse_P(200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
+            = request->beginResponse(200, "application/javascript", JS_SLIDER_GZIP, sizeof(JS_SLIDER_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
@@ -1428,7 +1428,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             return request->requestAuthentication();
         }
         AsyncWebServerResponse* response
-            = request->beginResponse_P(200, "application/javascript", JS_GRAPH_GZIP, sizeof(JS_GRAPH_GZIP));
+            = request->beginResponse(200, "application/javascript", JS_GRAPH_GZIP, sizeof(JS_GRAPH_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
@@ -1440,7 +1440,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             return request->requestAuthentication();
         }
 
-        AsyncWebServerResponse* response = request->beginResponse_P(
+        AsyncWebServerResponse* response = request->beginResponse(
             200, "application/javascript", JS_TABBEDCONTENT_GZIP, sizeof(JS_TABBEDCONTENT_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
@@ -1455,7 +1455,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         }
 
         AsyncWebServerResponse* response
-            = request->beginResponse_P(200, "text/css", CSS_STYLE_GZIP, sizeof(CSS_STYLE_GZIP));
+            = request->beginResponse(200, "text/css", CSS_STYLE_GZIP, sizeof(CSS_STYLE_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
@@ -1467,7 +1467,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         }
 
         AsyncWebServerResponse* response
-            = request->beginResponse_P(200, "text/css", CSS_NORMALIZE_GZIP, sizeof(CSS_NORMALIZE_GZIP));
+            = request->beginResponse(200, "text/css", CSS_NORMALIZE_GZIP, sizeof(CSS_NORMALIZE_GZIP));
         response->addHeader("Content-Encoding", "gzip");
         request->send(response);
     });
