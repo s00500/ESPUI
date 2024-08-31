@@ -1264,7 +1264,6 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             responseText += ("</body></html><head><meta http-equiv=\"Refresh\" content=\"0; URL='http://" +  WiFi.softAPIP().toString() + "'\" /></head>");
             response->write(responseText.c_str(), responseText.length());
             request->send(response);
-            request->redirect("/");
         }
         else
         {
