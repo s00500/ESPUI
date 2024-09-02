@@ -76,7 +76,7 @@ void buttonExample(Control* sender, int type, void* param)
         Serial.println("Status: Start");
         ESPUI.updateControlValue(status, "Start");
 
-        ESPUI.getControl(button1)->color = ControlColor::Carrot;
+        ESPUI.getControl(button1)->color = Control::Color::Carrot;
         ESPUI.updateControl(button1);
         break;
 
@@ -84,7 +84,7 @@ void buttonExample(Control* sender, int type, void* param)
         Serial.println("Status: Stop");
         ESPUI.updateControlValue(status, "Stop");
 
-        ESPUI.getControl(button1)->color = ControlColor::Peterriver;
+        ESPUI.getControl(button1)->color = Control::Color::Peterriver;
         ESPUI.updateControl(button1);
         break;
     }
@@ -250,33 +250,33 @@ void setup(void)
     { HeapSelectIram doAllocationsInIRAM;
 #endif
 
-    uint16_t tab1 = ESPUI.addControl(ControlType::Tab, "Settings 1", "Settings 1");
-    uint16_t tab2 = ESPUI.addControl(ControlType::Tab, "Settings 2", "Settings 2");
-    uint16_t tab3 = ESPUI.addControl(ControlType::Tab, "Settings 3", "Settings 3");
+    uint16_t tab1 = ESPUI.addControl(Control::Type::Tab, "Settings 1", "Settings 1");
+    uint16_t tab2 = ESPUI.addControl(Control::Type::Tab, "Settings 2", "Settings 2");
+    uint16_t tab3 = ESPUI.addControl(Control::Type::Tab, "Settings 3", "Settings 3");
 
     // shown above all tabs
-    status = ESPUI.addControl(ControlType::Label, "Status:", "Stop", ControlColor::Turquoise);
+    status = ESPUI.addControl(Control::Type::Label, "Status:", "Stop", Control::Color::Turquoise);
 
     uint16_t select1
-        = ESPUI.addControl(ControlType::Select, "Select:", "", ControlColor::Alizarin, tab1, &selectExample);
-    ESPUI.addControl(ControlType::Option, "Option1", "Opt1", ControlColor::Alizarin, select1);
-    ESPUI.addControl(ControlType::Option, "Option2", "Opt2", ControlColor::Alizarin, select1);
-    ESPUI.addControl(ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1);
+        = ESPUI.addControl(Control::Type::Select, "Select:", "", Control::Color::Alizarin, tab1, &selectExample);
+    ESPUI.addControl(Control::Type::Option, "Option1", "Opt1", Control::Color::Alizarin, select1);
+    ESPUI.addControl(Control::Type::Option, "Option2", "Opt2", Control::Color::Alizarin, select1);
+    ESPUI.addControl(Control::Type::Option, "Option3", "Opt3", Control::Color::Alizarin, select1);
 
-    ESPUI.addControl(ControlType::Text, "Text Test:", "a Text Field", ControlColor::Alizarin, tab1, &textCall);
+    ESPUI.addControl(Control::Type::Text, "Text Test:", "a Text Field", Control::Color::Alizarin, tab1, &textCall);
 
     // tabbed controls
-    ESPUI.addControl(ControlType::Label, "Millis:", "0", ControlColor::Emerald, tab1);
+    ESPUI.addControl(Control::Type::Label, "Millis:", "0", Control::Color::Emerald, tab1);
     button1 = ESPUI.addControl(
-        ControlType::Button, "Push Button", "Press", ControlColor::Peterriver, tab1, &buttonCallback);
-    ESPUI.addControl(ControlType::Button, "Other Button", "Press", ControlColor::Wetasphalt, tab1, &buttonExample, (void*)19);
-    ESPUI.addControl(ControlType::PadWithCenter, "Pad with center", "", ControlColor::Sunflower, tab2, &padExample);
-    ESPUI.addControl(ControlType::Pad, "Pad without center", "", ControlColor::Carrot, tab3, &padExample);
-    switchOne = ESPUI.addControl(ControlType::Switcher, "Switch one", "", ControlColor::Alizarin, tab3, &switchExample);
-    ESPUI.addControl(ControlType::Switcher, "Switch two", "", ControlColor::None, tab3, &otherSwitchExample);
-    ESPUI.addControl(ControlType::Slider, "Slider one", "30", ControlColor::Alizarin, tab1, &slider);
-    ESPUI.addControl(ControlType::Slider, "Slider two", "100", ControlColor::Alizarin, tab3, &slider);
-    ESPUI.addControl(ControlType::Number, "Number:", "50", ControlColor::Alizarin, tab3, &numberCall);
+        Control::Type::Button, "Push Button", "Press", Control::Color::Peterriver, tab1, &buttonCallback);
+    ESPUI.addControl(Control::Type::Button, "Other Button", "Press", Control::Color::Wetasphalt, tab1, &buttonExample, (void*)19);
+    ESPUI.addControl(Control::Type::PadWithCenter, "Pad with center", "", Control::Color::Sunflower, tab2, &padExample);
+    ESPUI.addControl(Control::Type::Pad, "Pad without center", "", Control::Color::Carrot, tab3, &padExample);
+    switchOne = ESPUI.addControl(Control::Type::Switcher, "Switch one", "", Control::Color::Alizarin, tab3, &switchExample);
+    ESPUI.addControl(Control::Type::Switcher, "Switch two", "", Control::Color::None, tab3, &otherSwitchExample);
+    ESPUI.addControl(Control::Type::Slider, "Slider one", "30", Control::Color::Alizarin, tab1, &slider);
+    ESPUI.addControl(Control::Type::Slider, "Slider two", "100", Control::Color::Alizarin, tab3, &slider);
+    ESPUI.addControl(Control::Type::Number, "Number:", "50", Control::Color::Alizarin, tab3, &numberCall);
 
     /*
      * .begin loads and serves all files from PROGMEM directly.

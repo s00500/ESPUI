@@ -4,79 +4,79 @@
 #include <ArduinoJson.h>
 #include <functional>
 
-enum ControlType : uint8_t
-{
-    // fixed Controls
-    Title = 0,
-
-    // updatable Controls
-    Pad,
-    PadWithCenter,
-    Button,
-    Label,
-    Switcher,
-    Slider,
-    Number,
-    Text,
-    Graph,
-    GraphPoint,
-    Tab,
-    Select,
-    Option,
-    Min,
-    Max,
-    Step,
-    Gauge,
-    Accel,
-    Separator,
-    Time,
-    FileDisplay,
-
-    Fragment = 98,
-    Password = 99,
-    UpdateOffset = 100,
-};
-
-enum ControlColor : uint8_t
-{
-    Turquoise,
-    Emerald,
-    Peterriver,
-    Wetasphalt,
-    Sunflower,
-    Carrot,
-    Alizarin,
-    Dark,
-    None = 0xFF
-};
-
 class Control
 {
 public:
-    ControlType type;
-    uint16_t id; // just mirroring the id here for practical reasons
+    enum Type : uint8_t
+    {
+        // fixed Controls
+        Title = 0,
+
+        // updatable Controls
+        Pad,
+        PadWithCenter,
+        Button,
+        Label,
+        Switcher,
+        Slider,
+        Number,
+        Text,
+        Graph,
+        GraphPoint,
+        Tab,
+        Select,
+        Option,
+        Min,
+        Max,
+        Step,
+        Gauge,
+        Accel,
+        Separator,
+        Time,
+        FileDisplay,
+
+        Fragment = 98,
+        Password = 99,
+        UpdateOffset = 100,
+    };
+
+    enum Color : uint8_t
+    {
+        Turquoise,
+        Emerald,
+        Peterriver,
+        Wetasphalt,
+        Sunflower,
+        Carrot,
+        Alizarin,
+        Dark,
+        None = 0xFF
+    };
+
+    typedef uint16_t ControlId_t;
+
     const char* label;
     std::function<void(Control*, int)> callback;
     String value;
-    ControlColor color;
+    Color color;
     bool visible;
     bool wide;
     bool vertical;
     bool enabled;
-    uint16_t parentControl;
+    ControlId_t parentControl;
     String panelStyle;
     String elementStyle;
     String inputType;
-    Control* next;
 
     static constexpr uint16_t noParent = 0xffff;
 
-    Control(ControlType type, 
-            const char* label, 
+    Control(ControlId_t id,
+            Type type,
+            const char* label,
             std::function<void(Control*, int)> callback,
-            const String& value, 
-            ControlColor color, 
-            bool visible, 
+            const String& value,
+            Color color,
+            bool visible,
             uint16_t parentControl);
 
     Control(const Control& Control);
@@ -90,8 +90,43 @@ public:
     inline bool ToBeDeleted() { return _ToBeDeleted; }
     inline bool NeedsSync(uint32_t lastControlChangeID) {return (false == _ToBeDeleted) && (lastControlChangeID < ControlChangeID);}
     void    SetControlChangedId(uint32_t value) {ControlChangeID = value;}
+    inline ControlId_t GetId() {return id;}
+    inline Type        GetType() {return type;}
+
+#define UI_TITLE            Control::Type::Title
+#define UI_LABEL            Control::Type::Label
+#define UI_BUTTON           Control::Type::Button
+#define UI_SWITCHER         Control::Type::Switcher
+#define UI_PAD              Control::Type::Pad
+#define UI_CPAD             Control::Type::Cpad
+#define UI_SLIDER           Control::Type::Slider
+#define UI_NUMBER           Control::Type::Number
+#define UI_TEXT_INPUT       Control::Type::Text
+#define UI_GRAPH            Control::Type::Graph
+#define UI_ADD_GRAPH_POINT  Control::Type::GraphPoint
+
+#define UPDATE_LABEL        Control::Type::UpdateLabel
+#define UPDATE_SWITCHER     Control::Type::UpdateSwitcher
+#define UPDATE_SLIDER       Control::Type::UpdateSlider
+#define UPDATE_NUMBER       Control::Type::UpdateNumber
+#define UPDATE_TEXT_INPUT   Control::Type::UpdateText
+#define CLEAR_GRAPH         Control::Type::ClearGraph
+
+// Colors
+#define COLOR_TURQUOISE     Control::Color::Turquoise
+#define COLOR_EMERALD       Control::Color::Emerald
+#define COLOR_PETERRIVER    Control::Color::Peterriver
+#define COLOR_WETASPHALT    Control::Color::Wetasphalt
+#define COLOR_SUNFLOWER     Control::Color::Sunflower
+#define COLOR_CARROT        Control::Color::Carrot
+#define COLOR_ALIZARIN      Control::Color::Alizarin
+#define COLOR_DARK          Control::Color::Dark
+#define COLOR_NONE          Control::Color::None
 
 private:
+    Type type = Type::Title;
+    ControlId_t id = Control::noParent;
+
     bool _ToBeDeleted = false;
     uint32_t ControlChangeID = 0;
     String OldValue = emptyString;
@@ -102,32 +137,3 @@ private:
     #define JsonMarshaledOverhead 64
 };
 
-#define UI_TITLE            ControlType::Title
-#define UI_LABEL            ControlType::Label
-#define UI_BUTTON           ControlType::Button
-#define UI_SWITCHER         ControlType::Switcher
-#define UI_PAD              ControlType::Pad
-#define UI_CPAD             ControlType::Cpad
-#define UI_SLIDER           ControlType::Slider
-#define UI_NUMBER           ControlType::Number
-#define UI_TEXT_INPUT       ControlType::Text
-#define UI_GRAPH            ControlType::Graph
-#define UI_ADD_GRAPH_POINT  ControlType::GraphPoint
-
-#define UPDATE_LABEL        ControlType::UpdateLabel
-#define UPDATE_SWITCHER     ControlType::UpdateSwitcher
-#define UPDATE_SLIDER       ControlType::UpdateSlider
-#define UPDATE_NUMBER       ControlType::UpdateNumber
-#define UPDATE_TEXT_INPUT   ControlType::UpdateText
-#define CLEAR_GRAPH         ControlType::ClearGraph
-
-// Colors
-#define COLOR_TURQUOISE     ControlColor::Turquoise
-#define COLOR_EMERALD       ControlColor::Emerald
-#define COLOR_PETERRIVER    ControlColor::Peterriver
-#define COLOR_WETASPHALT    ControlColor::Wetasphalt
-#define COLOR_SUNFLOWER     ControlColor::Sunflower
-#define COLOR_CARROT        ControlColor::Carrot
-#define COLOR_ALIZARIN      ControlColor::Alizarin
-#define COLOR_DARK          ControlColor::Dark
-#define COLOR_NONE          ControlColor::None

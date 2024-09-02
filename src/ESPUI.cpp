@@ -16,6 +16,7 @@
 #if ESP8266
 #include <umm_malloc/umm_heap_select.h>
 #endif
+#include "ESPUIcontrolMgr.h"
 
 static String heapInfo(const __FlashStringHelper* mode)
 {
@@ -429,7 +430,7 @@ void ESPUIClass::onWsEvent(
     AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len)
 {
     // Serial.println(String("ESPUIClass::OnWsEvent: type: ") + String(type));
-    RemoveToBeDeletedControls();
+    ESPUIcontrolMgr.RemoveToBeDeletedControls();
 
     if (WS_EVT_DISCONNECT == type)
     {
@@ -453,7 +454,7 @@ void ESPUIClass::onWsEvent(
         {
             ws->cleanupClients();
         }
-        
+
         if (MapOfClients.end() == MapOfClients.find(client->id()))
         {
             // Serial.println("ESPUIClass::OnWsEvent:Create new client.");
@@ -470,249 +471,129 @@ void ESPUIClass::onWsEvent(
     return;
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label)
+Control::ControlId_t ESPUIClass::addControl(Control::Type type, const char* label)
 {
-    return addControl(type, label, String(""));
+    return addControl(type, label, emptyString);
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value)
+Control::ControlId_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value)
 {
-    return addControl(type, label, value, ControlColor::Turquoise);
+    return addControl(type, label, value, Control::Color::Turquoise);
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color)
+Control::ControlId_t ESPUIClass::addControl(Control::Type type, const char* label, const String& value, Control::Color color)
 {
     return addControl(type, label, value, color, Control::noParent);
 }
 
-uint16_t ESPUIClass::addControl(
-    ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl)
+Control::ControlId_t ESPUIClass::addControl(Control::Type type, 
+const char* label, const String& value, Control::Color color, Control::ControlId_t parentControlId)
 {
-    return addControl(type, label, value, color, parentControl, new Control(type, label, nullptr, value, color, true, parentControl));
+    return addControl(type, label, value, color, parentControlId, (std::function<void(Control*, int)>)nullptr);
 }
 
-uint16_t ESPUIClass::addControl(ControlType type, const char* label, const String& value, ControlColor color,
-    uint16_t parentControl, std::function<void(Control*, int)> callback)
+Control::ControlId_t ESPUIClass::addControl(Control::Type type,
+    const char* label, const String& value, Control::Color color,
+    Control::ControlId_t parentControlId, std::function<void(Control*, int)> callback)
 {
-    uint16_t id = addControl(type, label, value, color, parentControl);
-    // set the original style callback
-    getControl(id)->callback = callback;
+    Control::ControlId_t id = ESPUIcontrolMgr.addControl(type, label, value, color, parentControlId, true, callback);
+    NotifyClients(ClientUpdateType_t::RebuildNeeded);
     return id;
 }
 
-uint16_t ESPUIClass::addControl(
-    ControlType type, const char* label, const String& value, ControlColor color, uint16_t parentControl, Control* control)
+bool ESPUIClass::removeControl(Control::ControlId_t id, bool force_rebuild_ui)
 {
-#ifdef ESP32
-    xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
-#endif // def ESP32
-
-    if (controls == nullptr)
+    bool Response = ESPUIcontrolMgr.removeControl(id);
+    if (force_rebuild_ui)
     {
-        controls = control;
+        ESPUI.jsonReload();
     }
     else
     {
-        Control* iterator = controls;
-
-        while (iterator->next != nullptr)
-        {
-            iterator = iterator->next;
-        }
-
-        iterator->next = control;
+        ESPUI.NotifyClients(ClientUpdateType_t::RebuildNeeded);
     }
-
-    controlCount++;
-
-#ifdef ESP32
-    xSemaphoreGive(ControlsSemaphore);
-#endif // def ESP32
-
-    NotifyClients(ClientUpdateType_t::RebuildNeeded);
-
-    return control->id;
-}
-
-bool ESPUIClass::removeControl(uint16_t id, bool force_rebuild_ui)
-{
-    bool Response = false;
-
-    Control* control = getControl(id);
-    if (control)
-    {
-        Response = true;
-        control->DeleteControl();
-        controlCount--;
-
-        if (force_rebuild_ui)
-        {
-            jsonReload();
-        }
-        else
-        {
-            NotifyClients(ClientUpdateType_t::RebuildNeeded);
-        }
-    }
-#ifdef DEBUG_ESPUI
-    else
-    {
-        // Serial.println(String("Could not Remove Control ") + String(id));
-    }
-#endif // def DEBUG_ESPUI
-
     return Response;
+} // removeControl
+
+Control::ControlId_t ESPUIClass::label(const char* label, Control::Color color, const String& value)
+{
+    return addControl(Control::Type::Label, label, value, color);
 }
 
-void ESPUIClass::RemoveToBeDeletedControls()
+Control::ControlId_t ESPUIClass::graph(const char* label, Control::Color color)
 {
-#ifdef ESP32
-    xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
-#endif // def ESP32
-
-    Control* PreviousControl = nullptr;
-    Control* CurrentControl = controls;
-
-    while (nullptr != CurrentControl)
-    {
-        Control* NextControl = CurrentControl->next;
-        if (CurrentControl->ToBeDeleted())
-        {
-            if (CurrentControl == controls)
-            {
-                // this is the root control
-                controls = NextControl;
-            }
-            else
-            {
-                PreviousControl->next = NextControl;
-            }
-            delete CurrentControl;
-            CurrentControl = NextControl;
-        }
-        else
-        {
-            PreviousControl = CurrentControl;
-            CurrentControl = NextControl;
-        }
-    }
-#ifdef ESP32
-    xSemaphoreGive(ControlsSemaphore);
-#endif // def ESP32
+    return addControl(Control::Type::Graph, label, "", color);
 }
 
-uint16_t ESPUIClass::label(const char* label, ControlColor color, const String& value)
+Control::ControlId_t ESPUIClass::slider(
+    const char* label, std::function<void(Control*, int)> callback, Control::Color color, int value, int min, int max)
 {
-    return addControl(ControlType::Label, label, value, color);
-}
-
-uint16_t ESPUIClass::graph(const char* label, ControlColor color)
-{
-    return addControl(ControlType::Graph, label, "", color);
-}
-
-uint16_t ESPUIClass::slider(
-    const char* label, std::function<void(Control*, int)> callback, ControlColor color, int value, int min, int max)
-{
-    uint16_t sliderId
-        = addControl(ControlType::Slider, label, String(value), color, Control::noParent, callback);
-    addControl(ControlType::Min, label, String(min), ControlColor::None, sliderId);
-    addControl(ControlType::Max, label, String(max), ControlColor::None, sliderId);
+    Control::ControlId_t sliderId
+        = addControl(Control::Type::Slider, label, String(value), color, Control::noParent, callback);
+    addControl(Control::Type::Min, label, String(min), Control::Color::None, sliderId);
+    addControl(Control::Type::Max, label, String(max), Control::Color::None, sliderId);
     return sliderId;
 }
 
-uint16_t ESPUIClass::button(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value)
+Control::ControlId_t ESPUIClass::button(const char* label, std::function<void(Control*, int)> callback, Control::Color color, const String& value)
 {
-    return addControl(ControlType::Button, label, value, color, Control::noParent, callback);
+    return addControl(Control::Type::Button, label, value, color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::switcher(const char* label, std::function<void(Control*, int)> callback, ControlColor color, bool startState)
+Control::ControlId_t ESPUIClass::switcher(const char* label, std::function<void(Control*, int)> callback, Control::Color color, bool startState)
 {
-    return addControl(ControlType::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
+    return addControl(Control::Type::Switcher, label, startState ? "1" : "0", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::pad(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
+Control::ControlId_t ESPUIClass::pad(const char* label, std::function<void(Control*, int)> callback, Control::Color color)
 {
-    return addControl(ControlType::Pad, label, "", color, Control::noParent, callback);
+    return addControl(Control::Type::Pad, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::padWithCenter(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
+Control::ControlId_t ESPUIClass::padWithCenter(const char* label, std::function<void(Control*, int)> callback, Control::Color color)
 {
-    return addControl(ControlType::PadWithCenter, label, "", color, Control::noParent, callback);
+    return addControl(Control::Type::PadWithCenter, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::number(
-    const char* label, std::function<void(Control*, int)> callback, ControlColor color, int number, int min, int max)
+Control::ControlId_t ESPUIClass::number(
+    const char* label, std::function<void(Control*, int)> callback, Control::Color color, int number, int min, int max)
 {
-    uint16_t numberId = addControl(ControlType::Number, label, String(number), color, Control::noParent, callback);
-    addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
-    addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+    Control::ControlId_t numberId = addControl(Control::Type::Number, label, String(number), color, Control::noParent, callback);
+    addControl(Control::Type::Min, label, String(min), Control::Color::None, numberId);
+    addControl(Control::Type::Max, label, String(max), Control::Color::None, numberId);
     return numberId;
 }
 
-uint16_t ESPUIClass::gauge(const char* label, ControlColor color, int number, int min, int max)
+Control::ControlId_t ESPUIClass::gauge(const char* label, Control::Color color, int number, int min, int max)
 {
-    uint16_t numberId = addControl(ControlType::Gauge, label, String(number), color, Control::noParent);
-    addControl(ControlType::Min, label, String(min), ControlColor::None, numberId);
-    addControl(ControlType::Max, label, String(max), ControlColor::None, numberId);
+    Control::ControlId_t numberId = addControl(Control::Type::Gauge, label, String(number), color, Control::noParent);
+    addControl(Control::Type::Min, label, String(min), Control::Color::None, numberId);
+    addControl(Control::Type::Max, label, String(max), Control::Color::None, numberId);
     return numberId;
 }
 
-uint16_t ESPUIClass::separator(const char* label)
+Control::ControlId_t ESPUIClass::separator(const char* label)
 {
-    return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
+    return addControl(Control::Type::Separator, label, "", Control::Color::Alizarin, Control::noParent, nullptr);
 }
 
-uint16_t ESPUIClass::fileDisplay(const char* label, ControlColor color, String filename)
+Control::ControlId_t ESPUIClass::fileDisplay(const char* label, Control::Color color, String filename)
 {
-    return addControl(ControlType::FileDisplay, label, filename, color, Control::noParent);
+    return addControl(Control::Type::FileDisplay, label, filename, color, Control::noParent);
 }
 
-uint16_t ESPUIClass::accelerometer(const char* label, std::function<void(Control*, int)> callback, ControlColor color)
+Control::ControlId_t ESPUIClass::accelerometer(const char* label, std::function<void(Control*, int)> callback, Control::Color color)
 {
-    return addControl(ControlType::Accel, label, "", color, Control::noParent, callback);
+    return addControl(Control::Type::Accel, label, "", color, Control::noParent, callback);
 }
 
-uint16_t ESPUIClass::text(const char* label, std::function<void(Control*, int)> callback, ControlColor color, const String& value)
+Control::ControlId_t ESPUIClass::text(const char* label, std::function<void(Control*, int)> callback, Control::Color color, const String& value)
 {
-    return addControl(ControlType::Text, label, value, color, Control::noParent, callback);
+    return addControl(Control::Type::Text, label, value, color, Control::noParent, callback);
 }
 
-Control* ESPUIClass::getControl(uint16_t id)
-{
-#ifdef ESP32
-    xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
-    Control* Response = getControlNoLock(id);
-    xSemaphoreGive(ControlsSemaphore);
-    return Response;
-#else
-    return getControlNoLock(id);
-#endif // !def ESP32
-}
-
-// WARNING: Anytime you walk the chain of controllers, the protection semaphore
-//          MUST be locked. This function assumes that the semaphore is locked
-//          at the time it is called. Make sure YOU locked it :)
-Control* ESPUIClass::getControlNoLock(uint16_t id)
-{
-    Control* Response = nullptr;
-    Control* control = controls;
-
-    while (nullptr != control)
-    {
-        if (control->id == id)
-        {
-            if (!control->ToBeDeleted())
-            {
-                Response = control;
-            }
-            break;
-        }
-        control = control->next;
-    }
-
-    return Response;
-}
+Control* ESPUIClass::getControl(Control::ControlId_t id) {return ESPUIcontrolMgr.getControl(id);}
+Control* ESPUIClass::getControlNoLock(Control::ControlId_t id) {return ESPUIcontrolMgr.getControlNoLock(id);}
 
 void ESPUIClass::updateControl(Control* control, int)
 {
@@ -735,7 +616,7 @@ uint32_t ESPUIClass::GetNextControlChangeId()
     return ++ControlChangeID;
 }
 
-void ESPUIClass::setPanelStyle(uint16_t id, const String& style, int clientId)
+void ESPUIClass::setPanelStyle(Control::ControlId_t id, const String& style, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -745,7 +626,7 @@ void ESPUIClass::setPanelStyle(uint16_t id, const String& style, int clientId)
     }
 }
 
-void ESPUIClass::setElementStyle(uint16_t id, const String& style, int clientId)
+void ESPUIClass::setElementStyle(Control::ControlId_t id, const String& style, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -755,7 +636,7 @@ void ESPUIClass::setElementStyle(uint16_t id, const String& style, int clientId)
     }
 }
 
-void ESPUIClass::setInputType(uint16_t id, const String& type, int clientId)
+void ESPUIClass::setInputType(Control::ControlId_t id, const String& type, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -765,7 +646,7 @@ void ESPUIClass::setInputType(uint16_t id, const String& type, int clientId)
     }
 }
 
-void ESPUIClass::setPanelWide(uint16_t id, bool wide)
+void ESPUIClass::setPanelWide(Control::ControlId_t id, bool wide)
 {
     Control* control = getControl(id);
     if (control)
@@ -774,7 +655,7 @@ void ESPUIClass::setPanelWide(uint16_t id, bool wide)
     }
 }
 
-void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId)
+void ESPUIClass::setEnabled(Control::ControlId_t id, bool enabled, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -785,7 +666,7 @@ void ESPUIClass::setEnabled(uint16_t id, bool enabled, int clientId)
     }
 }
 
-void ESPUIClass::setVertical(uint16_t id, bool vert)
+void ESPUIClass::setVertical(Control::ControlId_t id, bool vert)
 {
     Control* control = getControl(id);
     if (control)
@@ -794,7 +675,7 @@ void ESPUIClass::setVertical(uint16_t id, bool vert)
     }
 }
 
-void ESPUIClass::updateControl(uint16_t id, int clientId)
+void ESPUIClass::updateControl(Control::ControlId_t id, int clientId)
 {
     Control* control = getControl(id);
 
@@ -823,7 +704,7 @@ void ESPUIClass::updateControlValue(Control* control, const String& value, int c
     updateControl(control, clientId);
 }
 
-void ESPUIClass::updateControlValue(uint16_t id, const String& value, int clientId)
+void ESPUIClass::updateControlValue(Control::ControlId_t id, const String& value, int clientId)
 {
     Control* control = getControl(id);
 
@@ -841,7 +722,7 @@ void ESPUIClass::updateControlValue(uint16_t id, const String& value, int client
     updateControlValue(control, value, clientId);
 }
 
-void ESPUIClass::updateControlLabel(uint16_t id, const char* value, int clientId)
+void ESPUIClass::updateControlLabel(Control::ControlId_t id, const char* value, int clientId)
 {
     updateControlLabel(getControl(id), value, clientId);
 }
@@ -862,7 +743,7 @@ void ESPUIClass::updateControlLabel(Control* control, const char* value, int cli
     updateControl(control, clientId);
 }
 
-void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId)
+void ESPUIClass::updateVisibility(Control::ControlId_t id, bool visibility, int clientId)
 {
     Control* control = getControl(id);
     if (control)
@@ -872,57 +753,57 @@ void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId)
     }
 }
 
-void ESPUIClass::print(uint16_t id, const String& value)
+void ESPUIClass::print(Control::ControlId_t id, const String& value)
 {
     updateControlValue(id, value);
 }
 
-void ESPUIClass::updateLabel(uint16_t id, const String& value)
+void ESPUIClass::updateLabel(Control::ControlId_t id, const String& value)
 {
     updateControlValue(id, value);
 }
 
-void ESPUIClass::updateButton(uint16_t id, const String& value)
+void ESPUIClass::updateButton(Control::ControlId_t id, const String& value)
 {
     updateControlValue(id, value);
 }
 
-void ESPUIClass::updateSlider(uint16_t id, int nValue, int clientId)
+void ESPUIClass::updateSlider(Control::ControlId_t id, int nValue, int clientId)
 {
     updateControlValue(id, String(nValue), clientId);
 }
 
-void ESPUIClass::updateSwitcher(uint16_t id, bool nValue, int clientId)
+void ESPUIClass::updateSwitcher(Control::ControlId_t id, bool nValue, int clientId)
 {
     updateControlValue(id, String(nValue ? "1" : "0"), clientId);
 }
 
-void ESPUIClass::updateNumber(uint16_t id, int number, int clientId)
+void ESPUIClass::updateNumber(Control::ControlId_t id, int number, int clientId)
 {
     updateControlValue(id, String(number), clientId);
 }
 
-void ESPUIClass::updateText(uint16_t id, const String& text, int clientId)
+void ESPUIClass::updateText(Control::ControlId_t id, const String& text, int clientId)
 {
     updateControlValue(id, text, clientId);
 }
 
-void ESPUIClass::updateSelect(uint16_t id, const String& text, int clientId)
+void ESPUIClass::updateSelect(Control::ControlId_t id, const String& text, int clientId)
 {
     updateControlValue(id, text, clientId);
 }
 
-void ESPUIClass::updateGauge(uint16_t id, int number, int clientId)
+void ESPUIClass::updateGauge(Control::ControlId_t id, int number, int clientId)
 {
     updateControlValue(id, String(number), clientId);
 }
 
-void ESPUIClass::updateTime(uint16_t id, int clientId)
+void ESPUIClass::updateTime(Control::ControlId_t id, int clientId)
 {
     updateControl(id, clientId);
 }
 
-void ESPUIClass::clearGraph(uint16_t id, int clientId)
+void ESPUIClass::clearGraph(Control::ControlId_t id, int clientId)
 {
     do // once
     {
@@ -935,16 +816,16 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId)
         AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
-        root[F("type")] = (int)ControlType::Graph + UpdateOffset;
+        root[F("type")] = (int)Control::Type::Graph + Control::Type::UpdateOffset;
         root[F("value")] = 0;
-        root[F("id")] = control->id;
+        root[F("id")] = control->GetId();
 
         SendJsonDocToWebSocket(document, clientId);
 
     } while (false);
 }
 
-void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
+void ESPUIClass::addGraphPoint(Control::ControlId_t id, int nValue, int clientId)
 {
     do // once
     {
@@ -957,9 +838,9 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
         AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
-        root[F("type")] = (int)ControlType::GraphPoint;
+        root[F("type")] = (int)Control::Type::GraphPoint;
         root[F("value")] = nValue;
-        root[F("id")] = control->id;
+        root[F("id")] = control->GetId();
 
         SendJsonDocToWebSocket(document, clientId);
 
