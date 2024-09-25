@@ -531,7 +531,14 @@ uint16_t ESPUIClass::addControl(
 
     NotifyClients(ClientUpdateType_t::RebuildNeeded);
 
-    return control->id;
+    if (control == nullptr)
+    {
+        return 0;
+    }
+    else
+    {
+        return control->id;
+    }
 }
 
 bool ESPUIClass::removeControl(uint16_t id, bool force_rebuild_ui)
