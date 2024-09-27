@@ -531,14 +531,7 @@ uint16_t ESPUIClass::addControl(
 
     NotifyClients(ClientUpdateType_t::RebuildNeeded);
 
-    if (control == nullptr)
-    {
-        return 0;
-    }
-    else
-    {
-        return control->id;
-    }
+    return control->id;
 }
 
 bool ESPUIClass::removeControl(uint16_t id, bool force_rebuild_ui)
@@ -667,7 +660,7 @@ uint16_t ESPUIClass::gauge(const char* label, ControlColor color, int number, in
 
 uint16_t ESPUIClass::separator(const char* label)
 {
-    return addControl(ControlType::Separator, label, "", ControlColor::Alizarin, Control::noParent, nullptr);
+    return addControl(ControlType::Separator, label, "", ControlColor::Alizarin);
 }
 
 uint16_t ESPUIClass::fileDisplay(const char* label, ControlColor color, String filename)
