@@ -16,8 +16,8 @@
   ],
   "dependencies": [
     {
-      "name": "ESP Async WebServer",
-      "authors": "Hristo Gochkov",
+      "name": "ESPAsyncWebServer",
+      "authors": "ESP32Async",
       "frameworks": "arduino"
     },
     {
