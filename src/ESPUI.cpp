@@ -17,6 +17,15 @@
 #include <umm_malloc/umm_heap_select.h>
 #endif
 
+static const char* customJS = nullptr;
+
+// Set custom JavaScript to be included in the UI.
+// js: JavaScript code as a String or C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+void ESPUIClass::setCustomJS(const char* js)
+{
+    customJS = js;
+}
+
 static String heapInfo(const __FlashStringHelper* mode)
 {
     String result;
@@ -1270,6 +1279,15 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
             request->send(404);
         }
         yield();
+    });
+
+    server->on("/js/custom.js", HTTP_GET, [](AsyncWebServerRequest* request) {
+        if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword))
+        {
+            return request->requestAuthentication();
+        }
+
+        request->send(200, "application/javascript", customJS ? customJS : "");
     });
 
     server->begin();

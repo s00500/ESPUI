@@ -201,6 +201,9 @@ public:
 
     void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
+    // Set optional global custom JavaScript to be included in the UI.
+    void setCustomJS(const char* js);
+
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
     Control* controls = nullptr;
