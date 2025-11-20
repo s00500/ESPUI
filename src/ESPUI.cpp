@@ -23,7 +23,7 @@
 static const char* customJS = nullptr;
 
 // Set custom JavaScript to be included in the UI.
-// js: JavaScript code as a String or C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+// js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
 void ESPUIClass::setCustomJS(const char* js)
 {
     customJS = js;
