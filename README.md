@@ -667,6 +667,33 @@ All the example sketches include the DNS related code and will work as captive p
 ESPUI.captivePortal = false;
 ```
 
+### User-defined JavaScript
+
+You can add your own custom JavaScript to the UI. This allows you to create custom controls, handle events, or otherwise extend the functionality of the UI.
+
+To add custom JavaScript, call `ESPUI.setCustomJS()` before `ESPUI.begin()`. The argument to `setCustomJS()` is a C-string containing the JavaScript code. This string must remain valid for the lifetime of the ESPUIClass instance.
+
+```cpp
+const char* myCustomJS = "alert('Hello from custom JS!');";
+
+void setup() {
+  // ...
+  ESPUI.setCustomJS(myCustomJS);
+  ESPUI.begin("ESPUI Control");
+  // ...
+}
+```
+
+The custom JavaScript is served at `/js/custom.js` and is automatically included in the `index.htm` file. You can use this to interact with the UI elements, handle events, and create new UI components. For example, you can use `zepto.js` to listen for clicks on a button:
+
+```cpp
+const char* myCustomJS = R"=====(
+$(document).on('click', '#my-button', function() {
+  alert('Button clicked!');
+});
+)=====";
+```
+
 
 # Notes for Development
 
