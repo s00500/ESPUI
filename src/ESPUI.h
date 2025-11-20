@@ -201,7 +201,8 @@ public:
 
     void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
-    // Set optional global custom JavaScript to be included in the UI.
+    // Set optional user-defined JavaScript to be included in the UI.
+    // js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
     void setCustomJS(const char* js);
 
     // Variables
