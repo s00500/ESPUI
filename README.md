@@ -684,15 +684,7 @@ void setup() {
 }
 ```
 
-The custom JavaScript is served at `/js/custom.js` and is automatically included in the `index.htm` file. You can use this to interact with the UI elements, handle events, and create new UI components. For example, you can use `zepto.js` to listen for clicks on a button:
-
-```cpp
-const char* myCustomJS = R"=====(
-$(document).on('click', '#my-button', function() {
-  alert('Button clicked!');
-});
-)=====";
-```
+The custom JavaScript is served at `/js/custom.js` and is automatically included in the `index.htm` file. 
 
 
 # Notes for Development
