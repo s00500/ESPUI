@@ -17,6 +17,9 @@
 #include <umm_malloc/umm_heap_select.h>
 #endif
 
+// Optional user-defined JavaScript to be included in the UI.
+// Served at /js/custom.js, which is automatically included in index.htm.
+// js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
 static const char* customJS = nullptr;
 
 // Set custom JavaScript to be included in the UI.

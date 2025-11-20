@@ -203,6 +203,7 @@ public:
 
     // Set optional user-defined JavaScript to be included in the UI.
     // js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+    // This is intentionally not a String to avoid dynamic memory allocation.
     void setCustomJS(const char* js);
 
     // Variables
