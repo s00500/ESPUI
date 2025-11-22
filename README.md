@@ -686,6 +686,25 @@ void setup() {
 
 The custom JavaScript is served at `/js/custom.js` and is automatically included in the `index.htm` file. 
 
+### User-defined CSS
+
+You can add your own custom CSS to the UI. This allows you to globaly style the UI.
+
+To add custom CSS, call `ESPUI.setCustomCSS()` before `ESPUI.begin()`. The argument to `setCustomCSS()` is a C-string containing the CSS code. This string must remain valid for the lifetime of the ESPUIClass instance.
+
+```cpp
+const char* myCustomCSS = ".test { color: red; }";
+
+void setup() {
+  // ...
+  ESPUI.setCustomCSS(myCustomCSS);
+  ESPUI.begin("ESPUI Control");
+  // ...
+}
+```
+
+The custom CSS is served at `/css/custom.css` and is automatically included in the `index.htm` file.
+
 
 # Notes for Development
 
