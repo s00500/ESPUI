@@ -206,6 +206,11 @@ public:
     // This is intentionally not a String to avoid dynamic memory allocation.
     void setCustomJS(const char* js);
 
+    // Set optional user-defined CSS to be included in the UI.
+    // css: CSS code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+    // This is intentionally not a String to avoid dynamic memory allocation.
+    void setCustomCSS(const char* css);
+
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
     Control* controls = nullptr;
