@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 
 from jsmin import jsmin as jsminify
-from htmlmin import minify as htmlminify
+try:
+    from htmlmin import minify as htmlminify
+except ImportError:
+    # Fallback to minify_html for Python 3.13+ compatibility
+    import minify_html
+    def htmlminify(html):
+        return minify_html.minify(html, minify_js=False, minify_css=False)
 from csscompressor import compress as cssminify
 import gzip
 import sys
