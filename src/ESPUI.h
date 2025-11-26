@@ -201,6 +201,11 @@ public:
 
     void updateVisibility(uint16_t id, bool visibility, int clientId = -1);
 
+    // Set optional user-defined JavaScript to be included in the UI.
+    // js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+    // This is intentionally not a String to avoid dynamic memory allocation.
+    void setCustomJS(const char* js);
+
     // Variables
     const char* ui_title = "ESPUI"; // Store UI Title and Header Name
     Control* controls = nullptr;
