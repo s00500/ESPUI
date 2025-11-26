@@ -909,6 +909,9 @@ function selectchange(number) {
 }
 
 function buttonclick(number, isdown) {
+    if ($("#btn" + number).prop("disabled")) {
+        return;
+    }
     if (isdown) websock.send("bdown:" + number);
     else websock.send("bup:" + number);
 }
