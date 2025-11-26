@@ -207,6 +207,20 @@ void Control::onWsEvent(String & cmd, String& data)
     do // once
     {
         // Serial.println(String(F("Control::onWsEvent")));
+
+        // Handle time response separately - it should not mark the control as changed
+        // because it's a one-shot response to an updateTime() request, not a state change
+        // that needs to be broadcast to other clients
+        if (cmd.equals(F("time")))
+        {
+            if (HasCallback())
+            {
+                value = data;
+                SendCallback(TM_VALUE);
+            }
+            break;
+        }
+
         SetControlChangedId(ESPUI.GetNextControlChangeId());
         if (!HasCallback())
         {
@@ -316,12 +330,6 @@ void Control::onWsEvent(String & cmd, String& data)
             value = data;
             // updateControl(c, client->id());
             SendCallback(S_VALUE);
-        }
-        else if (cmd.equals(F("time")))
-        {
-            value = data;
-            // updateControl(c, client->id());
-            SendCallback(TM_VALUE);
         }
         else
         {
