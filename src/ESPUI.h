@@ -254,6 +254,7 @@ public:
 
     AsyncWebServer* WebServer() {return server;}
     AsyncWebSocket* WebSocket() {return ws;}
+    size_t clientCount() const {return MapOfClients.size();}
 
 #if defined(ESP32)
 #   if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
