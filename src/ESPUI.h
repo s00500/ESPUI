@@ -259,6 +259,7 @@ public:
 
     AsyncWebServer* WebServer() {return server;}
     AsyncWebSocket* WebSocket() {return ws;}
+    size_t clientCount() const {return MapOfClients.size();}
 
 #if defined(ESP32)
 #   if (ESP_IDF_VERSION_MAJOR == 4 && ESP_IDF_VERSION_MINOR >= 4) || ESP_IDF_VERSION_MAJOR > 4
@@ -292,7 +293,6 @@ protected:
 
 #define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
     void NotifyClients(ClientUpdateType_t newState);
-    void NotifyClient(uint32_t WsClientId, ClientUpdateType_t newState);
 
     bool SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId);
 

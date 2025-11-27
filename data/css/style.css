@@ -427,6 +427,12 @@ button:enabled:active {
   transform: translateX(4px) translateY(4px);
 }
 
+/* Pressed state for touch events */
+button.pressed {
+  background-color: #666666 !important;
+  transform: translateX(4px) translateY(4px);
+}
+
 /* Main Head Part
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
@@ -592,6 +598,14 @@ hr {
 }
 .control:not(.disabled) li:active {
   background-color:#777
+}
+
+/* Pressed state for touch events on pads */
+.control:not(.disabled) a.pressed {
+  background-color: #777 !important;
+}
+.control:not(.disabled) li.pressed a {
+  background-color: #777 !important;
 }
 
 /* Switch

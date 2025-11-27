@@ -379,10 +379,12 @@ function start() {
                     $("#btn" + data.id).on({
                         touchstart: function (e) {
                             e.preventDefault();
+                            $(this).addClass("pressed");
                             buttonclick(data.id, true);
                         },
                         touchend: function (e) {
                             e.preventDefault();
+                            $(this).removeClass("pressed");
                             buttonclick(data.id, false);
                         },
                     });
@@ -403,50 +405,60 @@ function start() {
                     $("#pf" + data.id).on({
                         touchstart: function (e) {
                             e.preventDefault();
+                            $(this).parent().addClass("pressed");
                             padclick(UP, data.id, true);
                         },
                         touchend: function (e) {
                             e.preventDefault();
+                            $(this).parent().removeClass("pressed");
                             padclick(UP, data.id, false);
                         },
                     });
                     $("#pl" + data.id).on({
                         touchstart: function (e) {
                             e.preventDefault();
+                            $(this).parent().addClass("pressed");
                             padclick(LEFT, data.id, true);
                         },
                         touchend: function (e) {
                             e.preventDefault();
+                            $(this).parent().removeClass("pressed");
                             padclick(LEFT, data.id, false);
                         },
                     });
                     $("#pr" + data.id).on({
                         touchstart: function (e) {
                             e.preventDefault();
+                            $(this).parent().addClass("pressed");
                             padclick(RIGHT, data.id, true);
                         },
                         touchend: function (e) {
                             e.preventDefault();
+                            $(this).parent().removeClass("pressed");
                             padclick(RIGHT, data.id, false);
                         },
                     });
                     $("#pb" + data.id).on({
                         touchstart: function (e) {
                             e.preventDefault();
+                            $(this).parent().addClass("pressed");
                             padclick(DOWN, data.id, true);
                         },
                         touchend: function (e) {
                             e.preventDefault();
+                            $(this).parent().removeClass("pressed");
                             padclick(DOWN, data.id, false);
                         },
                     });
                     $("#pc" + data.id).on({
                         touchstart: function (e) {
                             e.preventDefault();
+                            $(this).addClass("pressed");
                             padclick(CENTER, data.id, true);
                         },
                         touchend: function (e) {
                             e.preventDefault();
+                            $(this).removeClass("pressed");
                             padclick(CENTER, data.id, false);
                         },
                     });
@@ -464,9 +476,20 @@ function start() {
             case UI_TAB:
                 if (data.visible) {
                     $("#tabsnav").append(
-                        "<li><a onmouseup='tabclick(" + data.id + ")' href='#tab" + data.id + "'>" + data.value + "</a></li>"
+                        "<li><a id='tablink" + data.id + "' href='#tab" + data.id + "'>" + data.value + "</a></li>"
                     );
                     $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
+
+                    // Add touch and click handlers for tab
+                    $("#tablink" + data.id).on({
+                        touchend: function(e) {
+                            e.preventDefault();
+                            tabclick(data.id);
+                        },
+                        mouseup: function(e) {
+                            tabclick(data.id);
+                        }
+                    });
 
                     tabs = $(".tabscontent").tabbedContent({ loop: true }).data("api");
                     // switch to tab...
@@ -886,6 +909,9 @@ function selectchange(number) {
 }
 
 function buttonclick(number, isdown) {
+    if ($("#btn" + number).prop("disabled")) {
+        return;
+    }
     if (isdown) websock.send("bdown:" + number);
     else websock.send("bup:" + number);
 }
