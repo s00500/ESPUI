@@ -696,8 +696,6 @@ You can add your own custom CSS to the UI. This allows you to globaly style the 
 
 To add custom CSS, call `ESPUI.setCustomCSS()` before `ESPUI.begin()`. The argument to `setCustomCSS()` is a C-string containing the CSS code. This string must remain valid for the lifetime of the ESPUIClass instance.
 
-This can be used in conjunction with `setPanelClass` to apply custom CSS styles to controls.
-
 ```cpp
 const char* myCustomCSS = ".test { color: red; }";
 
@@ -711,6 +709,7 @@ void setup() {
 
 The custom CSS is served at `/css/custom.css` and is automatically included in the `index.htm` file.
 
+This can be used in conjunction with `setPanelClass` to apply custom CSS styles to controls.
 
 # Notes for Development
 
