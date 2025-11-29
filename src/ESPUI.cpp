@@ -769,6 +769,16 @@ void ESPUIClass::setPanelStyle(uint16_t id, const String& style, int clientId)
     }
 }
 
+void ESPUIClass::setPanelClass(uint16_t id, const String& pClass, int clientId)
+{
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->panelClass = pClass;
+        updateControl(control, clientId);
+    }
+}
+
 void ESPUIClass::setElementStyle(uint16_t id, const String& style, int clientId)
 {
     Control* control = getControl(id);

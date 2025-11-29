@@ -225,8 +225,8 @@ function handleVisibilityChange() {
 function start() {
     let location = window.location.hostname;
     let port = window.location.port;
-//    let location = "192.168.10.198";
-//    let port = "";
+    //    let location = "192.168.10.198";
+    //    let port = "";
 
     document.addEventListener("visibilitychange", handleVisibilityChange, false);
     if (
@@ -234,7 +234,7 @@ function start() {
         port != 80 ||
         port != 443
     ) {
-        websock = new WebSocket( "ws://" + location + ":" + port + "/ws" );
+        websock = new WebSocket("ws://" + location + ":" + port + "/ws");
     } else {
         websock = new WebSocket("ws://" + location + "/ws");
     }
@@ -370,9 +370,9 @@ function start() {
                 if (data.visible) addToHTML(data);
                 break;
 
-                /*
-              These elements must call additional functions after being added to the DOM
-            */
+            /*
+          These elements must call additional functions after being added to the DOM
+        */
             case UI_BUTTON:
                 if (data.visible) {
                     addToHTML(data);
@@ -482,11 +482,11 @@ function start() {
 
                     // Add touch and click handlers for tab
                     $("#tablink" + data.id).on({
-                        touchend: function(e) {
+                        touchend: function (e) {
                             e.preventDefault();
                             tabclick(data.id);
                         },
-                        mouseup: function(e) {
+                        mouseup: function (e) {
                             tabclick(data.id);
                         }
                     });
@@ -592,13 +592,12 @@ function start() {
                 break;
 
             case UI_FILEDISPLAY:
-                if (data.visible)
-                {
+                if (data.visible) {
                     addToHTML(data);
                     FileDisplayUploadFile(data);
                 }
                 break;
-    
+
             /*
              * Update messages change the value/style of a component without adding new HTML
              */
@@ -676,7 +675,7 @@ function start() {
             case UPDATE_FILEDISPLAY:
                 FileDisplayUploadFile(data);
                 break;
-        
+
             case UI_FRAGMENT:
                 // console.info("Starting Fragment Processing");
                 let FragmentLen = data.length;
@@ -692,24 +691,22 @@ function start() {
                 // console.info("UI_FRAGMENT:Arrived            '" + Arrived + "'");
                 // console.info("UI_FRAGMENT:FragmentFinal      '" + FragmentFinal + "'");
 
-                if (!data.hasOwnProperty('control')) 
-                {
+                if (!data.hasOwnProperty('control')) {
                     console.error("UI_FRAGMENT:Missing control record, skipping control");
                     // console.info("Done Fragment Processing");
                     break;
                 }
                 let control = data.control;
                 StopFragmentAssemblyTimer(data.control.id);
-                
+
                 // is this the first fragment?
-                if(0 === FragementOffset)
-                {
+                if (0 === FragementOffset) {
                     // console.info("Found first fragment");
                     controlAssemblyArray[control.id] = data;
                     // console.info("Value: " + controlAssemblyArray[control.id].control.value);
                     controlAssemblyArray[control.id].offset = NextFragmentOffset;
                     StartFragmentAssemblyTimer(control.id);
-                    let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : NextFragmentOffset });
+                    let TotalRequest = JSON.stringify({ 'id': control.id, 'offset': NextFragmentOffset });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
                     // console.info("asked for fragment " + TotalRequest);
                     // console.info("Done Fragment Processing");
@@ -717,24 +714,22 @@ function start() {
                 }
 
                 // not first fragment. are we assembling this control?
-                if("undefined" === typeof controlAssemblyArray[control.id])
-                {
+                if ("undefined" === typeof controlAssemblyArray[control.id]) {
                     // it looks like we missed the first fragment. Start the control over
                     console.error("Missing first fragment for control: " + control.id);
                     StartFragmentAssemblyTimer(control.id);
-                    let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : 0 });
+                    let TotalRequest = JSON.stringify({ 'id': control.id, 'offset': 0 });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
                     // console.info("asked for fragment " + TotalRequest);
                     // console.info("Done Fragment Processing");
                     break;
                 }
-                
+
                 // is this the expected next fragment
-                if(FragementOffset !== controlAssemblyArray[control.id].offset)
-                {
+                if (FragementOffset !== controlAssemblyArray[control.id].offset) {
                     console.error("Wrong next fragment. Expected: " + controlAssemblyArray[control.id].offset + " Got: " + FragementOffset);
                     StartFragmentAssemblyTimer(control.id);
-                    let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : controlAssemblyArray[control.id].length + controlAssemblyArray[control.id].offset });
+                    let TotalRequest = JSON.stringify({ 'id': control.id, 'offset': controlAssemblyArray[control.id].length + controlAssemblyArray[control.id].offset });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
                     // console.info("asked for the expected fragment: " + TotalRequest);
                     // console.info("Done Fragment Processing");
@@ -746,8 +741,7 @@ function start() {
                 controlAssemblyArray[control.id].offset = NextFragmentOffset;
                 // console.info("Value: " + controlAssemblyArray[control.id].control.value);
 
-                if(true === FragmentFinal)
-                {
+                if (true === FragmentFinal) {
                     var fauxEvent = {
                         data: JSON.stringify(controlAssemblyArray[control.id].control),
                     };
@@ -755,11 +749,10 @@ function start() {
                     controlAssemblyArray[control.id] = null;
                     // console.info("Found last fragment");
                 }
-                else
-                {
+                else {
                     // console.info("Ask for next fragment.");
                     StartFragmentAssemblyTimer(control.id);
-                    let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : NextFragmentOffset});
+                    let TotalRequest = JSON.stringify({ 'id': control.id, 'offset': NextFragmentOffset });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
                     // console.info("asked for the next fragment: " + TotalRequest);
                 }
@@ -791,6 +784,14 @@ function start() {
                     $("#id" + data.id).hide();
             }
 
+            if (data.hasOwnProperty('panelClass')) {
+                var element = $("#id" + data.id);
+                var baseClass = element.attr("data-base-class");
+                if (baseClass) {
+                    element.attr("class", baseClass + " " + data.panelClass);
+                }
+            }
+
             if (data.type == UPDATE_SLIDER) {
                 element.removeClass(
                     "slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin"
@@ -815,8 +816,7 @@ function start() {
     websock.onmessage = handleEvent;
 }
 
-async function FileDisplayUploadFile(data)
-{
+async function FileDisplayUploadFile(data) {
     let text = await downloadFile(data.value);
     let ItemToUpdateId = "fd" + data.id;
     // console.info("ItemToUpdateId: " + ItemToUpdateId);
@@ -835,45 +835,37 @@ async function FileDisplayUploadFile(data)
 
 } // FileDisplayUploadFile
 
-async function downloadFile(filename)
-{
+async function downloadFile(filename) {
     let response = await fetch(filename);
-		
-	if(response.status != 200) {
-		throw new Error("File Read Server Error: '" + response.status + "'");
-	}
-		
-	// read response stream as text
-	let text_data = await response.text();
 
-	return text_data;
+    if (response.status != 200) {
+        throw new Error("File Read Server Error: '" + response.status + "'");
+    }
+
+    // read response stream as text
+    let text_data = await response.text();
+
+    return text_data;
 } // downloadFile
 
-function StartFragmentAssemblyTimer(Id)
-{
+function StartFragmentAssemblyTimer(Id) {
     StopFragmentAssemblyTimer(Id);
-    FragmentAssemblyTimer[Id] = setInterval(function(_Id)
-    {
+    FragmentAssemblyTimer[Id] = setInterval(function (_Id) {
         // does the fragment assembly still exist?
-        if("undefined" !== typeof controlAssemblyArray[_Id])
-        {
-            if(null !== controlAssemblyArray[_Id])
-            {
+        if ("undefined" !== typeof controlAssemblyArray[_Id]) {
+            if (null !== controlAssemblyArray[_Id]) {
                 // we have a valid control that is being assembled
                 // ask for the next part
-                let TotalRequest = JSON.stringify({ 'id' : controlAssemblyArray[_Id].control.id, 'offset' : controlAssemblyArray[_Id].offset});
+                let TotalRequest = JSON.stringify({ 'id': controlAssemblyArray[_Id].control.id, 'offset': controlAssemblyArray[_Id].offset });
                 websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
             }
         }
     }, 1000, Id);
 }
 
-function StopFragmentAssemblyTimer(Id)
-{
-    if("undefined" !== typeof FragmentAssemblyTimer[Id])
-    {
-        if(FragmentAssemblyTimer[Id])
-        {
+function StopFragmentAssemblyTimer(Id) {
+    if ("undefined" !== typeof FragmentAssemblyTimer[Id]) {
+        if (FragmentAssemblyTimer[Id]) {
             clearInterval(FragmentAssemblyTimer[Id]);
         }
     }
@@ -990,6 +982,7 @@ var rangeSlider = function (isDiscrete) {
 
 var addToHTML = function (data) {
     panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "' " : "";
+    panelClass = data.hasOwnProperty('panelClass') ? " " + data.panelClass + " " : "";
     panelwide = data.hasOwnProperty('wide') ? "wide" : "";
 
     if (!data.hasOwnProperty('parentControl') || $("#tab" + data.parentControl).length > 0) {
@@ -1013,14 +1006,15 @@ var addToHTML = function (data) {
             case UI_GAUGE:
             case UI_ACCEL:
             case UI_FILEDISPLAY:
-                html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
-                    colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
+                var baseClass = "two columns " + panelwide + " card tcenter " + colorClass(data.color);
+                html = "<div id='id" + data.id + "' " + panelStyle + " class='" + baseClass + panelClass + "' data-base-class='" + baseClass + "'><h5>" + data.label + "</h5><hr/>" +
                     elementHTML(data) +
                     "</div>";
                 break;
 
             case UI_SEPARATOR:
-                html = "<div id='id" + data.id + "' " + panelStyle + " class='sectionbreak columns'>" +
+                var baseClass = "sectionbreak columns";
+                html = "<div id='id" + data.id + "' " + panelStyle + " class='" + baseClass + panelClass + "' data-base-class='" + baseClass + "'>" +
                     "<h5>" + data.label + "</h5><hr/></div>";
                 break;
             case UI_TIME:

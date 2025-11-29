@@ -65,6 +65,8 @@ public:
     bool enabled;
     uint16_t parentControl;
     String panelStyle;
+    String panelClass;
+    String elementStyle;
     String elementStyle;
     String inputType;
     Control* next;
