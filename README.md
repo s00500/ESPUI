@@ -524,7 +524,9 @@ or other CSS effects. Add styles with the following functions:
 
 ```
 setPanelStyle(uint16_t id, String style);
-setElementStyle(uint16_t id, String style)
+setPanelStyle(uint16_t id, String style);
+setElementStyle(uint16_t id, String style);
+setPanelClass(uint16_t id, String pClass);
 ```
 
 A panel style is applied to the panel on which the UI element is placed, an element style is applied to the element itself. 
@@ -534,6 +536,8 @@ Switcher, Number, Text, and Selector.
 
 Dynamic update of styles is supported. When either of the above functions are called, the control is updated live. This could 
 be used to refect a warning state by changing the color of a button, or for similar effects.
+
+You can also add custom CSS classes to the panel of a control using `setPanelClass`. This allows you to apply predefined CSS classes to your controls.
 
 For example, this code will set a control's panel to a random background color:
 
@@ -691,6 +695,8 @@ The custom JavaScript is served at `/js/custom.js` and is automatically included
 You can add your own custom CSS to the UI. This allows you to globaly style the UI.
 
 To add custom CSS, call `ESPUI.setCustomCSS()` before `ESPUI.begin()`. The argument to `setCustomCSS()` is a C-string containing the CSS code. This string must remain valid for the lifetime of the ESPUIClass instance.
+
+This can be used in conjunction with `setPanelClass` to apply custom CSS styles to controls.
 
 ```cpp
 const char* myCustomCSS = ".test { color: red; }";
