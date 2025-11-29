@@ -598,6 +598,7 @@ function start() {
                     FileDisplayUploadFile(data);
                 }
                 break;
+
             /*
              * Update messages change the value/style of a component without adding new HTML
              */
@@ -675,7 +676,7 @@ function start() {
             case UPDATE_FILEDISPLAY:
                 FileDisplayUploadFile(data);
                 break;
-
+        
             case UI_FRAGMENT:
                 // console.info("Starting Fragment Processing");
                 let FragmentLen = data.length;
@@ -699,7 +700,7 @@ function start() {
                 }
                 let control = data.control;
                 StopFragmentAssemblyTimer(data.control.id);
-
+                
                 // is this the first fragment?
                 if(0 === FragementOffset)
                 {
@@ -714,20 +715,20 @@ function start() {
                     // console.info("Done Fragment Processing");
                     break;
                 }
-                
+
                 // not first fragment. are we assembling this control?
                 if("undefined" === typeof controlAssemblyArray[control.id])
                 {
                     // it looks like we missed the first fragment. Start the control over
                     console.error("Missing first fragment for control: " + control.id);
                     StartFragmentAssemblyTimer(control.id);
-                    let TotalRequest = JSON.stringify({ 'id': control.id, 'offset': 0 });
+                    let TotalRequest = JSON.stringify({ 'id' : control.id, 'offset' : 0 });
                     websock.send("uifragmentok:" + 0 + ": " + TotalRequest + ":");
                     // console.info("asked for fragment " + TotalRequest);
                     // console.info("Done Fragment Processing");
                     break;
                 }
-
+                
                 // is this the expected next fragment
                 if(FragementOffset !== controlAssemblyArray[control.id].offset)
                 {
