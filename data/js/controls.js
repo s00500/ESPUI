@@ -598,7 +598,7 @@ function start() {
                     FileDisplayUploadFile(data);
                 }
                 break;
-
+    
             /*
              * Update messages change the value/style of a component without adding new HTML
              */
