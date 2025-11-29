@@ -709,7 +709,18 @@ void setup() {
 
 The custom CSS is served at `/css/custom.css` and is automatically included in the `index.htm` file.
 
-This can be used in conjunction with `setPanelClass` to apply custom CSS styles to controls.
+This can be used in conjunction with `setPanelClass` to apply custom CSS styles to controls. For example:
+
+```cpp
+// Make the value span of the panel red on error
+ESPUI.setCustomCSS(".err span { color: red; }");
+// Set the panel class to 'err' to make its value red
+ESPUI.setPanelClass(<id>, "err");
+```
+
+For simpler styles without using classes, you can use `setElementStyle` or `setPanelStyle` instead.
+
+
 
 # Notes for Development
 
