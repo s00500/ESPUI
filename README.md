@@ -537,8 +537,6 @@ Switcher, Number, Text, and Selector.
 Dynamic update of styles is supported. When either of the above functions are called, the control is updated live. This could 
 be used to refect a warning state by changing the color of a button, or for similar effects.
 
-You can also add custom CSS classes to the panel of a control using `setPanelClass`. This allows you to apply predefined CSS classes to your controls.
-
 For example, this code will set a control's panel to a random background color:
 
 ```
@@ -554,6 +552,8 @@ You can get quite creative with this.
 The [completeExample](examples/completeExample/completeExample.cpp) example includes a range of things that you can do with inline styles.
 
 ![More Inline Styles](docs/ui_inlinestyles2.png)
+
+You can also add custom CSS classes to the panel of a control using `setPanelClass`. This allows you to apply arbitrary CSS classes to your controls.
 
 
 ### Disabling Controls
