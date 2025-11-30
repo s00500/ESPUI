@@ -154,6 +154,7 @@ bool Control::MarshalControl(JsonObject & _item,
     item[F("enabled")] = enabled;
 
     if (!panelStyle.isEmpty())    {item[F("panelStyle")]    = panelStyle;}
+    if (!panelClass.isEmpty())    {item[F("panelClass")]    = panelClass;}
     if (!elementStyle.isEmpty())  {item[F("elementStyle")]  = elementStyle;}
     if (!inputType.isEmpty())     {item[F("inputType")]     = inputType;}
     if (wide == true)             {item[F("wide")]          = true;}
