@@ -22,11 +22,23 @@
 // js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
 static const char* customJS = nullptr;
 
+// Optional user-defined CSS to be included in the UI.
+// Served at /css/custom.css, which is automatically included in index.htm.
+// css: CSS code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+static const char* customCSS = nullptr;
+
 // Set custom JavaScript to be included in the UI.
 // js: JavaScript code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
 void ESPUIClass::setCustomJS(const char* js)
 {
     customJS = js;
+}
+
+// Set custom CSS to be included in the UI.
+// css: CSS code as a C-string. Must remain valid for the lifetime of the ESPUIClass instance.
+void ESPUIClass::setCustomCSS(const char* css)
+{
+    customCSS = css;
 }
 
 static String heapInfo(const __FlashStringHelper* mode)
@@ -757,6 +769,16 @@ void ESPUIClass::setPanelStyle(uint16_t id, const String& style, int clientId)
     }
 }
 
+void ESPUIClass::setPanelClass(uint16_t id, const String& pClass, int clientId)
+{
+    Control* control = getControl(id);
+    if (control)
+    {
+        control->panelClass = pClass;
+        updateControl(control, clientId);
+    }
+}
+
 void ESPUIClass::setElementStyle(uint16_t id, const String& style, int clientId)
 {
     Control* control = getControl(id);
@@ -1291,6 +1313,15 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         }
 
         request->send(200, "application/javascript", customJS ? customJS : "");
+    });
+
+    server->on("/css/custom.css", HTTP_GET, [](AsyncWebServerRequest* request) {
+        if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword))
+        {
+            return request->requestAuthentication();
+        }
+
+        request->send(200, "text/css", customCSS ? customCSS : "");
     });
 
     server->begin();

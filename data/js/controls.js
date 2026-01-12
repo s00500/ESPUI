@@ -791,6 +791,14 @@ function start() {
                     $("#id" + data.id).hide();
             }
 
+            if (data.hasOwnProperty('panelClass')) {
+                var element = $("#id" + data.id);
+                var baseClass = element.attr("data-base-class");
+                if (baseClass) {
+                    element.attr("class", baseClass + " " + data.panelClass);
+                }
+            }
+
             if (data.type == UPDATE_SLIDER) {
                 element.removeClass(
                     "slider-turquoise slider-emerald slider-peterriver slider-wetasphalt slider-sunflower slider-carrot slider-alizarin"
@@ -990,6 +998,7 @@ var rangeSlider = function (isDiscrete) {
 
 var addToHTML = function (data) {
     panelStyle = data.hasOwnProperty('panelStyle') ? " style='" + data.panelStyle + "' " : "";
+    panelClass = data.hasOwnProperty('panelClass') ? " " + data.panelClass + " " : "";
     panelwide = data.hasOwnProperty('wide') ? "wide" : "";
 
     if (!data.hasOwnProperty('parentControl') || $("#tab" + data.parentControl).length > 0) {
@@ -1013,14 +1022,15 @@ var addToHTML = function (data) {
             case UI_GAUGE:
             case UI_ACCEL:
             case UI_FILEDISPLAY:
-                html = "<div id='id" + data.id + "' " + panelStyle + " class='two columns " + panelwide + " card tcenter " +
-                    colorClass(data.color) + "'><h5>" + data.label + "</h5><hr/>" +
+                var baseClass = "two columns " + panelwide + " card tcenter " + colorClass(data.color);
+                html = "<div id='id" + data.id + "' " + panelStyle + " class='" + baseClass + panelClass + "' data-base-class='" + baseClass + "'><h5>" + data.label + "</h5><hr/>" +
                     elementHTML(data) +
                     "</div>";
                 break;
 
             case UI_SEPARATOR:
-                html = "<div id='id" + data.id + "' " + panelStyle + " class='sectionbreak columns'>" +
+                var baseClass = "sectionbreak columns";
+                html = "<div id='id" + data.id + "' " + panelStyle + " class='" + baseClass + panelClass + "' data-base-class='" + baseClass + "'>" +
                     "<h5>" + data.label + "</h5><hr/></div>";
                 break;
             case UI_TIME:

@@ -524,7 +524,8 @@ or other CSS effects. Add styles with the following functions:
 
 ```
 setPanelStyle(uint16_t id, String style);
-setElementStyle(uint16_t id, String style)
+setElementStyle(uint16_t id, String style);
+setPanelClass(uint16_t id, String pClass);
 ```
 
 A panel style is applied to the panel on which the UI element is placed, an element style is applied to the element itself. 
@@ -550,6 +551,8 @@ You can get quite creative with this.
 The [completeExample](examples/completeExample/completeExample.cpp) example includes a range of things that you can do with inline styles.
 
 ![More Inline Styles](docs/ui_inlinestyles2.png)
+
+You can also add custom CSS classes to the panel of a control using `setPanelClass`. This allows you to apply arbitrary CSS classes to your controls.
 
 
 ### Disabling Controls
@@ -685,6 +688,37 @@ void setup() {
 ```
 
 The custom JavaScript is served at `/js/custom.js` and is automatically included in the `index.htm` file. 
+
+### User-defined CSS
+
+You can add your own custom CSS to the UI. This allows you to globally style the UI.
+
+To add custom CSS, call `ESPUI.setCustomCSS()` before `ESPUI.begin()`. The argument to `setCustomCSS()` is a C-string containing the CSS code. This string must remain valid for the lifetime of the ESPUIClass instance.
+
+```cpp
+const char* myCustomCSS = ".test { color: red; }";
+
+void setup() {
+  // ...
+  ESPUI.setCustomCSS(myCustomCSS);
+  ESPUI.begin("ESPUI Control");
+  // ...
+}
+```
+
+The custom CSS is served at `/css/custom.css` and is automatically included in the `index.htm` file.
+
+This can be used in conjunction with `setPanelClass` to apply custom CSS styles to controls. For example:
+
+```cpp
+// Make the value span of the panel red on error
+ESPUI.setCustomCSS(".err span { color: red; }");
+// Set the panel class to 'err' to make its value red
+ESPUI.setPanelClass(<id>, "err");
+```
+
+For simpler styles without using classes, you can use `setElementStyle` or `setPanelStyle` instead.
+
 
 
 # Notes for Development
