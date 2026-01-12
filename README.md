@@ -524,7 +524,6 @@ or other CSS effects. Add styles with the following functions:
 
 ```
 setPanelStyle(uint16_t id, String style);
-setPanelStyle(uint16_t id, String style);
 setElementStyle(uint16_t id, String style);
 setPanelClass(uint16_t id, String pClass);
 ```
@@ -692,7 +691,7 @@ The custom JavaScript is served at `/js/custom.js` and is automatically included
 
 ### User-defined CSS
 
-You can add your own custom CSS to the UI. This allows you to globaly style the UI.
+You can add your own custom CSS to the UI. This allows you to globally style the UI.
 
 To add custom CSS, call `ESPUI.setCustomCSS()` before `ESPUI.begin()`. The argument to `setCustomCSS()` is a C-string containing the CSS code. This string must remain valid for the lifetime of the ESPUIClass instance.
 
