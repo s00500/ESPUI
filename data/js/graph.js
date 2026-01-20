@@ -172,7 +172,7 @@ function lineGraph(parent, xAccessor, yAccessor) {
 
       var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
       // primitive formatting
-      text.innerHTML = Math.floor(xDataValue) + " / " + Math.floor(yDataValue);
+      text.innerHTML = new Date(Math.floor(xDataValue)).toLocaleTimeString() + " / " + Math.floor(yDataValue);
       text.setAttribute("x", x);
       text.setAttribute("y", y);
 
