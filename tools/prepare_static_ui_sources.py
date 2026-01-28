@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# script is kept for legacy reasons, please use go version instead!
+
 from jsmin import jsmin as jsminify
 try:
     from htmlmin import minify as htmlminify
