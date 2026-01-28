@@ -481,9 +481,10 @@ function start() {
                     $("#tabscontent").append("<div id='tab" + data.id + "'></div>");
 
                     // Add touch and click handlers for tab
+                    // Note: Do NOT use e.preventDefault() in touchend - it blocks the click
+                    // event which tabbedcontent.js needs to actually switch tabs
                     $("#tablink" + data.id).on({
                         touchend: function(e) {
-                            e.preventDefault();
                             tabclick(data.id);
                         },
                         mouseup: function(e) {
