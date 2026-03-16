@@ -228,16 +228,74 @@ function start() {
 //    let location = "192.168.10.198";
 //    let port = "";
 
-    document.addEventListener("visibilitychange", handleVisibilityChange, false);
-    if (
-        port != "" ||
-        port != 80 ||
-        port != 443
-    ) {
-        websock = new WebSocket( "ws://" + location + ":" + port + "/ws" );
+    let wsCandidates = [];
+    if (port !== "") {
+        wsCandidates.push("ws://" + location + ":" + port + "/ws");
+
+        let parsedPort = parseInt(port, 10);
+        if (!isNaN(parsedPort)) {
+            wsCandidates.push("ws://" + location + ":" + (parsedPort + 1) + "/ws");
+            wsCandidates.push("ws://" + location + ":" + (parsedPort + 1));
+        }
     } else {
-        websock = new WebSocket("ws://" + location + "/ws");
+        wsCandidates.push("ws://" + location + "/ws");
+        wsCandidates.push("ws://" + location + ":81/ws");
+        wsCandidates.push("ws://" + location + ":81");
     }
+    wsCandidates = [...new Set(wsCandidates)];
+
+    let wsCandidateIndex = 0;
+
+    function connectWebSocket() {
+        websock = new WebSocket(wsCandidates[wsCandidateIndex]);
+
+        websock.onopen = function (evt) {
+            console.log("websock open");
+            $("#conStatus").addClass("color-green");
+            $("#conStatus").text("Connected");
+            websockConnected = true;
+            FragmentAssemblyTimer.forEach(element => {
+                clearInterval(element);
+            });
+            FragmentAssemblyTimer = new Array();
+            controlAssemblyArray = new Array();
+            websock.send("uiok:0");
+        };
+
+        websock.onclose = function (evt) {
+            console.log("websock close");
+            if (!websockConnected && wsCandidateIndex < wsCandidates.length - 1) {
+                wsCandidateIndex++;
+                connectWebSocket();
+                return;
+            }
+
+            conStatusError();
+            FragmentAssemblyTimer.forEach(element => {
+                clearInterval(element);
+            });
+            FragmentAssemblyTimer = new Array();
+            controlAssemblyArray = new Array();
+        };
+
+        websock.onerror = function (evt) {
+            console.log("websock Error");
+            if (!websockConnected && wsCandidateIndex < wsCandidates.length - 1) {
+                wsCandidateIndex++;
+                connectWebSocket();
+                return;
+            }
+
+            restart();
+            FragmentAssemblyTimer.forEach(element => {
+                clearInterval(element);
+            });
+            FragmentAssemblyTimer = new Array();
+            controlAssemblyArray = new Array();
+        };
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
     // is the timer running?
     if (null === WebSocketTimer) {
@@ -251,44 +309,6 @@ function start() {
             }
         }, 5000);
     } // end timer was not running
-
-    websock.onopen = function (evt) {
-        console.log("websock open");
-        $("#conStatus").addClass("color-green");
-        $("#conStatus").text("Connected");
-        websockConnected = true;
-        FragmentAssemblyTimer.forEach(element => {
-            clearInterval(element);
-        });
-        FragmentAssemblyTimer = new Array();
-        controlAssemblyArray = new Array();
-    };
-
-    websock.onclose = function (evt) {
-        // console.log("Close evt: '" + evt + "'");
-        // console.log("Close reason: '" + evt.reason + "'");
-        // console.log("Close code: '" + evt.code + "'");
-        console.log("websock close");
-        conStatusError();
-        FragmentAssemblyTimer.forEach(element => {
-            clearInterval(element);
-        });
-        FragmentAssemblyTimer = new Array();
-        controlAssemblyArray = new Array();
-    };
-
-    websock.onerror = function (evt) {
-        console.log("websock Error");
-        // console.log("Error evt: '" + evt + "'");
-        // console.log("Error data: '" + evt.data + "'");
-
-        restart();
-        FragmentAssemblyTimer.forEach(element => {
-            clearInterval(element);
-        });
-        FragmentAssemblyTimer = new Array();
-        controlAssemblyArray = new Array();
-    };
 
     var handleEvent = function (evt) {
         // console.log("handleEvent:Data evt: '" + evt + "'");
@@ -822,6 +842,7 @@ function start() {
     };
 
     websock.onmessage = handleEvent;
+    connectWebSocket();
 }
 
 async function FileDisplayUploadFile(data)

@@ -1,14 +1,16 @@
-#include <DNSServer.h>
 #include <ESPUI.h>
 
+#if !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_RP2040) && !defined(PICO_RP2040)
+#include <DNSServer.h>
 const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
 DNSServer dnsServer;
+#endif
 
+// Platform detection for WiFi include
 #if defined(ESP32)
 #include <WiFi.h>
-#else
-// esp8266
+#elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <umm_malloc/umm_heap_select.h>
 #ifndef CORE_MOCK
@@ -21,6 +23,11 @@ DNSServer dnsServer;
 #error on ESP8266 and ESPUI, you must define OOM debug option when developping
 #endif
 #endif
+#elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+#include <WiFi.h>
+#include <rp2040.h>
+#else
+#error "Unsupported platform. ESPUI supports ESP32, ESP8266, and RP2040/RP2350."
 #endif
 
 const char* ssid = "ESPUI";
@@ -179,8 +186,12 @@ void setup(void)
 
 #if defined(ESP32)
     WiFi.setHostname(hostname);
-#else
+#elif defined(ESP8266)
     WiFi.hostname(hostname);
+#elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+    // RP2040 - hostname not supported in standard arduino-pico
+#else
+    // Other platforms
 #endif
 
     // try to connect to existing network
@@ -198,9 +209,10 @@ void setup(void)
             timeout--;
         } while (timeout && WiFi.status() != WL_CONNECTED);
 
-        // not connected -> create hotspot
+        // not connected -> create hotspot (skip for RP2040)
         if (WiFi.status() != WL_CONNECTED)
         {
+#if !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_RP2040) && !defined(PICO_RP2040)
             Serial.print("\n\nCreating hotspot");
 
             WiFi.mode(WIFI_AP);
@@ -212,7 +224,7 @@ void setup(void)
             {
                 chipid |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
             }
-#else
+#elif defined(ESP8266)
             uint32_t chipid = ESP.getChipId();
 #endif
             char ap_ssid[25];
@@ -227,16 +239,26 @@ void setup(void)
                 Serial.print(".");
                 timeout--;
             } while (timeout);
+#else
+            Serial.print("\n\nRP2040 detected - running in simple mode without captive portal");
+#endif
         }
     }
 
+#if !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_RP2040) && !defined(PICO_RP2040)
     dnsServer.start(DNS_PORT, "*", apIP);
+#endif
 
     Serial.println("\n\nWiFi parameters:");
     Serial.print("Mode: ");
     Serial.println(WiFi.getMode() == WIFI_AP ? "Station" : "Client");
     Serial.print("IP address: ");
     Serial.println(WiFi.getMode() == WIFI_AP ? WiFi.softAPIP() : WiFi.localIP());
+
+#if defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+    // RP2040/RP2350: Use simple WiFi without captive portal
+    Serial.println("RP2040/RP2350 detected - running in simple mode");
+#endif
 
 #ifdef ESP8266
     { HeapSelectIram doAllocationsInIRAM;
@@ -282,7 +304,9 @@ void setup(void)
 
 void loop(void)
 {
+#if !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_RP2040) && !defined(PICO_RP2040)
     dnsServer.processNextRequest();
+#endif
 
     static long oldTime = 0;
     static bool testSwitchState = false;

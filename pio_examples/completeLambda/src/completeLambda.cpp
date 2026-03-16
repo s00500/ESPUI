@@ -25,13 +25,18 @@
 #include <EEPROM.h>
 #include <ESPUI.h>
 
+// Platform detection for WiFi include
 #if defined(ESP32)
 #include <WiFi.h>
 #include <ESPmDNS.h>
-#else
-// esp8266
+#elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
+#elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+#include <WiFi.h>
+#include <rp2040.h>
+#else
+#error "Unsupported platform. ESPUI supports ESP32, ESP8266, and RP2040/RP2350."
 #endif
 
 //Settings
@@ -391,6 +396,8 @@ void setup() {
 	connectWifi();
 	#if defined(ESP32)
 		WiFi.setSleep(false); //For the ESP32: turn off sleeping to increase UI responsivness (at the cost of power use)
+	#elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+		// RP2040: WiFi power management handled by arduino-pico core
 	#endif
 	setUpUI();
 }
@@ -434,7 +441,7 @@ void loop() {
 		}
 	}
 
-	#if !defined(ESP32)
+	#if defined(ESP8266)
 		//We don't need to call this explicitly on ESP32 but we do on 8266
 		MDNS.update();
 	#endif
@@ -462,8 +469,12 @@ void connectWifi() {
 
 #if defined(ESP32)
 	WiFi.setHostname(HOSTNAME);
-#else
+#elif defined(ESP8266)
 	WiFi.hostname(HOSTNAME);
+#elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+	// RP2040 - hostname not supported in standard arduino-pico
+#else
+	// Other platforms
 #endif
 	Serial.println("Begin wifi...");
 
@@ -479,8 +490,10 @@ void connectWifi() {
 		//Try to connect with stored credentials, fire up an access point if they don't work.
 		#if defined(ESP32)
 			WiFi.begin(stored_ssid.c_str(), stored_pass.c_str());
-		#else
+		#elif defined(ESP8266)
 			WiFi.begin(stored_ssid, stored_pass);
+		#elif defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_RP2040) || defined(PICO_RP2040)
+			WiFi.begin(stored_ssid.c_str(), stored_pass.c_str());
 		#endif
 		connect_timeout = 28; //7 seconds
 		while (WiFi.status() != WL_CONNECTED && connect_timeout > 0) {
@@ -494,9 +507,11 @@ void connectWifi() {
 		Serial.println(WiFi.localIP());
 		Serial.println("Wifi started");
 
+#if !defined(ARDUINO_ARCH_RP2040) && !defined(ARDUINO_RP2040) && !defined(PICO_RP2040)
 		if (!MDNS.begin(HOSTNAME)) {
 			Serial.println("Error setting up MDNS responder!");
 		}
+#endif
 	} else {
 		Serial.println("\nCreating access point...");
 		WiFi.mode(WIFI_AP);

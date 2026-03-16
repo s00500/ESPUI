@@ -34,5 +34,8 @@ Temporary Items
 *~
 *.bak
 
-
 .vscode/
+
+# PlatformIO build artifacts
+.pio/
+pio_build_*.log

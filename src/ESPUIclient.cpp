@@ -38,7 +38,8 @@ protected:
     size_t counter = 0;
 };
 
-ESPUIclient::ESPUIclient(AsyncWebSocketClient * _client):
+#if defined(ESP32) || defined(ESP8266)
+ESPUIclient::ESPUIclient(AsyncWebSocketClient* _client):
     client(_client)
 {
     fsm_EspuiClient_state_Idle_imp.SetParent(this);
@@ -48,6 +49,18 @@ ESPUIclient::ESPUIclient(AsyncWebSocketClient * _client):
 
     fsm_EspuiClient_state_Idle_imp.Init();
 }
+#else
+ESPUIclient::ESPUIclient(void* _client):
+    client(_client)
+{
+    fsm_EspuiClient_state_Idle_imp.SetParent(this);
+    fsm_EspuiClient_state_SendingUpdate_imp.SetParent(this);
+    fsm_EspuiClient_state_Rebuilding_imp.SetParent(this);
+    fsm_EspuiClient_state_Reloading_imp.SetParent(this);
+
+    fsm_EspuiClient_state_Idle_imp.Init();
+}
+#endif
 
 ESPUIclient::ESPUIclient(const ESPUIclient& source):
     client(source.client)
@@ -67,10 +80,17 @@ ESPUIclient::~ESPUIclient()
 bool ESPUIclient::CanSend()
 {
     bool Response = false;
+#if defined(ESP32) || defined(ESP8266)
     if (nullptr != client)
     {
         Response = client->canSend();
     }
+#else
+    if (nullptr != ESPUI.ws)
+    {
+        Response = ESPUI.ws->clientIsConnected(static_cast<uint8_t>(id()));
+    }
+#endif
     return Response;
 }
 
@@ -127,6 +147,7 @@ void ESPUIclient::NotifyClient(ClientUpdateType_t newState)
 }
 
 // Handle Websockets Communication
+#if defined(ESP32) || defined(ESP8266)
 bool ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t len)
 {
     bool Response = false;
@@ -252,6 +273,65 @@ bool ESPUIclient::onWsEvent(AwsEventType type, void* arg, uint8_t* data, size_t 
 
     return Response;
 }
+#else
+bool ESPUIclient::onWsEvent(int type, void* arg, uint8_t* data, size_t len)
+{
+    (void)arg;
+
+    if (WStype_CONNECTED == type)
+    {
+        Serial.println("[RP2040] WebSocket connected - triggering RebuildNeeded");
+        NotifyClient(ClientUpdateType_t::RebuildNeeded);
+        return false;
+    }
+
+    if (WStype_TEXT != type || nullptr == data || 0 == len)
+    {
+        return false;
+    }
+
+    String msg = "";
+    msg.reserve(len + 1);
+    for (size_t i = 0; i < len; i++)
+    {
+        msg += static_cast<char>(data[i]);
+    }
+
+    String cmd = msg.substring(0, msg.indexOf(":"));
+    String value = msg.substring(cmd.length() + 1, msg.lastIndexOf(':'));
+    uint16_t controlId = msg.substring(msg.lastIndexOf(':') + 1).toInt();
+
+    if (cmd.equals(F("uiok")))
+    {
+        Serial.println(String("[RP2040] Received uiok: controlId=") + controlId);
+        pCurrentFsmState->ProcessAck(controlId, emptyString);
+        return false;
+    }
+
+    if (cmd.equals(F("uifragmentok")))
+    {
+        if (!emptyString.equals(value))
+        {
+            pCurrentFsmState->ProcessAck(uint16_t(-1), value);
+        }
+        return false;
+    }
+
+    if (cmd.equals(F("uiuok")))
+    {
+        return false;
+    }
+
+    Control* control = ESPUI.getControl(controlId);
+    if (nullptr == control)
+    {
+        return false;
+    }
+
+    control->onWsEvent(cmd, value);
+    return true;
+}
+#endif
 
 /*
 Prepare a chunk of elements as a single JSON string. If the allowed number of elements is greater than the total
@@ -263,11 +343,9 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
                                       bool InUpdateMode,
                                       String FragmentRequestString)
 {
-#ifdef ESP32
+#if ESPUI_USING_FREERTOS
     xSemaphoreTake(ESPUI.ControlsSemaphore, portMAX_DELAY);
-#endif // def ESP32
-
-    // Serial.println(String("prepareJSONChunk: Start.          InUpdateMode: ") + String(InUpdateMode));
+#endif
     // Serial.println(String("prepareJSONChunk: Start.            startindex: ") + String(startindex));
     // Serial.println(String("prepareJSONChunk: Start. FragmentRequestString: '") + FragmentRequestString + "'");
     int elementcount = 0;
@@ -452,9 +530,9 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 
     } while (false);
 
-#ifdef ESP32
+#if ESPUI_USING_FREERTOS
     xSemaphoreGive(ESPUI.ControlsSemaphore);
-#endif // def ESP32
+#endif
 
     // Serial.println(String("prepareJSONChunk: END: elementcount: ") + String(elementcount));
     return elementcount;
@@ -506,6 +584,7 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
 
         if(0 == startidx)
         {
+            Serial.println(String("[RP2040] SendControlsToClient: Sending UI_INITIAL_GUI, startidx=0"));
             // Serial.println("ESPUIclient:SendControlsToClient: Tell client we are starting a transfer of controls.");
             document["type"] = (ClientUpdateType_t::RebuildNeeded == TransferMode) ? UI_INITIAL_GUI : UI_EXTEND_GUI;
             CurrentSyncID = NextSyncID;
@@ -526,6 +605,7 @@ bool ESPUIclient::SendControlsToClient(uint16_t startidx, ClientUpdateType_t Tra
             #endif
 
             // Serial.println("ESPUIclient:SendControlsToClient: Send message.");
+            Serial.println("[RP2040] Calling SendJsonDocToWebSocket...");
             if(true == SendJsonDocToWebSocket(document))
             {
                 // Serial.println("ESPUIclient:SendControlsToClient: Sent.");
@@ -582,7 +662,22 @@ bool ESPUIclient::SendJsonDocToWebSocket(JsonDocument& document)
             }
         #endif
         // Serial.println(F("ESPUIclient::SendJsonDocToWebSocket: client.text"));
+    #if defined(ESP32) || defined(ESP8266)
         client->text(json);
+    #else
+        Serial.println("[RP2040] SendJsonDocToWebSocket: checking ESPUI.ws pointer...");
+        if (nullptr == ESPUI.ws)
+        {
+            Serial.println("[RP2040] SendJsonDocToWebSocket: ESPUI.ws is NULL!");
+            Response = false;
+        }
+        else
+        {
+            Serial.println("[RP2040] SendJsonDocToWebSocket: calling ws->sendTXT...");
+            Response = ESPUI.ws->sendTXT(static_cast<uint8_t>(id()), json);
+            Serial.println(String("[RP2040] SendJsonDocToWebSocket: sendTXT returned ") + (Response ? "true" : "false"));
+        }
+    #endif
 
     } while (false);
 

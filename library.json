@@ -1,7 +1,7 @@
 {
   "name": "ESPUI",
-  "keywords": "espressif web interface iot easy ui",
-  "description": "ESP32 and ESP8266 Web Interface Library",
+  "keywords": "espressif web interface iot easy ui rp2040 rp2350 pico",
+  "description": "ESP32, ESP8266, RP2040, and RP2350 Web Interface Library",
   "repository": {
     "type": "git",
     "url": "https://github.com/s00500/ESPUI.git"
@@ -16,17 +16,19 @@
   ],
   "dependencies": [
     {
+      "owner": "ESP32Async",
       "name": "ESPAsyncWebServer",
-      "authors": "ESP32Async",
-      "frameworks": "arduino"
+      "version": "^3.7.9",
+      "platforms": ["espressif8266", "espressif32", "raspberrypi"]
     },
     {
       "name": "ArduinoJson",
       "authors": "Benoit Blanchon",
+      "version": "^7.0.4",
       "frameworks": "arduino"
     }
   ],
-  "version": "2.2.4",
+  "version": "2.3.4",
   "frameworks": "arduino",
-  "platforms": "*"
+  "platforms": ["espressif8266", "espressif32", "raspberrypi"]
 }

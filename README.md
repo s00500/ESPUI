@@ -3,7 +3,8 @@
 ![ESPUI](docs/ui_complete.png)
 
 ESPUI is a simple library to make a web-based user interface for your projects using
-the **ESP8266** or the **ESP32** It uses web sockets and lets you create,
+the **ESP8266**, **ESP32**, or **RP2040/RP2350**. It uses web sockets on ESP8266/ESP32
+and a synchronous web server path on RP2040/RP2350, and lets you create,
 
 ol, and update elements on your GUI through multiple devices like phones
 and tablets.
@@ -15,7 +16,8 @@ So if you either don't know how or just don't want to waste time: this is your
 simple solution user interface without the need of internet connectivity or any
 additional servers.
 
-The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, etc.).
+The library runs on **ESP8266**, **ESP32**, and **RP2040/RP2350** boards. For Pico-class
+boards, see the examples in `pio_examples/pico-gui` and `pio_examples/rp2040Example`.
 
 - [Dependencies](#dependencies)
 - [How to Install](#how-to-install)
@@ -76,15 +78,17 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 
 ## Dependencies
 
-This library is dependent on the following libraries.
+ESPUI has different network dependencies depending on the target platform.
 
-- [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
-- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Last tested with
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (optional, last tested with
   version 6.10.0)
 
+- (_For ESP8266/ESP32_) [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
 - (_For ESP8266_) [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
 - (_For ESP32_) [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
 - (_For ESP32_) [lorol/LittleFS_esp32](https://github.com/lorol/LITTLEFS)
+- (_For RP2040/RP2350_) no extra async TCP library is required; ESPUI uses the
+  synchronous web server path provided by the board core.
 
 ## How to Install
 
@@ -102,6 +106,19 @@ lib_deps =
     LittleFS_esp32 # (ESP32 only)
 ```
 
+For Raspberry Pi Pico / RP2040 / RP2350 projects in PlatformIO, use a Pico environment like this:
+
+```ini
+[env:pico]
+platform = https://github.com/maxgerhardt/platform-raspberrypi.git
+board = pico
+framework = arduino
+board_build.core = earlephilhower
+```
+
+The repository includes ready-to-build PlatformIO examples in `pio_examples/`, including
+`pico-gui` and `rp2040Example` for the RP2040/RP2350 code path.
+
 #### Using the Arduino IDE (_recommended_)
 
 You can find this Library in the Arduino IDE library manager. Go to 
@@ -117,6 +134,10 @@ can be achieved in 2 ways: _PROGMEM_ or _LITTLEFS_
 
 _When `ESPUI.begin()` is called the default is serving files from Memory and
 ESPUI should work out of the box!_
+
+On RP2040/RP2350, ESPUI runs without the async web stack used on ESP8266/ESP32.
+The UI still works, but updates are handled through the synchronous server path and
+can feel less immediate than on the async platforms.
 
 **OPTIONAL:** But if this causes your program to _use too much memory_ you can
 burn the files into the LITTLEFS filesystem on the ESP. There are now two ways to
@@ -452,6 +473,16 @@ to start the UI interface. (Or `ESPUI.beginLITTLEFS("Some Title");` respectively
 Make sure you setup a working network connection or AccessPoint **before** (see
 the `gui.ino` example). The web interface can then be used from multiple devices at once and
 also shows connection status in the top bar.
+
+For RP2040/RP2350 targets, call `ESPUI.handleClient();` from `loop()` so the synchronous
+server can process HTTP requests and UI updates:
+
+```cpp
+void loop()
+{
+  ESPUI.handleClient();
+}
+```
 
 
 

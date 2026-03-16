@@ -3,6 +3,7 @@
 void setup(void)
 {
   Serial.begin(115200);
+  delay(1000);
   ESPUI.setVerbosity(Verbosity::Verbose); //Enable verbose output so you see the files in LittleFS
   delay(500); //Delay to allow Serial Monitor to start after a reset
   Serial.println(F("\nPreparing filesystem with ESPUI resources"));
