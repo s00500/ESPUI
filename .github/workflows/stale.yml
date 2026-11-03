@@ -1,0 +1,39 @@
+name: Close stale issues
+
+# Only acts on issues labelled "needs-info" (waiting for a reply / retest from
+# the reporter). Everything else is left alone.
+#
+# needs-info + 30 days without activity -> labelled "stale" with a comment
+# stale + 14 more days without activity  -> closed
+# Any new comment removes the "stale" label again.
+
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          only-labels: "needs-info"
+          stale-issue-label: "stale"
+          days-before-stale: 30
+          days-before-close: 14
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          stale-issue-message: >
+            This issue is waiting for more information or a retest with the
+            current version of ESPUI. It will be closed in 14 days if there is
+            no further activity. Just leave a comment to keep it open.
+          close-issue-message: >
+            Closing this issue because there was no reply. If the problem still
+            happens with the current version, please comment or open a new
+            issue with the details.
+          close-issue-reason: not_planned
