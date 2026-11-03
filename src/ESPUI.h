@@ -302,7 +302,7 @@ protected:
 #define ClientUpdateType_t ESPUIclient::ClientUpdateType_t
     void NotifyClients(ClientUpdateType_t newState);
 
-    bool SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId);
+    bool SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, int clientId);
 
     std::map<uint32_t, ESPUIclient*> MapOfClients;
 

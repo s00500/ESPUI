@@ -418,7 +418,7 @@ void ESPUIClass::prepareFileSystem(bool format)
 #else
     if (!EspuiLittleFS.begin()) // Test for an already formatted LittleFS by a mount failure
     {
-        if (EspuiLittleFS.format()) // Attempt to format LittleFS
+        if (!EspuiLittleFS.format() || !EspuiLittleFS.begin()) // Attempt to format and mount LittleFS
         {
 #endif // !defined(ESP32)
 
@@ -982,9 +982,23 @@ void ESPUIClass::updateControlLabel(Control* control, const String& value, int c
 void ESPUIClass::updateVisibility(uint16_t id, bool visibility, int clientId)
 {
     Control* control = getControl(id);
-    if (control)
+    if (!control)
     {
-        control->visible = visibility;
+        return;
+    }
+
+    bool wasVisible = control->visible;
+    control->visible = visibility;
+
+    // The browser does not render hidden controls at all, and tabs have no
+    // panel element that an update could show or hide. So showing a control,
+    // or changing a tab's visibility, needs a rebuild (#183, #303).
+    if (visibility != wasVisible && (visibility || ControlType::Tab == control->type))
+    {
+        NotifyClients(ClientUpdateType_t::RebuildNeeded);
+    }
+    else
+    {
         updateControl(control, clientId);
     }
 }
@@ -1083,11 +1097,11 @@ void ESPUIClass::addGraphPoint(uint16_t id, int nValue, int clientId)
     } while (false);
 }
 
-bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, uint16_t clientId)
+bool ESPUIClass::SendJsonDocToWebSocket(ArduinoJson::JsonDocument& document, int clientId)
 {
     bool Response = false;
 
-    if (0 > clientId)
+    if (clientId >= 0)
     {
         if (MapOfClients.end() != MapOfClients.find(clientId))
         {

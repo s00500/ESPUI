@@ -2,6 +2,44 @@
 #include "ESPUIclient.h"
 #include "ESPUIcontrol.h"
 
+// ArduinoJson only escapes \b \f \n \r \t. Any other byte below 0x20 (e.g. from
+// a text value) ends up raw in the message, which is invalid JSON and breaks the
+// UI in the browser (#297). The output is compact, so such bytes can only occur
+// inside strings, where \u00XX is the valid form.
+static void EscapeControlCharacters(String& json)
+{
+    unsigned int length = json.length();
+    unsigned int index  = 0;
+    while (index < length && uint8_t(json[index]) >= 0x20)
+    {
+        index++;
+    }
+    if (index == length)
+    {
+        return; // nothing to do, the usual case
+    }
+
+    static const char hex[] = "0123456789abcdef";
+    String escaped;
+    escaped.reserve(length + 16);
+    escaped.concat(json.c_str(), index);
+    for (; index < length; index++)
+    {
+        uint8_t c = json[index];
+        if (c < 0x20)
+        {
+            escaped += F("\\u00");
+            escaped += hex[c >> 4];
+            escaped += hex[c & 0x0f];
+        }
+        else
+        {
+            escaped += char(c);
+        }
+    }
+    json = escaped;
+}
+
 // JSONSlave:
 // helper to process exact JSON serialization size
 // it takes ~2ms on esp8266 and avoid large String reallocation which is really worth the cost
@@ -571,6 +609,7 @@ bool ESPUIclient::SendJsonDocToWebSocket(JsonDocument& document)
         }
 
         String json = JSONSlave::toString(document);
+        EscapeControlCharacters(json);
 
         #if defined(DEBUG_ESPUI)
             if (ESPUI.verbosity >= Verbosity::VerboseJSON)

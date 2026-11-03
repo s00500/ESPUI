@@ -530,6 +530,7 @@ function start() {
                 break;
 
             case UI_MIN:
+            case UPDATE_MIN:
                 if (data.parentControl) {
                     //Is it applied to a slider?
                     if ($('#sl' + data.parentControl).length) {
@@ -542,6 +543,7 @@ function start() {
                 break;
 
             case UI_MAX:
+            case UPDATE_MAX:
                 if (data.parentControl) {
                     //Is it applied to a slider?
                     if ($('#sl' + data.parentControl).length) {
@@ -557,6 +559,7 @@ function start() {
                 break;
 
             case UI_STEP:
+            case UPDATE_STEP:
                 if (data.parentControl) {
                     //Is it applied to a slider?
                     if ($('#sl' + data.parentControl).length) {
@@ -632,14 +635,14 @@ function start() {
             case UPDATE_NUMBER:
                 $("#num" + data.id).val(data.value);
                 if (data.hasOwnProperty('elementStyle')) {
-                    $("#num" + data.id).attr("style", data.elementStyle);
+                    $("#num" + data.id).attr("style", inputStyle(data));
                 }
                 break;
 
             case UPDATE_TEXT_INPUT:
                 $("#text" + data.id).val(data.value);
                 if (data.hasOwnProperty('elementStyle')) {
-                    $("#text" + data.id).attr("style", data.elementStyle);
+                    $("#text" + data.id).attr("style", inputStyle(data));
                 }
                 if (data.hasOwnProperty('inputType')) {
                     $("#text" + data.id).attr("type", data.inputType);
@@ -649,8 +652,20 @@ function start() {
             case UPDATE_SELECT:
                 $("#select" + data.id).val(data.value);
                 if (data.hasOwnProperty('elementStyle')) {
-                    $("#select" + data.id).attr("style", data.elementStyle);
+                    $("#select" + data.id).attr("style", inputStyle(data));
                 }
+                break;
+
+            case UPDATE_TAB:
+                $("#tablink" + data.id).html(data.value);
+                break;
+
+            case UPDATE_OPTION:
+                $("#option" + data.id).val(data.value);
+                break;
+
+            case UPDATE_SEPARATOR:
+                // Only the label can change, handled below with the other update fields
                 break;
 
             case UPDATE_BUTTON:
@@ -910,7 +925,22 @@ function sliderchange(number) {
 }
 
 function numberchange(number) {
-    var val = $("#num" + number).val();
+    var input = $("#num" + number);
+    var val = input.val();
+
+    // Typed values bypass the min/max of the input field, so clamp them here (#84)
+    var num = parseFloat(val);
+    if (!isNaN(num)) {
+        var min = parseFloat(input.attr("min"));
+        var max = parseFloat(input.attr("max"));
+        if (!isNaN(min) && num < min) num = min;
+        if (!isNaN(max) && num > max) num = max;
+        if (num != parseFloat(val)) {
+            val = String(num);
+            input.val(val);
+        }
+    }
+
     websock.send("nvalue:" + val + ":" + number);
 }
 
@@ -1060,6 +1090,13 @@ var addToHTML = function (data) {
     }
 }
 
+// Input fields sit on coloured cards with white text, so they need an explicit
+// black text colour. Used for the first render and for updates, so that an
+// elementStyle update doesn't drop it (#267, #282).
+var inputStyle = function (data) {
+    return "color:black; " + (data.hasOwnProperty('elementStyle') ? data.elementStyle : "");
+}
+
 var elementHTML = function (data) {
     var id = data.id
     var elementStyle = data.hasOwnProperty('elementStyle') ? " style='" + data.elementStyle + "' " : "";
@@ -1109,14 +1146,17 @@ var elementHTML = function (data) {
                 elementStyle + " class='range-slider__range'><span class='range-slider__value'>" +
                 data.value + "</span></div>";
         case UI_NUMBER:
-            return "<input style='color:black; " + data.elementStyle + "' id='num" + id +
+            return "<input style='" + inputStyle(data) + "' id='num" + id +
                 "' type='number' value='" + data.value + "' onchange='numberchange(" + id + ")' />";
         case UI_TEXT_INPUT:
-            return "<input " + inputType + "style='color:black; " + data.elementStyle + "' id='text" + id +
+            return "<input " + inputType + "style='" + inputStyle(data) + "' id='text" + id +
                 "' value='" + data.value + "' onchange='textchange(" + id + ")' />";
         case UI_SELECT:
-            return "<select style='color:black; " + data.elementStyle + "' id='select" + id +
+            return "<select style='" + inputStyle(data) + "' id='select" + id +
                 "' onchange='selectchange(" + id + ")' />";
+        case UI_SEPARATOR:
+            // Separator inside a control group
+            return "<div id='id" + id + "' class='sectionbreak'><h5>" + data.label + "</h5><hr/></div>";
         case UI_GRAPH:
             return "<figure id='graph" + id + "'><figcaption>" + data.label + "</figcaption></figure>";
         case UI_GAUGE:
