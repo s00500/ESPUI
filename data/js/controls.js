@@ -370,6 +370,10 @@ function start() {
                 if (data.visible) addToHTML(data);
                 break;
 
+            case UI_TIME:
+                // Invisible control, nothing to render. Time requests arrive as UPDATE_TIME.
+                break;
+
                 /*
               These elements must call additional functions after being added to the DOM
             */
