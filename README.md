@@ -517,6 +517,17 @@ ESPUI.updateVisibility(controlId, false);
 Note that you cannot hide individual controls from a [control group](#grouped-controls), you have to hide the entire group.
 
 
+### Changing Labels
+
+The label of a control (the heading of its panel, or the text of a select option) can be changed at runtime with `updateControlLabel()`.
+
+```
+ESPUI.updateControlLabel(controlId, "New label");
+```
+
+ESPUI only stores the pointer, so the string must stay valid for as long as the control uses it (e.g. a string literal or a global/static buffer, not a temporary `String`).
+
+
 ### Inline Styles
 
 You can add custom CSS styles to controls. This allows you to style the UI with custom colors, drop shadows, 

@@ -781,6 +781,14 @@ function start() {
             //An "update" message was just recieved and processed
             var element = $("#id" + data.id);
 
+            if (data.hasOwnProperty('label')) {
+                // Panel and separator headings, and select option texts
+                var labelElement = (data.type == UPDATE_OPTION) ? $("#option" + data.id) : element.children("h5");
+                if (labelElement.length && labelElement.html() !== data.label) {
+                    labelElement.html(data.label);
+                }
+            }
+
             if (data.hasOwnProperty('panelStyle')) {
                 $("#id" + data.id).attr("style", data.panelStyle);
             }
