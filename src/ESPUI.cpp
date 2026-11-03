@@ -41,6 +41,71 @@ void ESPUIClass::setCustomCSS(const char* css)
     customCSS = css;
 }
 
+// Handler for every request that no other route matched.
+//
+// With captivePortal enabled, plain GET requests for a *foreign* host are
+// answered with a small HTML page that refreshes to the UI. These are the OS
+// connectivity probes (captive.apple.com, connectivitycheck.gstatic.com,
+// www.msftconnecttest.com, ...) and URLs typed by the user, sent to us by the
+// sketch's catch-all DNS server. Everything else gets a 404:
+//  - Non-GET requests: Windows fires lots of background POSTs right after
+//    joining the AP, and answering all of them made the device unstable (#269).
+//  - Unknown paths on our own address: those are real "not found" cases, e.g.
+//    a fileDisplay() pointing at a missing file, and must not return the
+//    portal page as the file content (#318).
+//
+// A bare 302 redirect is not enough for iOS/macOS: their captive network
+// assistant only opens the portal when the probe returns HTML content (#271).
+// The link uses the address and port the request arrived on, so it also works
+// in STA mode and with a non-default port.
+//
+// No yield() in here: this runs in the async TCP (SYS) context, where yield()
+// panics on ESP8266 (#313, #331).
+static void handleNotFound(AsyncWebServerRequest* request, bool captivePortal)
+{
+    if (!captivePortal || request->method() != HTTP_GET)
+    {
+        request->send(404);
+        return;
+    }
+
+    AsyncClient* client = request->client();
+    String ownAddress = client->localIP().toString();
+
+    String host = request->host();
+    int portSeparator = host.indexOf(':');
+    if (portSeparator >= 0)
+    {
+        host.remove(portSeparator);
+    }
+    if (host.equalsIgnoreCase(ownAddress))
+    {
+        request->send(404);
+        return;
+    }
+
+    String url = F("http://");
+    url += ownAddress;
+    uint16_t port = client->localPort();
+    if (port != 80)
+    {
+        url += ':';
+        url += port;
+    }
+    url += '/';
+
+    String page;
+    page.reserve(320);
+    page += F("<!DOCTYPE html><html><head><title>Captive Portal</title>"
+              "<meta http-equiv=\"Refresh\" content=\"0; URL='");
+    page += url;
+    page += F("'\" /></head><body><p>If this page does not redirect, <a href='");
+    page += url;
+    page += F("'>click here</a>.</p></body></html>");
+
+    request->send(200, "text/html", page);
+}
+
 static String heapInfo(const __FlashStringHelper* mode)
 {
     String result;
@@ -1149,16 +1214,7 @@ void ESPUIClass::beginLITTLEFS(const char* _title, const char* username, const c
         request->send(200, "text/plain", heapInfo(F("In LITTLEFS mode")));
     });
 
-    server->onNotFound([this](AsyncWebServerRequest* request) {
-        if (captivePortal)
-        {
-            request->redirect("/");
-        }
-        else
-        {
-            request->send(404);
-        }
-    });
+    server->onNotFound([this](AsyncWebServerRequest* request) { handleNotFound(request, captivePortal); });
 
     server->begin();
 
@@ -1305,24 +1361,7 @@ void ESPUIClass::begin(const char* _title, const char* username, const char* pas
         request->send(200, "text/plain", heapInfo(F("In Memorymode")));
     });
 
-    server->onNotFound([this](AsyncWebServerRequest* request) {
-        if (captivePortal)
-        {
-            AsyncResponseStream *response = request->beginResponseStream("text/html");
-            String responseText;
-            responseText.reserve(1024);
-            responseText += F("<!DOCTYPE html><html><head><title>Captive Portal</title></head><body>");
-            responseText += ("<p>If site does not re-direct click here <a href='http://" +  WiFi.softAPIP().toString() + "'>this link</a></p>");
-            responseText += ("</body></html><head><meta http-equiv=\"Refresh\" content=\"0; URL='http://" +  WiFi.softAPIP().toString() + "'\" /></head>");
-            response->write(responseText.c_str(), responseText.length());
-            request->send(response);
-        }
-        else
-        {
-            request->send(404);
-        }
-        yield();
-    });
+    server->onNotFound([this](AsyncWebServerRequest* request) { handleNotFound(request, captivePortal); });
 
     server->on("/js/custom.js", HTTP_GET, [](AsyncWebServerRequest* request) {
         if (ESPUI.basicAuth && !request->authenticate(ESPUI.basicAuthUsername, ESPUI.basicAuthPassword))

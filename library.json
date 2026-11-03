@@ -1,6 +1,6 @@
 {
   "name": "ESPUI",
-  "keywords": "espressif rp2040 rp2350 pico web interface iot easy ui",
+  "keywords": ["espressif", "esp32", "esp8266", "rp2040", "rp2350", "pico", "web", "interface", "iot", "easy", "ui"],
   "description": "ESP32, ESP8266, Raspberry Pi Pico W and Pico 2 W Web Interface Library",
   "repository": {
     "type": "git",
