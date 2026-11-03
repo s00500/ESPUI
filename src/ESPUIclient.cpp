@@ -265,7 +265,9 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 {
 #ifdef ESP32
     xSemaphoreTake(ESPUI.ControlsSemaphore, portMAX_DELAY);
-#endif // def ESP32
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_begin();
+#endif
 
     // Serial.println(String("prepareJSONChunk: Start.          InUpdateMode: ") + String(InUpdateMode));
     // Serial.println(String("prepareJSONChunk: Start.            startindex: ") + String(startindex));
@@ -454,7 +456,9 @@ uint32_t ESPUIclient::prepareJSONChunk(uint16_t startindex,
 
 #ifdef ESP32
     xSemaphoreGive(ESPUI.ControlsSemaphore);
-#endif // def ESP32
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_end();
+#endif
 
     // Serial.println(String("prepareJSONChunk: END: elementcount: ") + String(elementcount));
     return elementcount;

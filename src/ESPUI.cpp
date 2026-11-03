@@ -77,6 +77,11 @@ static String heapInfo(const __FlashStringHelper* mode)
     result += hfrag;
     result += "%\n";
 
+#elif defined(ARDUINO_ARCH_RP2040)
+
+    result += rp2040.getFreeHeap();
+    result += ' ';
+
 #else // !ESP8266
 
     result += ESP.getFreeHeap();
@@ -529,7 +534,9 @@ uint16_t ESPUIClass::addControl(
 {
 #ifdef ESP32
     xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
-#endif // def ESP32
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_begin();
+#endif
 
     if (controls == nullptr)
     {
@@ -551,7 +558,9 @@ uint16_t ESPUIClass::addControl(
 
 #ifdef ESP32
     xSemaphoreGive(ControlsSemaphore);
-#endif // def ESP32
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_end();
+#endif
 
     NotifyClients(ClientUpdateType_t::RebuildNeeded);
 
@@ -592,7 +601,9 @@ void ESPUIClass::RemoveToBeDeletedControls()
 {
 #ifdef ESP32
     xSemaphoreTake(ControlsSemaphore, portMAX_DELAY);
-#endif // def ESP32
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_begin();
+#endif
 
     Control* PreviousControl = nullptr;
     Control* CurrentControl = controls;
@@ -622,7 +633,9 @@ void ESPUIClass::RemoveToBeDeletedControls()
     }
 #ifdef ESP32
     xSemaphoreGive(ControlsSemaphore);
-#endif // def ESP32
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_end();
+#endif
 }
 
 uint16_t ESPUIClass::label(const char* label, ControlColor color, const String& value)
@@ -709,9 +722,14 @@ Control* ESPUIClass::getControl(uint16_t id)
     Control* Response = getControlNoLock(id);
     xSemaphoreGive(ControlsSemaphore);
     return Response;
+#elif defined(ARDUINO_ARCH_RP2040)
+    cyw43_arch_lwip_begin();
+    Control* Response = getControlNoLock(id);
+    cyw43_arch_lwip_end();
+    return Response;
 #else
     return getControlNoLock(id);
-#endif // !def ESP32
+#endif
 }
 
 // WARNING: Anytime you walk the chain of controllers, the protection semaphore

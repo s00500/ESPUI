@@ -5,7 +5,7 @@ const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
 DNSServer dnsServer;
 
-#if defined(ESP32)
+#if defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
 #include <WiFi.h>
 #else
 #include <ESP8266WiFi.h>
@@ -175,7 +175,7 @@ void setup(void)
     memset(HugeText, 0x0, sizeof(HugeText));
     memset(HugeText, 'a', sizeof(HugeText)-1);
 
-#if defined(ESP32)
+#if defined(ESP32) || defined(ARDUINO_ARCH_RP2040)
     WiFi.setHostname(hostname);
 #else
     WiFi.hostname(hostname);
@@ -210,6 +210,10 @@ void setup(void)
             {
                 chipid |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
             }
+#elif defined(ARDUINO_ARCH_RP2040)
+            uint8_t mac[6];
+            WiFi.macAddress(mac);
+            uint32_t chipid = (mac[3] << 16) | (mac[4] << 8) | mac[5];
 #else
             uint32_t chipid = ESP.getChipId();
 #endif

@@ -39,6 +39,13 @@
 #include <AsyncTCP.h>
 #include "WiFi.h"
 
+#elif defined(ARDUINO_ARCH_RP2040)
+#include <RPAsyncTCP.h>
+#include <WiFi.h>
+// lwIP (and with it every websocket event) runs from a background IRQ on arduino-pico,
+// so the control list is guarded with the recursive lwIP lock instead of a semaphore
+#include <pico/cyw43_arch.h>
+
 #else
 
 #include <ArduinoOTA.h>
