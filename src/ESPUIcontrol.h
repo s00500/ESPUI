@@ -55,7 +55,7 @@ class Control
 public:
     ControlType type;
     uint16_t id; // just mirroring the id here for practical reasons
-    const char* label;
+    String label;
     std::function<void(Control*, int)> callback;
     String value;
     ControlColor color;
@@ -74,7 +74,7 @@ public:
     static constexpr uint16_t noParent = 0xffff;
 
     Control(ControlType type, 
-            const char* label, 
+            const String& label,
             std::function<void(Control*, int)> callback,
             const String& value, 
             ControlColor color, 

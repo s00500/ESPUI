@@ -3,7 +3,7 @@
 static uint16_t idCounter = 0;
 static const String ControlError = "*** ESPUI ERROR: Could not transfer control ***";
 
-Control::Control(ControlType type, const char* label, std::function<void(Control*, int)> callback,
+Control::Control(ControlType type, const String& label, std::function<void(Control*, int)> callback,
     const String& value, ControlColor color, bool visible, uint16_t parentControl)
     : type(type),
       label(label),
@@ -65,7 +65,7 @@ bool Control::MarshalControl(JsonObject & _item,
 
     // how much space do we expect to use?
     uint32_t ValueMarshaledLength   = (value.length() - StartingOffset) * JsonMarshalingRatio;
-    uint32_t LabelMarshaledLength   = strlen(label) * JsonMarshalingRatio;
+    uint32_t LabelMarshaledLength   = label.length() * JsonMarshalingRatio;
     uint32_t MinimumMarshaledLength = LabelMarshaledLength + JsonMarshaledOverhead;
     uint32_t MaximumMarshaledLength = ValueMarshaledLength + MinimumMarshaledLength;
     uint32_t SpaceForMarshaledValue = AvailMarshaledLength - MinimumMarshaledLength;

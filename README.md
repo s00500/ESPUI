@@ -525,7 +525,7 @@ The label of a control (the heading of its panel, or the text of a select option
 ESPUI.updateControlLabel(controlId, "New label");
 ```
 
-ESPUI only stores the pointer, so the string must stay valid for as long as the control uses it (e.g. a string literal or a global/static buffer, not a temporary `String`).
+Labels are copied, so any string works, including a temporary `String` or a local `char` buffer. This also applies to the label passed when creating a control.
 
 
 ### Inline Styles
