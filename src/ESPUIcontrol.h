@@ -31,6 +31,7 @@ enum ControlType : uint8_t
     Separator,
     Time,
     FileDisplay,
+    ClearGraph, // message only, sent by clearGraph(); Graph + UpdateOffset is a normal graph update
 
     Fragment = 98,
     Password = 99,

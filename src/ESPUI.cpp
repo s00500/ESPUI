@@ -1066,7 +1066,7 @@ void ESPUIClass::clearGraph(uint16_t id, int clientId)
         AllocateJsonDocument(document, jsonUpdateDocumentSize);
         JsonObject root = document.to<JsonObject>();
 
-        root[F("type")] = (int)ControlType::Graph + UpdateOffset;
+        root[F("type")] = (int)ControlType::ClearGraph;
         root[F("value")] = 0;
         root[F("id")] = control->id;
 

@@ -32,7 +32,7 @@ const UPDATE_TEXT_INPUT = 108;
 
 const UI_GRAPH = 9;
 const ADD_GRAPH_POINT = 10;
-const CLEAR_GRAPH = 109;
+const UPDATE_GRAPH = 109;
 
 const UI_TAB = 11;
 const UPDATE_TAB = 111;
@@ -62,6 +62,10 @@ const UPDATE_TIME = 120;
 
 const UI_FILEDISPLAY = 21;
 const UPDATE_FILEDISPLAY = 121;
+
+// Message only, not a control. Must not be UPDATE_GRAPH: that is a normal update
+// (style, visibility, label) and must not wipe the graph data.
+const CLEAR_GRAPH = 22;
 
 const UI_FRAGMENT = 98;
 
@@ -588,6 +592,9 @@ function start() {
                 graphData[data.id] = [];
                 saveGraphData();
                 renderGraphSvg(graphData[data.id], "graph" + data.id);
+                break;
+            case UPDATE_GRAPH:
+                // Style, visibility and label are handled below with the other update fields
                 break;
 
             case UI_ACCEL:
