@@ -78,13 +78,16 @@ The Library runs on any kind of **ESP8266** and **ESP32** (NodeMCU, AI Thinker, 
 
 This library is dependent on the following libraries.
 
-- [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer)
-- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Last tested with
-  version 6.10.0)
+- [ESPAsyncWebServer](https://github.com/ESP32Async/ESPAsyncWebServer) (ESP32Async version, 3.x)
+- [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (version 6 or 7)
 
-- (_For ESP8266_) [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP)
-- (_For ESP32_) [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
-- (_For ESP32_) [lorol/LittleFS_esp32](https://github.com/lorol/LITTLEFS)
+- (_For ESP8266_) [ESPAsyncTCP](https://github.com/ESP32Async/ESPAsyncTCP) (ESP32Async version)
+- (_For ESP32_) [AsyncTCP](https://github.com/ESP32Async/AsyncTCP) (ESP32Async version)
+- (_For Raspberry Pi Pico W / Pico 2 W_) [RPAsyncTCP](https://github.com/ayushsharma82/RPAsyncTCP)
+
+LittleFS is built into all supported cores, so no separate LittleFS library is needed.
+Older forks of these libraries (me-no-dev, esphome, mathieucarbou) are no longer maintained
+and cause compile errors with current cores, so make sure they are not installed as well.
 
 ## How to Install
 
@@ -96,11 +99,15 @@ Just include this library as a dependency in `lib_deps` like so:
 
 ```
 lib_deps =
-    ESPUI
-    ESP Async WebServer
-    ESPAsyncTCP # (or AsyncTCP on ESP32)
-    LittleFS_esp32 # (ESP32 only)
+    s00500/ESPUI
+    bblanchon/ArduinoJson @ ^7.0.4
+    esp32async/ESPAsyncWebServer @ ^3.11.0
+    esp32async/AsyncTCP @ ^3.4.0       ; ESP32
+    ; esp32async/ESPAsyncTCP @ ^2.0.0  ; ESP8266
+    ; ayushsharma82/RPAsyncTCP @ ^1.3.2 ; Raspberry Pi Pico W / Pico 2 W
 ```
+
+See [pio_examples/gui/platformio.ini](pio_examples/gui/platformio.ini) for a complete configuration for all platforms.
 
 #### Using the Arduino IDE (_recommended_)
 
@@ -153,7 +160,7 @@ more program memory to work with.
 
 ## Documentation
 
-The heart of ESPUI is [ESPAsyncWebserver](https://github.com/me-no-dev/ESPAsyncWebServer). ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for handling events. The communication between the ESP and the client browser works using web sockets. ESPUI does not need network access and can be used in standalone access point mode, all resources are loaded directly from the ESPs memory.
+The heart of ESPUI is [ESPAsyncWebServer](https://github.com/ESP32Async/ESPAsyncWebServer). ESPUI's frontend is based on [Skeleton CSS](http://getskeleton.com/) and jQuery-like lightweight [zepto.js](https://zeptojs.com/) for handling events. The communication between the ESP and the client browser works using web sockets. ESPUI does not need network access and can be used in standalone access point mode, all resources are loaded directly from the ESPs memory.
 <br><br>
 This section will explain in detail how the Library is to be used from the Arduino code side. In the arduino `setup()` routine the interface can be customised by adding UI Elements. This is done by calling the corresponding library methods on the Library object `ESPUI`. Eg: `ESPUI.button("button", &myCallback);` creates a button in the interface that calls the `myCallback(Control *sender, int eventname)` function when changed. All buttons and items call their callback whenever there is a state change from them. This means the button will call the callback when it is pressed and also again when it is released. To separate different events, an integer number with the event name is passed to the callback function that can be handled in a `switch(){}case{}` statement.
 <br><br>
@@ -198,6 +205,29 @@ void YourClassName::myButtonCallback(Control* sender, int eventname)
   }
 }
 ```
+
+#### Updating controls from code
+
+Every function that creates a control returns its ID. Keep it in a variable, and use it later to change the control
+from anywhere in your code (e.g. in `loop()` or another control's callback):
+
+```
+uint16_t tempLabel;
+
+void setup() {
+  tempLabel = ESPUI.label("Temperature", ControlColor::Turquoise, "--");
+  // ...
+}
+
+void loop() {
+  ESPUI.updateLabel(tempLabel, String(readTemperature(), 1) + " °C");
+}
+```
+
+Each control type has its own update function (`updateLabel()`, `updateSlider()`, `updateNumber()`, `updateText()`,
+`updateSwitcher()`, `updateSelect()`, `updateButton()`, ...). `ESPUI.updateControlValue(id, String)` works for every
+control. Updates are sent to all connected browsers right away. It makes no difference whether the control is in a tab
+or which tab the browser currently shows.
 <br>
 <br>
 #### Button
@@ -247,7 +277,7 @@ button actions.
 ![labels](docs/ui_labels.png)
 
 Labels are used to display textual information (i.e. states, values of sensors, 
-configuration parameters etc.). To send data from the code use `ESP.updateLabel()` . 
+configuration parameters etc.). To send data from the code use `ESPUI.updateLabel(labelId, "new value")`.
 Labels get a name on creation and a initial value.
 
 Labels automatically wrap your text. If you want them to have multiple lines use
@@ -270,7 +300,7 @@ This requires that the client has access to the image in question, either from t
 Sliders can be used to select (or display) a numerical value. Sliders provide
 realtime data and are touch compatible. Note that like all ESPUI functions, the callback does not return an `int` 
 but a `String` so should be converted with the `.toInt()` function. See the examples for more details. Sliders can
-be updated from code using `ESP.updateSlider()`.
+be updated from code using `ESPUI.updateSlider(sliderId, value)`.
 
 A slider usually only sends a new value when it is released to save network bandwidth. 
 This behaviour can be changed globally by setting `sliderContinuous` before `begin()`:
@@ -293,13 +323,28 @@ ESP. A number box needs to have a min and a max value. To set it up just use:
 
 `ESPUI.number("Numbertest", &numberCall, ControlColor::Alizarin, 5, 0, 10);`
 
-Number inputs can be updated from code using `ESP.updateNumber()`.
+Number inputs can be updated from code using `ESPUI.updateNumber(numberId, value)`.
 
-Note that HTML number boxes will respect their min and max when the user
-clicks the up and down arrows, but it is possible on most clients to simply type 
-any number in. As with all user input, numbers should be validated in callback code
-because all client side checks can be skipped. If any value from the UI might
-cause a problem, validate it.
+`ESPUI.number()` adds Min and Max child controls for you. With `addControl()` (e.g. to put
+a number into a tab) you add them yourself, and you can also add a Step control. These work
+the same way for sliders:
+
+```
+uint16_t num = ESPUI.addControl(ControlType::Number, "Temperature", "21.5", ControlColor::Alizarin, tab1, &numberCall);
+ESPUI.addControl(ControlType::Min,  "", "10",  ControlColor::None, num);
+ESPUI.addControl(ControlType::Max,  "", "30",  ControlColor::None, num);
+ESPUI.addControl(ControlType::Step, "", "0.5", ControlColor::None, num);
+```
+
+The value can be changed later with `ESPUI.updateControlValue(minId, "5")` (same for Max and Step).
+
+For decimal numbers use a Step like `0.1`, and update the value with
+`ESPUI.updateControlValue(numberId, String(value, 1))`. `updateNumber()` takes an `int`
+and would cut off the decimals. In the callback, read the value with `sender->value.toFloat()`.
+
+The UI keeps typed-in values within min and max, but as with all user input, numbers
+should still be validated in callback code because all client side checks can be skipped.
+If any value from the UI might cause a problem, validate it.
 
 Events:
  - `N_VALUE` - Fired when a number value changes.
@@ -318,7 +363,7 @@ text = ESPUI.text("Label", callback, ControlColor::Dark, "Initial value");
 ESPUI.addControl(ControlType::Max, "", "32", ControlColor::None, text);
 ```
 
-Text inputs can be updated from code using `ESP.updateText()`.
+Text inputs can be updated from code using `ESPUI.updateText(textId, "new text")`.
 
 However even with a set maximum length, user input should still be validated 
 because it is easy to bypass client-side checks. Never trust user input.
@@ -389,7 +434,7 @@ ESPUI.addControl( ControlType::Option, "Option2", "Opt2", ControlColor::Alizarin
 ESPUI.addControl( ControlType::Option, "Option3", "Opt3", ControlColor::Alizarin, select1);
 ```
 
-Check the **tabbedGui** example for a working demo. Selectors can be updated from code using `ESP.updateSelect()`.
+Check the **tabbedGui** example for a working demo. Selectors can be updated from code using `ESPUI.updateSelect(selectId, "Opt2")` (pass the value of the option to select).
 
 Events:
  - `S_VALUE` - Fired when a select value changes.
@@ -473,9 +518,16 @@ added to a tab will be shown above the tab selctor.
 ESPUI.addControl(ControlType::Text, "Text Title", "a Text Field", ControlColor::Alizarin, tab1, &textCall);
 ```
 
-Note that the basic functions to add controls like `ESPUI.button()` or `ESPUI.slider()` do not add to any tab, 
-so they are good for building small UIs. However if you need to use tabs then you will have to add all your
-controls using the full `ESPUI.addControl()` function.
+Note that the shorthand functions (`ESPUI.button()`, `ESPUI.switcher()`, `ESPUI.slider()`, `ESPUI.number()`,
+`ESPUI.text()`, `ESPUI.label()`, `ESPUI.separator()`, ...) have no parent parameter. Controls created with them
+always appear above the tab bar, so they are only suitable for small UIs without tabs. To put a control into a tab
+(or into a [control group](#grouped-controls)), create it with `ESPUI.addControl()` and pass the tab's ID as the
+parent:
+
+```
+uint16_t tab1 = ESPUI.addControl(ControlType::Tab, "Settings 1", "Settings 1");
+ESPUI.addControl(ControlType::Button, "Button in tab 1", "Press", ControlColor::Peterriver, tab1, &buttonCallback);
+```
 
 
 

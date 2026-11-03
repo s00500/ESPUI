@@ -37,7 +37,7 @@
 #warning then check http://<ip>/heap
 #endif // MMU_IRAM_HEAP
 #ifndef DEBUG_ESP_OOM
-#error on ESP8266 and ESPUI, you must define OOM debug option when developping
+#error on ESP8266 and ESPUI, you must define the OOM debug option when developing. Arduino IDE: Tools > Debug level > pick an option that includes OOM. PlatformIO: build_flags = -DDEBUG_ESP_OOM. (Or remove this check.)
 #endif
 #endif
 #endif
